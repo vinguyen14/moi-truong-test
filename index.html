@@ -112,27 +112,6 @@
                 document.getElementById('authModal').classList.remove('hidden');
             }
 
-            // Gán phím tắt ẩn (Ctrl + Shift + A) để Admin cấu hình
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
-                    // 1. Cấu hình API
-                    const currentApi = localStorage.getItem('kv_api_url') || '';
-                    const apiPrompt = prompt("ADMIN MODE - Bước 1/2:\nNhập Web App URL (API Google Apps Script) để hứng dữ liệu ảnh:", currentApi);
-                    
-                    if(apiPrompt !== null) {
-                        localStorage.setItem('kv_api_url', apiPrompt.trim());
-                        
-                        // 2. Cấu hình Tên Khóa
-                        const currentCourse = localStorage.getItem('kv_course_name') || 'KiotViet - K01';
-                        const coursePrompt = prompt("ADMIN MODE - Bước 2/2:\nNhập Tên Khóa Học (Hệ thống sẽ dùng tên này để tạo Folder trên Google Drive):", currentCourse);
-                        
-                        if(coursePrompt !== null) {
-                            localStorage.setItem('kv_course_name', coursePrompt.trim());
-                            alert("✅ ĐÃ CẬP NHẬT THÀNH CÔNG:\n1. API: Đã lưu\n2. Khóa học: " + coursePrompt.trim());
-                        }
-                    }
-                }
-            });
     </script>
 </body>
 </html>

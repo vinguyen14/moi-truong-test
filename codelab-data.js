@@ -4,7 +4,7 @@
 // CẤU HÌNH HỆ THỐNG DÀNH CHO ADMIN (SỬA TẠI ĐÂY)
 const APP_CONFIG = {
     // 1. Dán link Google Apps Script của bạn vào trong cặp ngoặc kép dưới đây
-    API_URL: "https://script.google.com/macros/s/AKfycbxJII62u88IdVGuCdFvw1r59hKYClZiebK2oEeAViYl1_zPGDrjsZplNQYHiijfwQBC/exec", 
+    API_URL: "https://script.google.com/macros/s/AKfycbzPH7Zs3hvSCGhzmOkSUrh29rrfhGWti9O7mru8zOQNUKv18LmFHuCEYktbQq7v4Veo/exec", 
     
     // 2. Tên khóa học (Sẽ dùng để tạo Folder trên Google Drive)
     COURSE_NAME: "26KV15" 

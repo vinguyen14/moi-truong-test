@@ -29,7 +29,32 @@
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden text-gray-800">
-
+<!-- THẺ XÁC NHẬN HOÀN THÀNH (ĐỂ HỌC VIÊN CHỤP ẢNH GỬI ZALO) -->
+    <div id="certificateModal" class="fixed inset-0 bg-gray-900 bg-opacity-90 z-[100] flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-lg w-full mx-4 text-center relative border-4 border-yellow-400">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2 uppercase">Xác Nhận Hoàn Thành</h2>
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <p class="text-gray-600 mb-4 text-lg">Chúc mừng bạn đã hoàn thành xuất sắc bài tập!</p>
+            
+            <div class="bg-gray-50 border border-gray-200 rounded p-4 text-left space-y-2 mb-6">
+                <p><strong>👤 Họ và tên:</strong> <span id="certName" class="text-blue-700"></span></p>
+                <p><strong>🏢 Phòng ban:</strong> <span id="certDept" class="text-blue-700"></span></p>
+                <p><strong>📚 Bài học:</strong> <span id="certSession"></span></p>
+                <p><strong>💯 Tiến độ:</strong> <span class="text-green-600 font-bold">100% (Đã nộp toàn bộ)</span></p>
+                <p><strong>⏰ Thời gian:</strong> <span id="certTime" class="text-red-500 font-bold"></span></p>
+            </div>
+            
+            <p class="text-sm font-bold text-red-600 mb-6 bg-red-50 p-2 rounded">
+                YÊU CẦU: HÃY CHỤP ẢNH MÀN HÌNH NÀY VÀ GỬI VÀO NHÓM ZALO TRƯỚC 16:00
+            </p>
+            
+            <button onclick="window.location.href='index.html'" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition">
+                Trở về Trang chủ
+            </button>
+        </div>
+    </div>
     <!-- HEADER CHUẨN GOOGLE -->
     <header class="bg-white border-b border-gray-200 z-20 flex flex-col shadow-sm">
         <div class="flex items-center justify-between px-6 py-3">
@@ -231,18 +256,15 @@
             }
         }
 
-        // HÀM NỘP BÀI LÊN BACKEND (XỬ LÝ CẢ TEXT VÀ ẢNH)
+        // HÀM NỘP BÀI LÊN BACKEND
         function uploadToGAS(index, exerciseTitle) {
-            saveDraft(); // Đảm bảo lưu text mới nhất trước khi gửi
-
+            saveDraft(); 
             const fileInput = document.getElementById(`inpFiles_${index}`);
             const files = fileInput.files;
             const currentData = stepDataStore[index];
             
-            // Kiểm tra: Phải có Text HOẶC phải có Ảnh mới cho nộp
             if ((!currentData.text || currentData.text.trim() === "") && (!files || files.length === 0)) {
-                alert("Vui lòng điền câu trả lời tự luận HOẶC chọn ảnh minh chứng để nộp bài!");
-                return;
+                alert("Vui lòng điền câu trả lời tự luận HOẶC chọn ảnh minh chứng để nộp bài!"); return;
             }
 
             const apiUrl = APP_CONFIG.API_URL;
@@ -256,7 +278,6 @@
             }
             const profile = JSON.parse(profileRaw);
 
-            // Giao diện loading
             const btnEl = document.getElementById(`btnSubmitStep_${index}`);
             const txtEl = document.getElementById(`btnSubmitText_${index}`);
             const oldText = txtEl.innerText;
@@ -266,7 +287,6 @@
             txtEl.innerText = "Đang đẩy dữ liệu lên hệ thống...";
             btnEl.disabled = true;
 
-            // Chuyển ảnh sang Base64
             let promises = [];
             if(files && files.length > 0) {
                 for(let i = 0; i < files.length; i++) {
@@ -279,42 +299,30 @@
                 }
             }
 
-            // Đợi chuyển ảnh xong rồi gọi Fetch
             Promise.all(promises).then(imagesData => {
                 const payload = {
-                    studentName: profile.name,
-                    department: profile.dept,
-                    courseName: courseName,
-                    session: document.getElementById('sessionTitle').innerText,
-                    exerciseTitle: exerciseTitle,
-                    textAnswer: currentData.text, // Kèm theo đoạn text
-                    images: imagesData
+                    studentName: profile.name, department: profile.dept,
+                    courseName: courseName, session: document.getElementById('sessionTitle').innerText,
+                    exerciseTitle: exerciseTitle, textAnswer: currentData.text, images: imagesData
                 };
-
-                return fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
+                return fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
             })
             .then(r => r.json())
             .then(data => {
                 if(data.status === 'success') {
-                    // Cập nhật LocalStorage với các Link ảnh mới tải lên
+                    // ĐÁNH DẤU LÀ BÀI NÀY ĐÃ ĐƯỢC NỘP
+                    currentData.isSubmitted = true;
                     if(data.urls && data.urls.length > 0) {
                         currentData.uploadedUrls = [...currentData.uploadedUrls, ...data.urls];
-                        localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
                     }
+                    localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
+                    
                     alert("🎉 Đã nộp bài thành công!");
-                    goToStep(index); // Render lại giao diện để hiện khung xanh lịch sử
-                    renderSidebar(); // Render lại sidebar để hiện dấu Tích ✓
-                } else {
-                    alert("Lỗi server: " + data.message);
-                }
+                    goToStep(index); 
+                    renderSidebar(); 
+                } else alert("Lỗi server: " + data.message);
             })
-            .catch(err => {
-                alert("Lỗi mạng: Không thể kết nối tới Google Server. Xin thử lại.");
-            })
+            .catch(err => alert("Lỗi mạng: Xin thử lại."))
             .finally(() => {
                 btnEl.classList.replace('bg-gray-400', 'bg-[#1a73e8]');
                 btnEl.classList.remove('cursor-not-allowed', 'animate-pulse');
@@ -323,30 +331,61 @@
             });
         }
 
+        // TÍNH TIẾN ĐỘ THỰC CHẤT
         function updateBottomNav() {
             const btnNext = document.getElementById('btnNext');
             document.getElementById('btnPrev').disabled = (currentStepIndex === 0);
             
-            if(currentStepIndex === currentExercises.length - 1) {
+            const total = currentExercises.length;
+            let completedCount = 0;
+            for(let i=0; i<total; i++) {
+                if(stepDataStore[i] && stepDataStore[i].isSubmitted) completedCount++;
+            }
+            const percent = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
+            if(currentStepIndex === total - 1) {
                 btnNext.innerHTML = 'Kết thúc buổi học';
                 btnNext.classList.replace('bg-[#1a73e8]', 'bg-green-600');
             } else {
                 btnNext.innerHTML = 'Tiếp <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
                 btnNext.classList.replace('bg-green-600', 'bg-[#1a73e8]');
             }
-            const percent = Math.round(((currentStepIndex + 1) / currentExercises.length) * 100);
+            
             document.getElementById('progressBar').style.width = percent + '%';
             document.getElementById('timeRemaining').innerText = `Tiến độ: ${percent}%`;
         }
 
         function nextStep() {
             saveDraft();
-            if(currentStepIndex < currentExercises.length - 1) goToStep(currentStepIndex + 1);
-            else window.location.href = 'index.html'; 
-        }
-        function prevStep() { 
-            saveDraft();
-            if(currentStepIndex > 0) goToStep(currentStepIndex - 1); 
+            
+            // Lấy % hiện tại
+            const total = currentExercises.length;
+            let completedCount = 0;
+            for(let i=0; i<total; i++) {
+                if(stepDataStore[i] && stepDataStore[i].isSubmitted) completedCount++;
+            }
+            const percent = total === 0 ? 0 : Math.round((completedCount / total) * 100);
+
+            if(currentStepIndex < total - 1) {
+                goToStep(currentStepIndex + 1);
+            } else {
+                // NẾU LÀ BÀI CUỐI CÙNG MÀ CHƯA ĐẠT 100% -> CHẶN LẠI
+                if(percent < 100) {
+                    alert(`Bạn mới hoàn thành ${percent}%.\nVui lòng kiểm tra lại các bài chưa có dấu (✓) bên cột trái và ấn nút "Nộp bài" trước khi Kết thúc.`);
+                } else {
+                    // HIỂN THỊ THẺ XÁC NHẬN
+                    const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
+                    document.getElementById('certName').innerText = profile.name;
+                    document.getElementById('certDept').innerText = profile.dept;
+                    document.getElementById('certSession').innerText = document.getElementById('sessionTitle').innerText;
+                    
+                    const now = new Date();
+                    const timeString = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + " ngày " + now.getDate() + "/" + (now.getMonth()+1) + "/" + now.getFullYear();
+                    document.getElementById('certTime').innerText = timeString;
+                    
+                    document.getElementById('certificateModal').classList.remove('hidden');
+                }
+            }
         }
     </script>
 </body>

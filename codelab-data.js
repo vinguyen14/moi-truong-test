@@ -1,6 +1,15 @@
 // File: codelab-data.js
 // Mục đích: Lưu trữ toàn bộ dữ liệu Bài tập KiotViet chuẩn hóa dạng Mảng Objects.
 
+// CẤU HÌNH HỆ THỐNG DÀNH CHO ADMIN (SỬA TẠI ĐÂY)
+const APP_CONFIG = {
+    // 1. Dán link Google Apps Script của bạn vào trong cặp ngoặc kép dưới đây
+    API_URL: "https://script.google.com/macros/s/AKfycbxJII62u88IdVGuCdFvw1r59hKYClZiebK2oEeAViYl1_zPGDrjsZplNQYHiijfwQBC/exec", 
+    
+    // 2. Tên khóa học (Sẽ dùng để tạo Folder trên Google Drive)
+    COURSE_NAME: "26KV15" 
+};
+
 const CODELAB_DATA = [
   {
     id: "session_1",

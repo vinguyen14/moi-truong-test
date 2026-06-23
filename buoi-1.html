@@ -29,6 +29,22 @@
         
         /* CSS cho tiêu đề nhóm (dành riêng cho Buổi 3) */
         .group-header { padding: 16px 16px 8px; font-weight: bold; color: #5f6368; margin-top: 16px; border-bottom: 1px solid #e0e0e0; margin-right: 16px;}
+        /* --- THÊM ĐOẠN CSS NÀY VÀO TRONG THẺ <STYLE> --- */
+        @media print {
+            /* Ẩn tất cả mọi thứ trên web */
+            body * { visibility: hidden; }
+            
+            /* Chỉ hiện khu vực nội dung PDF */
+            #pdf-content, #pdf-content * { visibility: visible; }
+            #pdf-content { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; }
+            
+            /* Ẩn các thứ không cần thiết khi in */
+            #certificateModal, header, footer, aside, .fixed { display: none !important; }
+            
+            /* Định dạng lại khung để in đẹp hơn */
+            .print-page-break { page-break-inside: avoid; margin-bottom: 30px; }
+            img { max-width: 100% !important; height: auto !important; max-height: 500px; object-fit: contain; }
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -472,21 +488,15 @@
         }
 
         // ==========================================
-        // TÍNH NĂNG XUẤT FILE PDF
+        // TÍNH NĂNG XUẤT FILE PDF (BẢN CHUẨN NATIVE)
         // ==========================================
-        async function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const pdfLoading = document.getElementById('pdfLoading');
+        function generatePDF() {
             const pdfContent = document.getElementById('pdf-content');
-            
-            // Hiện màn hình loading
-            pdfLoading.classList.remove('hidden');
-
             const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
             const sessionName = document.getElementById('sessionTitle').innerText;
 
-            // Xây dựng khung HTML để chụp ảnh
-            let reportHtml = `<div style="font-family: Arial, sans-serif; color: #333;">`;
+            // Xây dựng khung HTML 
+            let reportHtml = `<div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 0 auto;">`;
             reportHtml += `<h1 style="font-size: 24px; font-weight: bold; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; margin-bottom: 20px;">Báo cáo bài tập - ${sessionName}</h1>`;
             reportHtml += `<div style="background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 30px;">
                             <p style="margin: 0 0 8px 0; font-size: 16px;"><strong>Học viên:</strong> ${profile.name} - ${profile.dept}</p>
@@ -499,29 +509,30 @@
                 const ex = currentExercises[i];
                 const data = stepDataStore[i] || {};
                 
-                reportHtml += `<div style="margin-bottom: 40px; page-break-inside: avoid;">`;
+                reportHtml += `<div class="print-page-break">`;
                 reportHtml += `<h2 style="font-size: 18px; font-weight: bold; color: #1a73e8; margin-bottom: 10px;">${ex.title}</h2>`;
                 
-                // Hiển thị phần trả lời lý thuyết (nếu có)
                 if(data.text && data.text.trim() !== '') {
                     reportHtml += `<p style="font-weight: bold; margin-bottom: 5px;">Câu trả lời tự luận:</p>`;
                     reportHtml += `<div style="background: #e8f0fe; border-left: 4px solid #1a73e8; padding: 12px; margin-bottom: 15px; white-space: pre-wrap; font-size: 14px;">${data.text}</div>`;
                 }
                 
-                // Hiển thị ảnh (Bí quyết: đổi URL đuôi của Google Drive để lấy ảnh to rõ nét)
                 if(data.uploadedUrls && data.uploadedUrls.length > 0) {
                     reportHtml += `<p style="font-weight: bold; margin-bottom: 5px;">Ảnh minh chứng đã nộp:</p>`;
-                    reportHtml += `<div style="display: flex; flex-direction: column; gap: 10px;">`;
+                    reportHtml += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
                     data.uploadedUrls.forEach(url => {
-                        // Thử lấy direct link của ảnh từ link view (Tùy thuộc vào quyền chia sẻ)
-                        const directUrl = url.replace('file/d/', 'uc?id=').replace('/view?usp=drivesdk', '');
-                        reportHtml += `<img src="${directUrl}" style="max-width: 100%; border: 1px solid #ccc; border-radius: 4px;" crossorigin="anonymous">`;
+                        // Tách ID file từ link Google Drive để tạo link tải ảnh trực tiếp (Vượt rào lỗi hiển thị)
+                        let directUrl = url;
+                        let fileIdMatch = url.match(/\/d\/(.+?)\//);
+                        if(fileIdMatch && fileIdMatch[1]) {
+                            directUrl = `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+                        }
+                        reportHtml += `<div style="text-align: center;"><img src="${directUrl}" style="border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"></div>`;
                     });
                     reportHtml += `</div>`;
                 } else if(!data.text) {
                     reportHtml += `<p style="color: #d93025; font-style: italic;">Chưa nộp bài</p>`;
                 }
-                
                 reportHtml += `</div>`;
             }
             reportHtml += `</div>`;
@@ -529,46 +540,15 @@
             // Gắn vào vùng ẩn
             pdfContent.innerHTML = reportHtml;
             
-            // Đợi 2 giây cho ảnh load lên hết vào vùng ẩn (rất quan trọng)
-            setTimeout(async () => {
-                try {
-                    // Dùng html2canvas chụp cái div ẩn đó
-                    const canvas = await html2canvas(pdfContent, { 
-                        scale: 1.5, 
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: "#ffffff"
-                    });
-                    
-                    const imgData = canvas.toDataURL('image/jpeg', 0.8); // Nén ảnh nhẹ đi xíu để file PDF ko quá nặng
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    const pdfWidth = pdf.internal.pageSize.getWidth();
-                    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                    
-                    // Nếu ảnh chụp ra dài hơn 1 trang A4, jsPDF tự động cắt sang trang
-                    let position = 0;
-                    let heightLeft = pdfHeight;
-                    const pageHeight = pdf.internal.pageSize.getHeight();
-
-                    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-                    heightLeft -= pageHeight;
-
-                    while (heightLeft >= 0) {
-                        position = heightLeft - pdfHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-                        heightLeft -= pageHeight;
-                    }
-                    
-                    // Ép trình duyệt tải file xuống
-                    pdf.save(`[KiotViet] ${profile.name} - ${sessionName}.pdf`);
-                } catch (error) {
-                    console.error("Lỗi tạo PDF: ", error);
-                    alert("Không thể tải toàn bộ ảnh vào PDF. Có thể do ảnh quá nặng, vui lòng nộp lại dạng file nén.");
-                } finally {
-                    pdfLoading.classList.add('hidden'); // Tắt màn hình loading
-                }
-            }, 2000);
+            // Tạm thời ẩn bảng Xác nhận đi để gọi lệnh In
+            document.getElementById('certificateModal').classList.add('hidden');
+            
+            // Đợi nửa giây cho HTML render xong rồi gọi lệnh In của Chrome
+            setTimeout(() => {
+                window.print();
+                // In xong (hoặc bấm Hủy) thì mở lại bảng Xác nhận
+                document.getElementById('certificateModal').classList.remove('hidden');
+            }, 500);
         }
     </script>
 </body>

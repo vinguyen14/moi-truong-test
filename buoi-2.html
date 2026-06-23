@@ -4,73 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buổi 1 - Thực hành KiotViet</title>
+    <!-- Thêm Font Roboto chuẩn Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .step-active { background-color: #e0f2fe; border-left-color: #3b82f6; font-weight: 600; color: #1e3a8a;}
-        .step-inactive { border-left-color: transparent; color: #475569; }
-        .step-inactive:hover { background-color: #f8fafc; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 10px; }
+        
+        /* Cấu trúc step Circle Sidebar */
+        .step-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; cursor: pointer; border-radius: 0 24px 24px 0; margin-right: 16px; border: 1px solid transparent; border-left: none;}
+        
+        /* Trạng thái chưa chọn */
+        .step-inactive { color: #5f6368; border-color: #dadce0; background: white;}
+        .step-inactive:hover { background: #f1f3f4; }
+        .step-inactive .step-circle { background: #7f8c8d; color: white; }
+        
+        /* Trạng thái đang chọn (Active) */
+        .step-active { background-color: #e8f0fe; color: #1a73e8; font-weight: 500; border-color: #d2e3fc;}
+        .step-active .step-circle { background: #1a73e8; color: white; font-weight: bold; }
+
+        .step-circle { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px;}
     </style>
 </head>
-<body class="bg-white flex flex-col h-screen overflow-hidden text-gray-800 font-sans">
+<body class="flex flex-col h-screen overflow-hidden text-gray-800">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm z-20 relative flex flex-col">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+    <!-- HEADER CHUẨN GOOGLE -->
+    <header class="bg-white border-b border-gray-200 z-20 flex flex-col shadow-sm">
+        <div class="flex items-center justify-between px-6 py-3">
             <div class="flex items-center gap-4">
-                <a href="index.html" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    <span class="font-medium hidden sm:inline">Về trang chủ</span>
+                <a href="index.html" class="flex items-center gap-2 text-gray-600 hover:text-blue-600 font-medium transition text-sm border border-gray-300 px-4 py-1.5 rounded-md hover:bg-gray-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Quay lại
                 </a>
-                <div class="font-bold text-xl text-blue-600 border-l pl-4 border-gray-300" id="sessionTitle">Buổi 1: Đang tải...</div>
+                <div class="font-normal text-lg text-gray-700 pl-4 border-l border-gray-300" id="sessionTitle">Đang tải...</div>
             </div>
-            <div class="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-md" id="timeRemaining">Hoàn thành: 0%</div>
+            <div class="flex items-center gap-3 text-sm font-medium text-gray-600 bg-gray-100 px-4 py-1.5 rounded border border-gray-200">
+                <span id="courseLabel" class="text-blue-600 border-r border-gray-300 pr-3">Khóa: --</span>
+                <span id="timeRemaining">Tiến độ: 0%</span>
+            </div>
         </div>
-        <div class="w-full bg-gray-200 h-1"><div id="progressBar" class="bg-blue-600 h-1 transition-all duration-300" style="width: 0%"></div></div>
+        <!-- Progress Bar Mỏng -->
+        <div class="w-full bg-gray-200 h-1"><div id="progressBar" class="bg-[#1a73e8] h-1 transition-all duration-300" style="width: 0%"></div></div>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-        <aside class="w-80 border-r border-gray-200 bg-gray-50 overflow-y-auto custom-scrollbar flex-shrink-0 hidden md:block">
-            <div class="p-4 font-bold text-gray-500 uppercase text-xs tracking-wider">Danh sách bài tập Buổi 1</div>
-            <ul id="stepList" class="flex flex-col text-sm"></ul>
+        
+        <!-- SIDEBAR -->
+        <aside class="w-80 overflow-y-auto custom-scrollbar flex-shrink-0 hidden md:block pt-6">
+            <ul id="stepList" class="flex flex-col gap-2"></ul>
         </aside>
 
-        <main class="flex-1 overflow-y-auto custom-scrollbar bg-white relative">
-            <div id="mainContent" class="max-w-4xl mx-auto p-8 pb-32"></div>
+        <!-- MAIN CONTENT (Khung trắng nổi) -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar relative p-6">
+            <div id="mainContent" class="max-w-4xl mx-auto bg-white border border-gray-200 rounded-lg shadow-sm p-10 mb-24">
+                <!-- Data Rendered Here -->
+            </div>
             
-            <div class="fixed bottom-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-between items-center shadow-lg transition-all md:w-[calc(100%-20rem)] w-full">
-                <button id="btnPrev" onclick="prevStep()" class="flex items-center gap-2 px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <!-- BOTTOM BAR -->
+            <div class="fixed bottom-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-between items-center md:w-[calc(100%-20rem)] w-full">
+                <button id="btnPrev" onclick="prevStep()" class="flex items-center gap-2 px-5 py-2 text-gray-600 font-medium hover:text-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Trở lại
                 </button>
-                <button id="btnNext" onclick="nextStep()" class="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md font-medium transition shadow-md">
-                    Tiếp tục <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                <button id="btnNext" onclick="nextStep()" class="flex items-center gap-2 px-6 py-2.5 text-white bg-[#1a73e8] hover:bg-blue-700 rounded transition shadow">
+                    Tiếp <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </button>
             </div>
         </main>
     </div>
 
-    <!-- Nhúng File Data -->
     <script src="codelab-data.js"></script>
     <script>
-        // CẤU HÌNH CHO FILE NÀY
+        // --- CHÚ Ý: SỬA ĐOẠN NÀY NẾU LÀ BUỔI 2, BUỔI 3 ---
         const SESSION_ID = 'session_2'; 
         const STORAGE_KEY = 'kv_codelab_progress_b2';
-        
+        // -------------------------------------------------
+
         let currentStepIndex = 0;
         let currentExercises = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedState = localStorage.getItem(STORAGE_KEY);
             if(savedState) currentStepIndex = parseInt(savedState) || 0;
+            
+            // Hiển thị tên khóa học cho học viên biết
+            const cName = localStorage.getItem('kv_course_name') || 'Chưa định danh';
+            document.getElementById('courseLabel').innerText = "Khóa: " + cName;
+
             loadSessionData();
         });
 
         function loadSessionData() {
             const session = CODELAB_DATA.find(s => s.id === SESSION_ID);
-            if(!session) return alert("Không tìm thấy dữ liệu Buổi 1. Vui lòng kiểm tra file codelab-data.js");
+            if(!session) return;
             document.getElementById('sessionTitle').innerText = session.title;
             currentExercises = session.exercises;
             renderSidebar();
@@ -82,10 +109,16 @@
             listUl.innerHTML = '';
             currentExercises.forEach((ex, index) => {
                 const li = document.createElement('li');
-                li.className = `px-4 py-3 border-l-4 cursor-pointer transition ${index === currentStepIndex ? 'step-active' : 'step-inactive'}`;
+                // Format giống hệt ảnh Codelab
+                li.className = `step-item shadow-sm ${index === currentStepIndex ? 'step-active' : 'step-inactive'}`;
                 li.onclick = () => goToStep(index);
-                const shortTitle = ex.title.replace('BÀI TẬP ', 'Bài ').replace(':', ' -');
-                li.innerHTML = `<span class="mr-2 opacity-60">${index + 1}.</span> ${shortTitle}`;
+                
+                const shortTitle = ex.title.replace('BÀI TẬP ', '').replace('CĐ 1 - ', '').replace('CĐ 2 - ', '');
+                
+                li.innerHTML = `
+                    <div class="step-circle">${index + 1}</div>
+                    <div class="leading-snug text-[14px]">${shortTitle}</div>
+                `;
                 listUl.appendChild(li);
             });
         }
@@ -97,36 +130,50 @@
 
             document.querySelectorAll('#stepList li').forEach((li, i) => {
                 if(i === index) {
-                    li.classList.replace('step-inactive', 'step-active');
-                    li.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                } else li.classList.replace('step-active', 'step-inactive');
+                    li.className = `step-item shadow-sm step-active`;
+                    li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else li.className = `step-item shadow-sm step-inactive`;
             });
 
             const contentDiv = document.getElementById('mainContent');
-            let html = `<h1 class="text-3xl font-bold text-gray-900 mb-6 pb-4 border-b">${ex.title}</h1>`;
+            let html = `<h1 class="text-3xl text-gray-800 mb-8 pb-4 border-b border-gray-200" style="font-weight: 400;">${ex.title}</h1>`;
 
             if(ex.theory && ex.theory.length > 0) {
-                html += `<div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-md mb-8">
-                    <h3 class="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">Phần A: Câu hỏi lý thuyết</h3>
-                    <ul class="space-y-2 text-blue-900">${ex.theory.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+                html += `<div class="mb-8">
+                    <p class="mb-3 text-gray-800 font-medium">Hãy trả lời các câu hỏi sau:</p>
+                    <div class="bg-[#f1f3f4] p-4 rounded text-gray-800 font-mono text-[14px] space-y-2 border border-gray-200">
+                        ${ex.theory.map(t => `<p> ${t}</p>`).join('')}
+                    </div></div>`;
             }
+
             if(ex.requirements && ex.requirements.length > 0) {
-                html += `<div class="mb-8"><h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-orange-200 inline-block pb-1">🎯 Yêu cầu</h3>
-                    <ul class="space-y-3">${ex.requirements.map(r => `<li class="flex items-start gap-3 bg-orange-50 p-3 rounded border border-orange-100"><span class="text-gray-700">${r}</span></li>`).join('')}</ul></div>`;
+                html += `<div class="mb-8">
+                    <p class="mb-3 text-gray-800 font-medium">Yêu cầu:</p>
+                    <ul class="space-y-2 text-[15px] text-gray-700 pl-4 border-l-4 border-[#1a73e8]">
+                        ${ex.requirements.map(r => `<li>${r}</li>`).join('')}
+                    </ul></div>`;
             }
+
             if(ex.instructions && ex.instructions.length > 0) {
-                html += `<div class="mb-10"><h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 inline-block pb-1">🛠️ Hướng dẫn thao tác</h3>
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 space-y-4 font-mono text-sm">${ex.instructions.map(i => `<p>${i}</p>`).join('')}</div></div>`;
+                html += `<div class="mb-10">
+                    <p class="mb-3 text-gray-800 font-medium">Hướng dẫn thao tác:</p>
+                    <div class="bg-[#f1f3f4] p-5 rounded font-mono text-[14px] text-gray-800 border border-gray-200 leading-relaxed space-y-3">
+                        ${ex.instructions.map(i => `<p>${i}</p>`).join('')}
+                    </div></div>`;
             }
+
             if(ex.confirm) {
-                html += `<div class="bg-green-50 border-2 border-dashed border-green-400 p-6 rounded-lg text-center">
-                    <h3 class="text-lg font-bold text-green-800 mb-2">📸 Nộp bài tập</h3>
-                    <p class="text-green-700 mb-4">${ex.confirm}</p>
-                    <label id="uploadLabel_${index}" class="cursor-pointer bg-white border border-green-400 text-green-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-green-100 transition inline-flex items-center gap-2 shadow-sm">
+                html += `<div class="mt-10 border-t border-gray-200 pt-6">
+                    <p class="text-gray-800 font-medium mb-2">Xác nhận hoàn thành:</p>
+                    <p class="text-gray-600 text-[14px] mb-4">${ex.confirm}</p>
+                    
+                    <label id="uploadLabel_${index}" class="cursor-pointer bg-[#1a73e8] text-white px-5 py-2.5 rounded hover:bg-blue-700 transition inline-flex items-center gap-2 shadow-sm font-medium">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        <span id="uploadText_${index}">Tải ảnh lên (Chấm bài)</span>
-                        <input type="file" class="hidden" accept="image/*" onchange="uploadToGAS(event, ${index}, '${ex.title}')">
+                        <span id="uploadText_${index}">Chọn một hoặc nhiều ảnh nộp bài</span>
+                        <!-- MULTIPLE: Cho phép up nhiều ảnh cùng lúc -->
+                        <input type="file" multiple class="hidden" accept="image/*" onchange="uploadToGAS(event, ${index}, '${ex.title}')">
                     </label>
+                    <div id="previewArea_${index}" class="mt-4 flex flex-wrap gap-2 text-sm text-gray-500"></div>
                 </div>`;
             }
 
@@ -136,100 +183,112 @@
             localStorage.setItem(STORAGE_KEY, currentStepIndex);
         }
 
+        // HÀM XỬ LÝ NHIỀU ẢNH
+        function uploadToGAS(event, index, exerciseTitle) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const apiUrl = localStorage.getItem('kv_api_url');
+            const courseName = localStorage.getItem('kv_course_name') || 'Chưa đặt tên Khóa';
+            
+            if (!apiUrl) {
+                alert("Lỗi: Giảng viên chưa cấu hình API (Ctrl+Shift+A)."); return;
+            }
+
+            const profileRaw = localStorage.getItem('kv_trainer_profile');
+            if (!profileRaw) {
+                alert("Lỗi: Bạn chưa định danh Họ tên. Hãy quay lại Trang chủ!"); return;
+            }
+            const profile = JSON.parse(profileRaw);
+
+            // Giao diện Đang tải
+            const labelEl = document.getElementById(`uploadLabel_${index}`);
+            const textEl = document.getElementById(`uploadText_${index}`);
+            const previewEl = document.getElementById(`previewArea_${index}`);
+            const originalHTML = textEl.innerHTML;
+            
+            labelEl.classList.replace('bg-[#1a73e8]', 'bg-gray-400');
+            labelEl.classList.add('cursor-not-allowed');
+            textEl.innerHTML = `Đang xử lý ${files.length} ảnh...`;
+            previewEl.innerHTML = `<span class="animate-pulse text-blue-600">Đang đẩy dữ liệu lên hệ thống, vui lòng chờ...</span>`;
+
+            // Đọc tất cả ảnh sang Base64 bằng Promise.all
+            let promises = [];
+            for(let i = 0; i < files.length; i++) {
+                promises.push(new Promise((resolve, reject) => {
+                    let reader = new FileReader();
+                    reader.onload = e => {
+                        resolve({
+                            mimeType: files[i].type,
+                            base64Data: e.target.result.split(',')[1] // Cắt phần dataURL
+                        });
+                    };
+                    reader.onerror = e => reject(e);
+                    reader.readAsDataURL(files[i]);
+                }));
+            }
+
+            Promise.all(promises).then(imagesData => {
+                const payload = {
+                    studentName: profile.name,
+                    department: profile.dept,
+                    courseName: courseName,
+                    session: document.getElementById('sessionTitle').innerText,
+                    exerciseTitle: exerciseTitle,
+                    images: imagesData // Gửi mảng ảnh
+                };
+
+                return fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+            })
+            .then(r => r.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    labelEl.classList.replace('bg-gray-400', 'bg-green-600');
+                    textEl.innerHTML = `✅ Đã nộp ${files.length} ảnh thành công!`;
+                    previewEl.innerHTML = `<span class="text-green-600 font-medium">Hệ thống đã ghi nhận ảnh của bạn.</span>`;
+                } else {
+                    alert("Lỗi server: " + data.message);
+                    labelEl.classList.replace('bg-gray-400', 'bg-[#1a73e8]');
+                    textEl.innerHTML = originalHTML;
+                    previewEl.innerHTML = "";
+                }
+            })
+            .catch(err => {
+                alert("Lỗi mạng: Xin thử lại!");
+                labelEl.classList.replace('bg-gray-400', 'bg-[#1a73e8]');
+                textEl.innerHTML = originalHTML;
+                previewEl.innerHTML = "";
+            })
+            .finally(() => {
+                labelEl.classList.remove('cursor-not-allowed');
+            });
+        }
+
         function updateBottomNav() {
             const btnNext = document.getElementById('btnNext');
             document.getElementById('btnPrev').disabled = (currentStepIndex === 0);
             
             if(currentStepIndex === currentExercises.length - 1) {
-                btnNext.innerHTML = 'Hoàn thành Buổi 1';
-                btnNext.classList.replace('bg-blue-600', 'bg-green-600');
-                btnNext.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+                btnNext.innerHTML = 'Kết thúc buổi học';
+                btnNext.classList.replace('bg-[#1a73e8]', 'bg-green-600');
             } else {
-                btnNext.innerHTML = 'Tiếp tục <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
-                btnNext.classList.replace('bg-green-600', 'bg-blue-600');
-                btnNext.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+                btnNext.innerHTML = 'Tiếp <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+                btnNext.classList.replace('bg-green-600', 'bg-[#1a73e8]');
             }
             const percent = Math.round(((currentStepIndex + 1) / currentExercises.length) * 100);
             document.getElementById('progressBar').style.width = percent + '%';
-            document.getElementById('timeRemaining').innerText = `Hoàn thành: ${percent}%`;
+            document.getElementById('timeRemaining').innerText = `Tiến độ: ${percent}%`;
         }
 
         function nextStep() {
             if(currentStepIndex < currentExercises.length - 1) goToStep(currentStepIndex + 1);
-            else window.location.href = 'index.html'; // Trở về index khi xong
+            else window.location.href = 'index.html'; 
         }
         function prevStep() { if(currentStepIndex > 0) goToStep(currentStepIndex - 1); }
-
-        function uploadToGAS(event, index, exerciseTitle) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const apiUrl = localStorage.getItem('kv_api_url');
-            if (!apiUrl) {
-                alert("Hệ thống chưa được kết nối Database (Thiếu API URL). Vui lòng báo Giảng viên nhấn Ctrl+Shift+A ở trang chủ để cấu hình.");
-                return;
-            }
-
-            const profileRaw = localStorage.getItem('kv_trainer_profile');
-            if (!profileRaw) {
-                alert("Bạn chưa đăng nhập thông tin. Vui lòng quay lại trang chủ.");
-                window.location.href = 'index.html';
-                return;
-            }
-            const profile = JSON.parse(profileRaw);
-
-            // Đổi UI sang Loading
-            const labelEl = document.getElementById(`uploadLabel_${index}`);
-            const textEl = document.getElementById(`uploadText_${index}`);
-            const originalHTML = textEl.innerHTML;
-            
-            labelEl.classList.replace('bg-white', 'bg-gray-100');
-            labelEl.classList.add('cursor-not-allowed', 'opacity-75');
-            textEl.innerHTML = "Đang tải lên hệ thống...";
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // Lấy Base64 bằng cách cắt chuỗi DataURL
-                const dataURL = e.target.result;
-                const base64Data = dataURL.split(',')[1]; 
-
-                const payload = {
-                    studentName: profile.name,
-                    department: profile.dept,
-                    session: document.getElementById('sessionTitle').innerText,
-                    exerciseTitle: exerciseTitle,
-                    mimeType: file.type,
-                    fileName: `${profile.name}_${exerciseTitle}.png`,
-                    imageBase64: base64Data
-                };
-
-                // Gọi fetch POST chuẩn
-                fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if(data.status === 'success') {
-                        labelEl.classList.replace('border-green-400', 'border-blue-500');
-                        labelEl.classList.replace('text-green-700', 'text-blue-700');
-                        textEl.innerHTML = "✅ Đã nộp bài thành công!";
-                    } else {
-                        alert("Lỗi server: " + data.message);
-                        textEl.innerHTML = originalHTML;
-                    }
-                })
-                .catch(err => {
-                    alert("Lỗi kết nối mạng: " + err);
-                    textEl.innerHTML = originalHTML;
-                })
-                .finally(() => {
-                    labelEl.classList.remove('cursor-not-allowed', 'opacity-75');
-                });
-            };
-            reader.readAsDataURL(file);
-        }
     </script>
 </body>
 </html>

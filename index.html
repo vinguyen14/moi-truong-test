@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainer OS - Cổng Đào Tạo KiotViet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">T</div>
+                <h1 class="text-2xl font-bold text-gray-900">Trainer OS</h1>
+            </div>
+            <div class="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
+                Ngành hàng: Bán lẻ
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-10 w-full">
+        <!-- Banner Tổng quan -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-10 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full -mr-20 -mt-20 opacity-50"></div>
+            <div class="relative z-10">
+                <h2 class="text-3xl font-bold text-blue-800 mb-4">Chào mừng đến với Khóa Thực Hành KiotViet! 🚀</h2>
+                <p class="text-gray-600 mb-6 max-w-3xl leading-relaxed text-lg">
+                    Hệ thống bài tập Codelabs được thiết kế sát với thực tế vận hành của cửa hàng Bán lẻ. 
+                    Mục tiêu giúp bạn nắm vững thao tác phần mềm từ cơ bản đến nâng cao sau khi học xong lý thuyết.
+                </p>
+                <div class="flex flex-wrap gap-4 text-sm">
+                    <span class="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-md font-medium border border-blue-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Tổng thời lượng: 3 Buổi
+                    </span>
+                    <span class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-2 rounded-md font-medium border border-green-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Hình thức: Thực hành trực tiếp
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khối Quy trình & Lộ trình -->
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+            Lộ trình thực hành
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Buổi 1 -->
+            <a href="buoi-1.html" class="group bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-blue-400 transition cursor-pointer flex flex-col h-full saas-card">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">01</div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition">Tổng quan KiotViet</h4>
+                <p class="text-gray-500 text-sm mb-6 flex-1">Làm quen giao diện, đăng ký gian hàng, tạo mới hàng hóa, nhập/bán hàng cơ bản và xem báo cáo tổng quan.</p>
+                <div class="text-blue-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Bắt đầu thực hành <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- Buổi 2 -->
+            <a href="buoi-2.html" class="group bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:blue-400 transition cursor-pointer flex flex-col h-full saas-card">
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">02</div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition">Nâng cao Bán hàng & Hàng hóa</h4>
+                <p class="text-gray-500 text-sm mb-6 flex-1">Xử lý trả hàng, công nợ, bảng giá công thức, giá vốn trung bình, Sổ quỹ và Import/Export dữ liệu Excel.</p>
+                <div class="text-indigo-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Bắt đầu thực hành <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- Buổi 3 -->
+            <a href="buoi-3.html" class="group bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg hover:border-purple-400 transition cursor-pointer flex flex-col h-full saas-card">
+                <div class="w-12 h-12 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition-transform">03</div>
+                <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition">Mobile App & Phần cứng</h4>
+                <p class="text-gray-500 text-sm mb-6 flex-1">Quy trình bán hàng trên điện thoại (App Mobile) và cài đặt Driver máy in hóa đơn, máy in tem, ngăn kéo đựng tiền.</p>
+                <div class="text-purple-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                    Bắt đầu thực hành <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </div>
+            </a>
+        </div>
+    </main>
+</body>
+</html>

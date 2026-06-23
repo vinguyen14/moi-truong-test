@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buổi 1 - Thực hành KiotViet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .step-active { background-color: #e0f2fe; border-left-color: #3b82f6; font-weight: 600; color: #1e3a8a;}
+        .step-inactive { border-left-color: transparent; color: #475569; }
+        .step-inactive:hover { background-color: #f8fafc; }
+    </style>
+</head>
+<body class="bg-white flex flex-col h-screen overflow-hidden text-gray-800 font-sans">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm z-20 relative flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <span class="font-medium hidden sm:inline">Về trang chủ</span>
+                </a>
+                <div class="font-bold text-xl text-blue-600 border-l pl-4 border-gray-300" id="sessionTitle">Buổi 1: Đang tải...</div>
+            </div>
+            <div class="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-md" id="timeRemaining">Hoàn thành: 0%</div>
+        </div>
+        <div class="w-full bg-gray-200 h-1"><div id="progressBar" class="bg-blue-600 h-1 transition-all duration-300" style="width: 0%"></div></div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="w-80 border-r border-gray-200 bg-gray-50 overflow-y-auto custom-scrollbar flex-shrink-0 hidden md:block">
+            <div class="p-4 font-bold text-gray-500 uppercase text-xs tracking-wider">Danh sách bài tập Buổi 1</div>
+            <ul id="stepList" class="flex flex-col text-sm"></ul>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto custom-scrollbar bg-white relative">
+            <div id="mainContent" class="max-w-4xl mx-auto p-8 pb-32"></div>
+            
+            <div class="fixed bottom-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-between items-center shadow-lg transition-all md:w-[calc(100%-20rem)] w-full">
+                <button id="btnPrev" onclick="prevStep()" class="flex items-center gap-2 px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-md font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Trở lại
+                </button>
+                <button id="btnNext" onclick="nextStep()" class="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md font-medium transition shadow-md">
+                    Tiếp tục <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Nhúng File Data -->
+    <script src="codelab-data.js"></script>
+    <script>
+        // CẤU HÌNH CHO FILE NÀY
+        const SESSION_ID = 'session_1'; 
+        const STORAGE_KEY = 'kv_codelab_progress_b1';
+        
+        let currentStepIndex = 0;
+        let currentExercises = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedState = localStorage.getItem(STORAGE_KEY);
+            if(savedState) currentStepIndex = parseInt(savedState) || 0;
+            loadSessionData();
+        });
+
+        function loadSessionData() {
+            const session = CODELAB_DATA.find(s => s.id === SESSION_ID);
+            if(!session) return alert("Không tìm thấy dữ liệu Buổi 1. Vui lòng kiểm tra file codelab-data.js");
+            document.getElementById('sessionTitle').innerText = session.title;
+            currentExercises = session.exercises;
+            renderSidebar();
+            goToStep(currentStepIndex);
+        }
+
+        function renderSidebar() {
+            const listUl = document.getElementById('stepList');
+            listUl.innerHTML = '';
+            currentExercises.forEach((ex, index) => {
+                const li = document.createElement('li');
+                li.className = `px-4 py-3 border-l-4 cursor-pointer transition ${index === currentStepIndex ? 'step-active' : 'step-inactive'}`;
+                li.onclick = () => goToStep(index);
+                const shortTitle = ex.title.replace('BÀI TẬP ', 'Bài ').replace(':', ' -');
+                li.innerHTML = `<span class="mr-2 opacity-60">${index + 1}.</span> ${shortTitle}`;
+                listUl.appendChild(li);
+            });
+        }
+
+        function goToStep(index) {
+            if(index < 0 || index >= currentExercises.length) return;
+            currentStepIndex = index;
+            const ex = currentExercises[index];
+
+            document.querySelectorAll('#stepList li').forEach((li, i) => {
+                if(i === index) {
+                    li.classList.replace('step-inactive', 'step-active');
+                    li.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else li.classList.replace('step-active', 'step-inactive');
+            });
+
+            const contentDiv = document.getElementById('mainContent');
+            let html = `<h1 class="text-3xl font-bold text-gray-900 mb-6 pb-4 border-b">${ex.title}</h1>`;
+
+            if(ex.theory && ex.theory.length > 0) {
+                html += `<div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-md mb-8">
+                    <h3 class="text-lg font-bold text-blue-800 mb-3 flex items-center gap-2">Phần A: Câu hỏi lý thuyết</h3>
+                    <ul class="space-y-2 text-blue-900">${ex.theory.map(t => `<li>${t}</li>`).join('')}</ul></div>`;
+            }
+            if(ex.requirements && ex.requirements.length > 0) {
+                html += `<div class="mb-8"><h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-orange-200 inline-block pb-1">🎯 Yêu cầu</h3>
+                    <ul class="space-y-3">${ex.requirements.map(r => `<li class="flex items-start gap-3 bg-orange-50 p-3 rounded border border-orange-100"><span class="text-gray-700">${r}</span></li>`).join('')}</ul></div>`;
+            }
+            if(ex.instructions && ex.instructions.length > 0) {
+                html += `<div class="mb-10"><h3 class="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 inline-block pb-1">🛠️ Hướng dẫn thao tác</h3>
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 space-y-4 font-mono text-sm">${ex.instructions.map(i => `<p>${i}</p>`).join('')}</div></div>`;
+            }
+            if(ex.confirm) {
+                html += `<div class="bg-green-50 border-2 border-dashed border-green-400 p-6 rounded-lg text-center">
+                    <h3 class="text-lg font-bold text-green-800 mb-2">📸 Xác nhận hoàn thành</h3><p class="text-green-700 mb-4">${ex.confirm}</p>
+                    <label class="cursor-pointer bg-white border border-green-300 text-green-700 px-4 py-2 rounded hover:bg-green-100 inline-flex items-center gap-2">Tải ảnh lên<input type="file" class="hidden" accept="image/*" onchange="alert('Hệ thống Trainer OS đã ghi nhận tệp (Mockup).')"></label></div>`;
+            }
+
+            contentDiv.innerHTML = html;
+            updateBottomNav();
+            document.querySelector('main').scrollTo(0, 0);
+            localStorage.setItem(STORAGE_KEY, currentStepIndex);
+        }
+
+        function updateBottomNav() {
+            const btnNext = document.getElementById('btnNext');
+            document.getElementById('btnPrev').disabled = (currentStepIndex === 0);
+            
+            if(currentStepIndex === currentExercises.length - 1) {
+                btnNext.innerHTML = 'Hoàn thành Buổi 1';
+                btnNext.classList.replace('bg-blue-600', 'bg-green-600');
+                btnNext.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            } else {
+                btnNext.innerHTML = 'Tiếp tục <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>';
+                btnNext.classList.replace('bg-green-600', 'bg-blue-600');
+                btnNext.classList.replace('hover:bg-green-700', 'hover:bg-blue-700');
+            }
+            const percent = Math.round(((currentStepIndex + 1) / currentExercises.length) * 100);
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('timeRemaining').innerText = `Hoàn thành: ${percent}%`;
+        }
+
+        function nextStep() {
+            if(currentStepIndex < currentExercises.length - 1) goToStep(currentStepIndex + 1);
+            else window.location.href = 'index.html'; // Trở về index khi xong
+        }
+        function prevStep() { if(currentStepIndex > 0) goToStep(currentStepIndex - 1); }
+    </script>
+</body>
+</html>

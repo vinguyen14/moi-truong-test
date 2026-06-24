@@ -3,195 +3,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bài tập thực hành Kiotviet Retail</title>
+    <title>Buổi 1 - Thực hành KiotViet</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>body { font-family: 'Roboto', sans-serif; }</style>
-</head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col relative">
+    <style>
+        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 10px; }
+        .step-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; cursor: pointer; border-radius: 0 24px 24px 0; margin-right: 16px; border: 1px solid transparent; border-left: none;}
+        .step-inactive { color: #5f6368; background: white; }
+        .step-inactive:hover { background: #f1f3f4; }
+        .step-inactive .step-circle { background: #e8eaed; color: #5f6368; }
+        .step-active { background-color: #e8f0fe; color: #1a73e8; font-weight: 500;}
+        .step-active .step-circle { background: #1a73e8; color: white; font-weight: bold; }
+        .step-circle { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 2px; position: relative;}
+        .group-header { padding: 16px 16px 8px; font-weight: bold; color: #5f6368; margin-top: 16px; border-bottom: 1px solid #e0e0e0; margin-right: 16px;}
+        
+        /* CSS cho chấm đỏ thông báo */
+        .notification-dot { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%; border: 2px solid white; }
+        .animate-ping-slow { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
 
-    <!-- MODAL ĐĂNG NHẬP -->
-    <div id="authModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 z-[100] flex items-center justify-center hidden">
-        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 relative">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 transition">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Đăng nhập</h2>
-            <p class="text-gray-500 mb-6 text-sm">Vui lòng nhập đúng thông tin để hệ thống ghi nhận kết quả cho bạn.</p>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên học viên *</label>
-                    <input type="text" id="inpName" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#1a73e8] outline-none" placeholder="VD: Nguyễn Lê Nhật Vi">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Phòng ban *</label>
-                    <input type="text" id="inpDept" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-[#1a73e8] outline-none" placeholder="VD: L&D">
-                </div>
-                <button onclick="saveProfile()" class="w-full bg-[#1a73e8] hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-lg mt-4">
-                    Lưu thông tin & Bắt đầu
+        @media print {
+            body * { visibility: hidden; }
+            #pdf-content, #pdf-content * { visibility: visible; }
+            #pdf-content { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; }
+            #certificateModal, header, footer, aside, .fixed { display: none !important; }
+            .print-page-break { page-break-inside: avoid; margin-bottom: 30px; }
+            img { max-width: 100% !important; height: auto !important; max-height: 500px; object-fit: contain; }
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen relative overflow-x-hidden">
+
+    <!-- Bảng Chứng Nhận & Load PDF (Đã ẩn mặc định) -->
+    <div id="certificateModal" class="fixed inset-0 bg-gray-900 bg-opacity-90 z-[100] flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-lg w-full mx-4 text-center relative border-4 border-yellow-400 overflow-hidden">
+            <div id="pdfLoading" class="absolute inset-0 bg-white bg-opacity-90 z-10 flex flex-col items-center justify-center hidden">
+                <svg class="animate-spin h-10 w-10 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <p class="font-bold text-blue-700 text-lg">Đang tạo file PDF...</p>
+                <p class="text-sm text-gray-500 mt-2">Vui lòng đợi 100% ảnh được tải về bản in.</p>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-2 uppercase">Xác Nhận Hoàn Thành</h2>
+            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <p class="text-gray-600 mb-4 text-lg">Chúc mừng bạn đã hoàn thành xuất sắc bài tập!</p>
+            <div class="bg-gray-50 border border-gray-200 rounded p-4 text-left space-y-2 mb-6">
+                <p><strong>👤 Họ và tên:</strong> <span id="certName" class="text-blue-700"></span></p>
+                <p><strong>🏢 Phòng ban:</strong> <span id="certDept" class="text-blue-700"></span></p>
+                <p><strong>📚 Bài học:</strong> <span id="certSession"></span></p>
+                <p><strong>💯 Tiến độ:</strong> <span class="text-green-600 font-bold">100% (Đã nộp toàn bộ)</span></p>
+                <p><strong>⏰ Thời gian:</strong> <span id="certTime" class="text-red-500 font-bold"></span></p>
+            </div>
+            <p class="text-sm font-bold text-red-600 mb-6 bg-red-50 p-2 rounded">YÊU CẦU: HÃY CHỤP ẢNH MÀN HÌNH NÀY VÀ GỬI VÀO NHÓM ZALO TRƯỚC 16:00</p>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button onclick="generatePDF()" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4-4m0 0l-4-4m4 4v12"></path></svg> Tải báo cáo PDF
                 </button>
+                <a href="index.html" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition inline-block">Trở về Trang chủ</a>
             </div>
         </div>
     </div>
 
-    <!-- HEADER -->
-    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 lg:px-6 py-3 flex justify-between items-center">
-            <a href="index.html">
-                <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="KiotViet Logo" class="h-8">
-            </a>
-            <button id="btnIdentity" onclick="openAuthModal()" class="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full border transition shadow-sm">
-                👤 Đang kiểm tra...
-            </button>
-        </div>
-    </header>
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 z-20 flex flex-col shadow-sm sticky top-0">
+        <div class="flex items-center justify-between px-4 lg:px-6 py-3">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="shrink-0"><img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="KiotViet Logo" class="h-8"></a>
+                <div class="font-normal text-lg text-gray-700 pl-4 border-l border-gray-300 hidden md:block truncate" id="sessionTitle">Đang tải...</div>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Nút Đồng bộ nhận xét (Có chấm đỏ nếu có tin mới) -->
+                <button onclick="fetchFeedback(true)" class="relative flex items-center gap-1 text-sm font-medium text-orange-600 bg-orange-50 border border-orange-200 px-3 py-1.5 rounded hover:bg-orange-100 transition shadow-sm" title="Làm mới nhận xét">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    <span class="hidden sm:inline" id="btnFeedbackText">Tải Nhận Xét</span>
+                    <!-- Chấm đỏ báo hiệu có tin -->
+                    <span id="globalNotificationDot" class="hidden absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-white"></span></span>
+                </button>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 max-w-6xl mx-auto px-4 lg:px-6 py-10 w-full">
-        
-        <!-- HƯỚNG DẪN QUY TRÌNH (Layout dọc) -->
-        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-6 mb-10 shadow-sm">
-            <h3 class="text-xl font-bold text-indigo-800 mb-4 flex items-center gap-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Hướng dẫn Tham gia Thực hành
-            </h3>
-            <div class="flex flex-col gap-4 text-indigo-900 text-[15px]">
-                <div class="flex items-start gap-3">
-                    <span class="bg-indigo-200 text-indigo-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
-                    <span><strong>Định danh:</strong> Bấm vào nút "👤 Chưa định danh" ở góc phải bên trên để nhập <em>Họ và tên, Phòng ban</em>. Làm 1 lần duy nhất.</span>
-                </div>
-                <div class="flex items-start gap-3">
-                    <span class="bg-indigo-200 text-indigo-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
-                    <span><strong>Cách làm bài:</strong> Thực hành trên KiotViet -> Chụp ảnh màn hình -> Quay lại web bấm <em>Nộp bài bước này</em>. Hệ thống chỉ tính tiến độ khi bạn đã ấn nút Nộp.</span>
-                </div>
-                <div class="flex items-start gap-3">
-                    <span class="bg-indigo-200 text-indigo-800 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
-                    <span><strong>Hoàn thành:</strong> Khi đạt tiến độ 100%, hãy bấm "Kết thúc buổi học", hệ thống sẽ cấp cho bạn một <em>Thông báo Xác Nhận Hoàn Thành</em>.</span>
-                </div>
-                <div class="flex items-start gap-3 bg-white p-3 rounded-lg border border-indigo-200 mt-2">
-                    <span class="text-red-500 font-bold shrink-0 mt-0.5">⏰ DEADLINE:</span>
-                    <span class="font-medium text-red-600">Hoàn thành bài tập và gửi ảnh Xác Nhận Hoàn Thành lên Group Zalo trước 16:00 cùng ngày.</span>
+                <div class="flex items-center gap-3 text-sm font-medium text-gray-600 bg-gray-100 px-4 py-1.5 rounded border border-gray-200 shrink-0">
+                    <span id="studentLabel" class="text-[#1a73e8] border-r border-gray-300 pr-3 font-medium hidden sm:inline">👤 Chưa định danh</span>
+                    <span id="timeRemaining">Tiến độ: 0%</span>
                 </div>
             </div>
         </div>
+        <div class="w-full bg-gray-200 h-1"><div id="progressBar" class="bg-[#1a73e8] h-1 transition-all duration-300" style="width: 0%"></div></div>
+    </header>
 
-        <h3 class="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">Lộ trình thực hành</h3>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Buổi 1 -->
-            <a href="buoi-1.html" class="group relative bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition flex flex-col h-full">
-                <div id="check_session_1" class="hidden absolute top-4 right-4 bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 border border-green-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Đã hoàn thành
-                </div>
-                <div class="w-12 h-12 bg-blue-50 text-[#1a73e8] rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition">01</div>
-                <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-[#1a73e8] transition">Tổng quan KiotViet</h4>
-                <p class="text-gray-500 text-[15px] mb-6 flex-1">Làm quen giao diện, đăng ký, tạo hàng hóa, nhập/bán hàng cơ bản và xem báo cáo.</p>
-                <div class="text-[#1a73e8] font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Bắt đầu thực hành <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-80 overflow-y-auto custom-scrollbar flex-shrink-0 hidden md:block pt-6">
+            <ul id="stepList" class="flex flex-col gap-2"></ul>
+        </aside>
 
-            <!-- Buổi 2 -->
-            <a href="buoi-2.html" class="group relative bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition flex flex-col h-full">
-                <div id="check_session_2" class="hidden absolute top-4 right-4 bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 border border-green-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Đã hoàn thành
-                </div>
-                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition">02</div>
-                <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition">Nâng cao Bán hàng</h4>
-                <p class="text-gray-500 text-[15px] mb-6 flex-1">Xử lý trả hàng, công nợ, bảng giá công thức, giá vốn, Sổ quỹ và Import/Export Excel.</p>
-                <div class="text-indigo-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Bắt đầu thực hành <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar relative p-4 md:p-6 bg-gray-50 flex flex-col">
+            <div id="mainContent" class="max-w-4xl mx-auto bg-white border border-gray-200 rounded-lg shadow-sm p-6 md:p-10 mb-24 w-full relative">
+                <!-- Nội dung Render vào đây -->
+            </div>
+            
+            <div class="fixed bottom-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-between items-center md:w-[calc(100%-20rem)] w-full z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button id="btnPrev" onclick="prevStep()" class="flex items-center gap-2 px-5 py-2 text-gray-600 font-medium hover:text-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Trở lại</button>
+                <button id="btnNext" onclick="nextStep()" class="flex items-center gap-2 px-6 py-2.5 text-white bg-[#1a73e8] hover:bg-blue-700 rounded transition shadow font-bold">Tiếp <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></button>
+            </div>
+        </main>
+    </div>
 
-            <!-- Buổi 3 -->
-            <a href="buoi-3.html" class="group relative bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition flex flex-col h-full">
-                <div id="check_session_3" class="hidden absolute top-4 right-4 bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1 border border-green-200">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Đã hoàn thành
-                </div>
-                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center font-bold text-xl mb-4 group-hover:scale-110 transition">03</div>
-                <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition">Mobile App & Cấu hình</h4>
-                <p class="text-gray-500 text-[15px] mb-6 flex-1">Quy trình bán hàng trên App Mobile và cài đặt máy in, thiết bị phần cứng.</p>
-                <div class="text-purple-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Bắt đầu thực hành <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </div>
-            </a>
-        </div>
-    </main>
-    
-    <!-- FOOTER -->
-    <footer class="text-center py-6 mt-auto bg-gray-50 border-t border-gray-200">
-        <div class="flex flex-col items-center gap-3">
-            <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="KiotViet Logo" class="h-5 opacity-60">
-            <p class="text-xs text-gray-500">© 2026 KiotViet Learning & Development</p>
-        </div>
-    </footer>
+    <!-- Vùng in PDF Ẩn -->
+    <div id="pdf-content" class="absolute -left-[9999px] top-0 bg-white p-10 text-gray-800" style="width: 210mm;"></div>
 
-    <!-- SCRIPT CHỨA LOGIC ĐỊNH DANH VÀ TIẾN ĐỘ -->
     <script src="codelab-data.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            renderIdentity();
-            const profileRaw = localStorage.getItem('kv_trainer_profile');
-            if(!profileRaw) openAuthModal();
-            
-            // Tự động đánh dấu tích xanh nếu học viên đã nộp đủ bài
-            checkCompletion('session_1', 'kv_codelab_data_b1', 'check_session_1');
-            checkCompletion('session_2', 'kv_codelab_data_b2', 'check_session_2');
-            checkCompletion('session_3', 'kv_codelab_data_b3', 'check_session_3');
-        });
+        // =========================================================
+        // CHÚ Ý: KHI BẠN NHÂN BẢN FILE NÀY THÀNH BUỔI 2, BUỔI 3
+        // BẠN CHỈ CẦN SỬA ĐÚNG 3 DÒNG BÊN DƯỚI NÀY LÀ XONG:
+        const SESSION_ID = 'session_1'; 
+        const STORAGE_KEY = 'kv_codelab_progress_b1';
+        const DATA_KEY = 'kv_codelab_data_b1'; 
+        // =========================================================
 
-        function checkCompletion(sessionId, storageKey, badgeId) {
-            const sessionData = CODELAB_DATA.find(s => s.id === sessionId);
-            if(!sessionData) return;
-            
-            // Loại bỏ những phần là GroupHeader (như "Thao tác Mobile App") ra khỏi tổng số bài cần làm
-            let totalExercises = 0;
-            sessionData.exercises.forEach(ex => {
-                if(!ex.isGroupHeader) totalExercises++;
+        let currentStepIndex = 0;
+        let currentExercises = [];
+        let stepDataStore = {};
+        let pendingFiles = []; // Mảng chứa ảnh Upload/Dán ảo
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedState = localStorage.getItem(STORAGE_KEY); if(savedState) currentStepIndex = parseInt(savedState) || 0;
+            const savedData = localStorage.getItem(DATA_KEY); if(savedData) stepDataStore = JSON.parse(savedData);
+            const profileRaw = localStorage.getItem('kv_trainer_profile');
+            if(profileRaw) { const profile = JSON.parse(profileRaw); document.getElementById('studentLabel').innerText = `👤 ${profile.name}`; }
+
+            loadSessionData();
+
+            // SỰ KIỆN DÁN ẢNH (CTRL + V)
+            document.addEventListener('paste', function(e) {
+                let items = e.clipboardData.items;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf("image") !== -1) {
+                        let file = items[i].getAsFile();
+                        let newFile = new File([file], "Anh_Dan_Hệ_Thống_" + Math.floor(Math.random()*1000) + ".png", {type: file.type});
+                        pendingFiles.push(newFile);
+                        renderFileTags();
+                        // Hiệu ứng nháy xanh nhẹ
+                        const uploadArea = document.getElementById('uploadArea');
+                        if(uploadArea) {
+                            uploadArea.classList.add('bg-blue-50', 'border-blue-300');
+                            setTimeout(() => uploadArea.classList.remove('bg-blue-50', 'border-blue-300'), 500);
+                        }
+                    }
+                }
             });
 
-            const savedData = localStorage.getItem(storageKey);
-            if(savedData) {
-                const store = JSON.parse(savedData);
-                let completedCount = 0;
-                // Duyệt qua tất cả các bài tập
-                for(let i = 0; i < sessionData.exercises.length; i++) {
-                    if(store[i] && store[i].isSubmitted) completedCount++;
-                }
-                
-                // Nếu số bài đã nộp = tổng số bài thực tế, thì hiện chữ Đã hoàn thành
-                if(completedCount === totalExercises && totalExercises > 0) {
-                    document.getElementById(badgeId).classList.remove('hidden');
-                }
-            }
-        }
+            // Tự động quét nhận xét khi vào web (chạy ngầm)
+            setTimeout(() => { fetchFeedback(false); }, 1500); 
+        });
 
-        function renderIdentity() {
-            const btn = document.getElementById('btnIdentity');
+        // HÀM TẢI NHẬN XÉT (Có báo chấm đỏ)
+        function fetchFeedback(isManualClick) {
+            const apiUrl = APP_CONFIG.API_URL;
+            if(!apiUrl) return;
             const profileRaw = localStorage.getItem('kv_trainer_profile');
-            if(profileRaw) {
-                const profile = JSON.parse(profileRaw);
-                btn.innerHTML = `👤 ${profile.name} <span class="hidden md:inline">- ${profile.dept}</span> <span class="text-xs font-normal opacity-70 underline ml-1">(Sửa)</span>`;
-                btn.className = "flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full border transition shadow-sm bg-blue-50 text-[#1a73e8] border-blue-200 hover:bg-blue-100 cursor-pointer";
-                document.getElementById('inpName').value = profile.name;
-                document.getElementById('inpDept').value = profile.dept;
+            if(!profileRaw) return;
+            const profile = JSON.parse(profileRaw);
+            const sessionName = document.getElementById('sessionTitle').innerText;
+            
+            if(isManualClick) document.getElementById('btnFeedbackText').innerText = "Đang tải...";
+            
+            fetch(`${apiUrl}?studentName=${encodeURIComponent(profile.name)}&session=${encodeURIComponent(sessionName)}`)
+            .then(r => r.json())
+            .then(res => {
+                if(res.status === 'success' && res.data) {
+                    let hasNew = false;
+                    for(let i=0; i<currentExercises.length; i++) {
+                        const title = currentExercises[i].title;
+                        if(res.data[title]) {
+                            if(!stepDataStore[i]) stepDataStore[i] = {};
+                            // Nếu nhận xét khác với cái đã lưu -> Đánh dấu là Mới (Chưa đọc)
+                            if(stepDataStore[i].feedback !== res.data[title]) {
+                                stepDataStore[i].feedback = res.data[title];
+                                stepDataStore[i].isUnread = true; // Đánh dấu chưa đọc
+                                hasNew = true;
+                            }
+                        }
+                    }
+                    if(hasNew) {
+                        localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
+                        renderSidebar(); // Hiện chấm đỏ Sidebar
+                        goToStep(currentStepIndex); // Render lại UI hiện tại
+                    }
+                    if(isManualClick && !hasNew) alert("Chưa có nhận xét mới nào từ Giảng viên.");
+                }
+            })
+            .catch(err => { if(isManualClick) console.log("Lỗi tải nhận xét:", err); })
+            .finally(() => { if(isManualClick) document.getElementById('btnFeedbackText').innerText = "Tải Nhận Xét"; updateGlobalNotification(); });
+        }
+
+        function loadSessionData() {
+            const session = CODELAB_DATA.find(s => s.id === SESSION_ID);
+            if(!session) return;
+            document.getElementById('sessionTitle').innerText = session.title;
+            currentExercises = session.exercises;
+            if(currentExercises[currentStepIndex] && currentExercises[currentStepIndex].isGroupHeader) currentStepIndex++;
+            renderSidebar(); goToStep(currentStepIndex);
+        }
+
+        // Cập nhật chấm đỏ to trên Header
+        function updateGlobalNotification() {
+            let hasAnyUnread = false;
+            for(let key in stepDataStore) {
+                if(stepDataStore[key].isUnread) { hasAnyUnread = true; break; }
+            }
+            const dot = document.getElementById('globalNotificationDot');
+            if(hasAnyUnread) dot.classList.remove('hidden'); else dot.classList.add('hidden');
+        }
+
+        function renderSidebar() {
+            const listUl = document.getElementById('stepList'); listUl.innerHTML = '';
+            let exerciseCounter = 1; 
+            currentExercises.forEach((ex, index) => {
+                if(ex.isGroupHeader) {
+                    const li = document.createElement('li'); li.className = 'group-header'; li.innerText = ex.title; listUl.appendChild(li);
+                } else {
+                    const li = document.createElement('li'); li.className = `step-item shadow-sm ${index === currentStepIndex ? 'step-active' : 'step-inactive'}`; li.onclick = () => goToStep(index);
+                    const isSubmitted = stepDataStore[index] && stepDataStore[index].isSubmitted;
+                    
+                    // Thêm chấm đỏ vào vòng tròn số nếu có nhận xét chưa đọc
+                    const unreadBadge = (stepDataStore[index] && stepDataStore[index].isUnread) ? '<span class="notification-dot"></span>' : '';
+                    
+                    li.innerHTML = `<div class="step-circle">${isSubmitted ? '✓' : exerciseCounter}${unreadBadge}</div><div class="leading-snug text-[14px]">${ex.title}</div>`;
+                    listUl.appendChild(li); exerciseCounter++;
+                }
+            });
+            updateGlobalNotification();
+        }
+
+        function goToStep(index) {
+            saveDraft(); 
+            if(index < 0 || index >= currentExercises.length || currentExercises[index].isGroupHeader) return;
+            
+            currentStepIndex = index; const ex = currentExercises[index];
+            pendingFiles = []; // Clear file ảo
+
+            document.querySelectorAll('#stepList li').forEach((li, i) => {
+                if(!currentExercises[i].isGroupHeader) {
+                    if(i === index) { li.className = `step-item shadow-sm step-active`; li.scrollIntoView({ behavior: 'smooth', block: 'center' }); } 
+                    else li.className = `step-item shadow-sm step-inactive`;
+                }
+            });
+
+            const contentDiv = document.getElementById('mainContent');
+            const myData = stepDataStore[index] || { text: "", uploadedUrls: [], isSubmitted: false };
+
+            let html = `<div class="relative w-full pr-12 md:pr-32">
+                <h1 class="text-2xl md:text-3xl text-gray-800 mb-8 pb-4 border-b border-gray-200 font-normal">${ex.title}</h1>`;
+
+            // UI NHẬN XÉT KIỂU GOOGLE DOCS (Nút nổi bên phải tiêu đề)
+            if(myData.feedback) {
+                const pingHtml = myData.isUnread ? `<span class="absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-white"></span></span>` : '';
+                
+                html += `<div class="absolute top-0 right-0 z-20">
+                    <button onclick="toggleFeedback(${index})" class="relative flex items-center gap-1.5 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-300 px-3 py-1.5 rounded-full text-sm font-medium shadow-sm transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <span class="hidden sm:inline">Nhận xét</span>
+                        ${pingHtml}
+                    </button>
+                    <!-- Hộp thoại trượt ra -->
+                    <div id="feedbackBox_${index}" class="hidden absolute top-10 right-0 w-72 md:w-80 bg-white border border-yellow-300 shadow-xl rounded-lg p-4 z-30 transition origin-top-right">
+                        <div class="flex items-center justify-between mb-2 pb-2 border-b border-yellow-100">
+                            <p class="font-bold text-yellow-800 text-sm flex items-center gap-1">👨‍🏫 Giảng viên nhận xét:</p>
+                            <button onclick="toggleFeedback(${index})" class="text-gray-400 hover:text-gray-700"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                        </div>
+                        <p class="text-gray-700 text-[14px] whitespace-pre-wrap leading-relaxed">${myData.feedback}</p>
+                    </div>
+                </div>`;
+            }
+            html += `</div>`; // Đóng div wrap title
+
+            if(ex.theory && ex.theory.length > 0) {
+                html += `<div class="mb-8"><p class="mb-3 text-[#1a73e8] font-bold text-lg">📝 Phần A: Câu hỏi lý thuyết</p><div class="bg-[#f1f3f4] p-5 rounded-lg text-gray-800 border border-gray-200 mb-4 space-y-2 text-[15px]">${ex.theory.map(t => `<p>${t}</p>`).join('')}</div><textarea id="inpTextAnswer_${index}" rows="4" class="w-full border border-gray-300 rounded-lg p-4 focus:ring-2 focus:ring-[#1a73e8] outline-none" placeholder="Gõ câu trả lời tự luận (nếu có)..." oninput="saveDraft()">${myData.text}</textarea></div>`;
+            }
+
+            if((ex.requirements && ex.requirements.length > 0) || (ex.instructions && ex.instructions.length > 0)) {
+                html += `<p class="mb-3 text-[#1a73e8] font-bold text-lg">💻 Phần B: Bài tập thực hành</p>`;
+            }
+            if(ex.requirements && ex.requirements.length > 0) {
+                html += `<div class="mb-6"><p class="mb-2 font-medium">Yêu cầu:</p><ul class="space-y-2 text-[15px] text-gray-700 pl-4 border-l-4 border-orange-400 bg-orange-50 py-3 pr-3 rounded-r-lg">${ex.requirements.map(r => `<li>${r}</li>`).join('')}</ul></div>`;
+            }
+            if(ex.instructions && ex.instructions.length > 0) {
+                html += `<div class="mb-8"><p class="mb-2 font-medium">Hướng dẫn thao tác:</p><div class="bg-gray-50 p-5 rounded-lg font-mono text-[14px] text-gray-700 border border-gray-200 leading-relaxed space-y-3">${ex.instructions.map(i => `<p>${i}</p>`).join('')}</div></div>`;
+            }
+
+            let historyHtml = ""; let btnText = "Nộp bài bước này";
+            if(myData.isSubmitted) {
+                btnText = "Nộp bổ sung ảnh";
+                historyHtml = `<div class="bg-green-50 border border-green-200 p-4 rounded-lg mb-4 text-sm text-green-800"><p class="font-bold flex items-center gap-1 mb-2">✅ Đã ghi nhận bài làm</p><ul class="list-disc pl-5 mt-1 text-blue-600 underline">${myData.uploadedUrls.map((url, i) => `<li><a href="${url.replace('file/d/', 'uc?id=').replace('/view?usp=drivesdk', '')}" target="_blank">Xem ảnh minh chứng đã nộp (${i+1})</a></li>`).join('')}</ul></div>`;
+            }
+
+            // GIAO DIỆN UPLOAD GỌN GÀNG (Ghim bên trái, Nút bên phải)
+            html += `<div class="mt-8 border-t border-gray-200 pt-8">
+                ${historyHtml}
+                <p class="text-gray-800 font-medium mb-2">📸 Minh chứng thực hành <span class="text-red-500">* (Bắt buộc)</span></p>
+                <p class="text-gray-500 text-[13px] mb-4">${ex.confirm ? ex.confirm : 'Bạn cần nộp ảnh để hoàn thành bài này.'}</p>
+                
+                <div id="uploadArea" class="flex flex-col bg-gray-50 p-4 border border-dashed border-gray-300 rounded-lg transition">
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-4 w-full">
+                        
+                        <!-- Nút Chọn File (Bên trái) -->
+                        <div class="relative w-full md:w-auto shrink-0">
+                            <button class="w-full flex justify-center items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 hover:bg-gray-100 rounded text-sm text-gray-700 font-medium shadow-sm transition">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                Bấm Chọn ảnh
+                            </button>
+                            <input type="file" multiple accept="image/*" onchange="handleFileSelect(event)" class="absolute left-0 top-0 w-full h-full opacity-0 cursor-pointer">
+                        </div>
+                        
+                        <p class="text-sm text-gray-500 italic hidden md:block">...hoặc ấn <strong>Ctrl + V</strong> để dán ảnh.</p>
+
+                        <!-- Nút Nộp Bài (Đẩy sang phải) -->
+                        <button id="btnSubmitStep_${index}" onclick="uploadToGAS(${index}, '${ex.title}')" class="w-full md:w-auto ml-auto bg-[#1a73e8] text-white px-8 py-2.5 rounded hover:bg-blue-700 transition shadow font-bold flex items-center justify-center gap-2 shrink-0">
+                            <span id="btnSubmitText_${index}">${btnText}</span>
+                        </button>
+                    </div>
+
+                    <!-- Hiển thị Tag Ảnh -->
+                    <div id="fileTags" class="mt-4 flex flex-wrap gap-2 empty:hidden"></div>
+                </div>
+            </div>`;
+
+            contentDiv.innerHTML = html; updateBottomNav(); document.querySelector('main').scrollTo(0, 0); localStorage.setItem(STORAGE_KEY, currentStepIndex);
+        }
+
+        // HÀM BẬT TẮT HỘP THOẠI NHẬN XÉT
+        function toggleFeedback(index) {
+            const box = document.getElementById(`feedbackBox_${index}`);
+            if(box.classList.contains('hidden')) {
+                box.classList.remove('hidden');
+                // Khi mở ra xem -> Đánh dấu là đã đọc
+                if(stepDataStore[index] && stepDataStore[index].isUnread) {
+                    stepDataStore[index].isUnread = false;
+                    localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
+                    // Xóa chấm đỏ ở box hiện tại
+                    goToStep(index); 
+                    // Render lại sidebar để mất chấm đỏ
+                    renderSidebar();
+                }
             } else {
-                btn.innerHTML = `👤 Chưa định danh (Bấm để nhập)`;
-                btn.className = "flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full border transition shadow-sm bg-red-50 text-red-600 border-red-200 hover:bg-red-100 cursor-pointer animate-pulse";
+                box.classList.add('hidden');
             }
         }
 
-        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
-        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-        
-        function saveProfile() {
-            const name = document.getElementById('inpName').value.trim();
-            const dept = document.getElementById('inpDept').value.trim();
-            if(!name || !dept) { alert("Vui lòng điền Họ tên và Phòng ban!"); return; }
-            localStorage.setItem('kv_trainer_profile', JSON.stringify({ name: name, dept: dept }));
-            closeAuthModal(); 
-            renderIdentity(); 
+        // HÀM CHỌN ẢNH BẰNG NÚT BẤM (CỘNG DỒN VÀO MẢNG ẢO)
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if(files.length === 0) return;
+            for(let i=0; i<files.length; i++) { pendingFiles.push(files[i]); }
+            renderFileTags(); event.target.value = ''; // Reset để chọn tiếp
+        }
+
+        // HIỂN THỊ TAG ẢNH
+        function renderFileTags() {
+            const tagContainer = document.getElementById(`fileTags`); if(!tagContainer) return;
+            let html = '';
+            for(let i=0; i<pendingFiles.length; i++) {
+                let fileName = pendingFiles[i].name; if(fileName.length > 25) fileName = fileName.substring(0, 20) + '...';
+                html += `<span class="bg-blue-100 text-blue-800 border border-blue-200 text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1 shadow-sm">
+                            🖼️ ${fileName} 
+                            <button onclick="removeFile(${i})" class="ml-1 hover:text-red-500 font-bold ml-2 text-sm focus:outline-none">×</button>
+                         </span>`;
+            }
+            tagContainer.innerHTML = html;
+        }
+
+        function removeFile(index) { pendingFiles.splice(index, 1); renderFileTags(); }
+
+        function saveDraft() {
+            const index = currentStepIndex; const textEl = document.getElementById(`inpTextAnswer_${index}`);
+            if(!stepDataStore[index]) stepDataStore[index] = { text: "", uploadedUrls: [], isSubmitted: false, feedback: "" };
+            if(textEl) { stepDataStore[index].text = textEl.value; localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore)); }
+        }
+
+        function compressImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image(); img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas'); const MAX_WIDTH = 1200;
+                        let width = img.width; let height = img.height;
+                        if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+                        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+                        resolve({ mimeType: 'image/jpeg', base64Data: compressedBase64 });
+                    };
+                }; reader.onerror = error => reject(error);
+            });
+        }
+
+        function uploadToGAS(index, exerciseTitle) {
+            saveDraft(); const currentData = stepDataStore[index];
+            
+            if (pendingFiles.length === 0 && (!currentData.uploadedUrls || currentData.uploadedUrls.length === 0)) {
+                alert("❌ LỖI: Bắt buộc phải có ảnh minh chứng. Vui lòng chọn ảnh hoặc dán ảnh vào khung."); return;
+            }
+            if (pendingFiles.length === 0 && currentData.uploadedUrls.length > 0 && currentData.text === document.getElementById(`inpTextAnswer_${index}`).value) {
+                alert("💡 Bạn chưa có chỉnh sửa chữ hay thêm ảnh mới nào cả."); return;
+            }
+
+            const apiUrl = APP_CONFIG.API_URL; const courseName = APP_CONFIG.COURSE_NAME;
+            if (!apiUrl) { alert("Lỗi Admin: Chưa cấu hình API URL!"); return; }
+            const profileRaw = localStorage.getItem('kv_trainer_profile');
+            if (!profileRaw) { window.location.href = 'index.html'; return; }
+            const profile = JSON.parse(profileRaw);
+
+            const btnEl = document.getElementById(`btnSubmitStep_${index}`); const txtEl = document.getElementById(`btnSubmitText_${index}`);
+            const oldText = txtEl.innerText;
+            btnEl.classList.replace('bg-[#1a73e8]', 'bg-gray-400'); btnEl.classList.add('cursor-not-allowed', 'animate-pulse');
+            txtEl.innerText = `Đang xử lý...`; btnEl.disabled = true;
+
+            let promises = [];
+            for(let i = 0; i < pendingFiles.length; i++) { promises.push(compressImage(pendingFiles[i])); }
+
+            Promise.all(promises).then(imagesData => {
+                const payload = { studentName: profile.name, department: profile.dept, courseName: courseName, session: document.getElementById('sessionTitle').innerText, exerciseTitle: exerciseTitle, textAnswer: currentData.text, images: imagesData };
+                return fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+            }).then(r => r.json()).then(data => {
+                if(data.status === 'success') {
+                    currentData.isSubmitted = true;
+                    if(data.urls) currentData.uploadedUrls = [...new Set([...currentData.uploadedUrls, ...data.urls])];
+                    localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
+                    pendingFiles = []; alert("🎉 Đã nộp bài thành công!"); goToStep(index); renderSidebar(); 
+                } else alert("Lỗi server: " + data.message);
+            }).catch(err => alert("Lỗi kết nối mạng: Vui lòng thử lại sau."))
+            .finally(() => { btnEl.classList.replace('bg-gray-400', 'bg-[#1a73e8]'); btnEl.classList.remove('cursor-not-allowed', 'animate-pulse'); txtEl.innerText = oldText; btnEl.disabled = false; });
+        }
+
+        function updateBottomNav() {
+            const btnNext = document.getElementById('btnNext');
+            let prevIndex = currentStepIndex - 1; while(prevIndex >= 0 && currentExercises[prevIndex].isGroupHeader) prevIndex--;
+            document.getElementById('btnPrev').disabled = (prevIndex < 0);
+            
+            let totalRealExercises = 0; let completedCount = 0;
+            for(let i=0; i<currentExercises.length; i++) {
+                if(!currentExercises[i].isGroupHeader) { totalRealExercises++; if(stepDataStore[i] && stepDataStore[i].isSubmitted) completedCount++; }
+            }
+            const percent = totalRealExercises === 0 ? 0 : Math.round((completedCount / totalRealExercises) * 100);
+
+            let isLastStep = true;
+            for(let i = currentStepIndex + 1; i < currentExercises.length; i++) { if(!currentExercises[i].isGroupHeader) { isLastStep = false; break; } }
+            if(isLastStep) { btnNext.innerHTML = 'Kết thúc buổi học'; btnNext.classList.replace('bg-[#1a73e8]', 'bg-green-600'); } 
+            else { btnNext.innerHTML = 'Tiếp ❯'; btnNext.classList.replace('bg-green-600', 'bg-[#1a73e8]'); }
+            
+            document.getElementById('progressBar').style.width = percent + '%'; document.getElementById('timeRemaining').innerText = `Tiến độ: ${percent}%`;
+        }
+
+        function nextStep() {
+            saveDraft();
+            let totalRealExercises = 0; let completedCount = 0;
+            for(let i=0; i<currentExercises.length; i++) { if(!currentExercises[i].isGroupHeader) { totalRealExercises++; if(stepDataStore[i] && stepDataStore[i].isSubmitted) completedCount++; } }
+            const percent = totalRealExercises === 0 ? 0 : Math.round((completedCount / totalRealExercises) * 100);
+            let nextIndex = currentStepIndex + 1; while(nextIndex < currentExercises.length && currentExercises[nextIndex].isGroupHeader) nextIndex++;
+
+            if(nextIndex < currentExercises.length) { goToStep(nextIndex); } 
+            else {
+                if(percent < 100) alert(`Bạn mới hoàn thành ${percent}%.\nVui lòng làm đủ các bài chưa có dấu (✓) và nộp ẢNH MINH CHỨNG trước khi Kết thúc.`);
+                else {
+                    const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
+                    document.getElementById('certName').innerText = profile.name; document.getElementById('certDept').innerText = profile.dept;
+                    document.getElementById('certSession').innerText = document.getElementById('sessionTitle').innerText;
+                    const now = new Date(); document.getElementById('certTime').innerText = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + " ngày " + now.getDate() + "/" + (now.getMonth()+1) + "/" + now.getFullYear();
+                    document.getElementById('certificateModal').classList.remove('hidden');
+                }
+            }
+        }
+
+        function prevStep() { saveDraft(); let prevIndex = currentStepIndex - 1; while(prevIndex >= 0 && currentExercises[prevIndex].isGroupHeader) prevIndex--; if(prevIndex >= 0) goToStep(prevIndex); }
+
+        function generatePDF() {
+            const pdfContent = document.getElementById('pdf-content'); const pdfLoading = document.getElementById('pdfLoading');
+            const profile = JSON.parse(localStorage.getItem('kv_trainer_profile')); const sessionName = document.getElementById('sessionTitle').innerText;
+
+            pdfLoading.classList.remove('hidden');
+            let reportHtml = `<div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 0 auto;">`;
+            reportHtml += `<h1 style="font-size: 24px; font-weight: bold; border-bottom: 2px solid #1a73e8; padding-bottom: 10px; margin-bottom: 20px;">Báo cáo bài tập - ${sessionName}</h1>`;
+            reportHtml += `<div style="background: #f8f9fa; border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 30px;"><p style="margin: 0 0 8px 0; font-size: 16px;"><strong>Học viên:</strong> ${profile.name} - ${profile.dept}</p><p style="margin: 0; font-size: 16px;"><strong>Khóa học:</strong> ${APP_CONFIG.COURSE_NAME}</p></div>`;
+
+            for(let i=0; i<currentExercises.length; i++) {
+                if(currentExercises[i].isGroupHeader) continue;
+                const ex = currentExercises[i]; const data = stepDataStore[i] || {};
+                
+                reportHtml += `<div class="print-page-break">`;
+                reportHtml += `<h2 style="font-size: 18px; font-weight: bold; color: #1a73e8; margin-bottom: 10px;">${ex.title}</h2>`;
+                
+                if(data.feedback) { reportHtml += `<div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; margin-bottom: 15px;"><p style="font-weight: bold; font-size: 14px; margin-bottom: 5px; color: #92400e;">💬 Nhận xét của Giảng viên:</p><p style="font-size: 14px; color: #333; white-space: pre-wrap;">${data.feedback}</p></div>`; }
+                if(data.text && data.text.trim() !== '') { reportHtml += `<div style="background: #e8f0fe; border-left: 4px solid #1a73e8; padding: 12px; margin-bottom: 15px; white-space: pre-wrap; font-size: 14px;">${data.text}</div>`; }
+                
+                if(data.uploadedUrls && data.uploadedUrls.length > 0) {
+                    reportHtml += `<div style="display: flex; flex-direction: column; gap: 15px;">`;
+                    data.uploadedUrls.forEach(url => {
+                        let directUrl = url; let fileIdMatch = url.match(/\/d\/(.+?)\//);
+                        if(fileIdMatch && fileIdMatch[1]) directUrl = `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
+                        reportHtml += `<div style="text-align: center;"><img src="${directUrl}" style="max-width: 100%; border: 1px solid #ccc; border-radius: 4px;"></div>`;
+                    });
+                    reportHtml += `</div>`;
+                } else if(!data.text) reportHtml += `<p style="color: #d93025; font-style: italic;">Chưa nộp bài</p>`;
+                reportHtml += `</div>`;
+            }
+            reportHtml += `</div>`;
+            
+            pdfContent.innerHTML = reportHtml; document.getElementById('certificateModal').classList.add('hidden');
+            const images = pdfContent.getElementsByTagName('img'); let loadedImagesCount = 0;
+            if (images.length === 0) { pdfLoading.classList.add('hidden'); window.print(); document.getElementById('certificateModal').classList.remove('hidden'); } 
+            else {
+                for (let img of images) {
+                    img.onload = img.onerror = function() {
+                        loadedImagesCount++;
+                        if (loadedImagesCount === images.length) { pdfLoading.classList.add('hidden'); setTimeout(() => { window.print(); document.getElementById('certificateModal').classList.remove('hidden'); }, 500); }
+                    };
+                }
+            }
         }
     </script>
 </body>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chấm Điểm Kịch Bản (Giảng Viên)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }</style>
+</head>
+<body class="p-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+            <div>
+                <h1 class="text-2xl font-black text-indigo-700">PORTAL CHẤM ĐIỂM KỊCH BẢN</h1>
+                <p class="text-sm text-slate-500 font-medium">Dành cho Giảng viên KiotViet</p>
+            </div>
+            <button onclick="loadSubmissions()" id="btnRefresh" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+                <i class="fas fa-sync-alt"></i> Làm mới dữ liệu
+            </button>
+        </div>
+
+        <!-- Khung nhập link API (Vì file này đứng độc lập) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-8">
+            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Đường link API (GAS):</label>
+            <input type="text" id="inpApi" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium" placeholder="Dán link https://script.google.com/.../exec của bạn vào đây">
+            <p class="text-xs text-red-500 mt-2 italic">* Giảng viên phải dán link API vào đây rồi bấm Làm mới dữ liệu.</p>
+        </div>
+
+        <div id="loading" class="text-center py-10 hidden">
+            <i class="fas fa-spinner fa-spin text-4xl text-indigo-500 mb-4"></i>
+            <p class="font-bold text-slate-500">Đang tải danh sách bài nộp...</p>
+        </div>
+
+        <!-- Danh sách bài làm -->
+        <div id="submissionsList" class="space-y-6"></div>
+    </div>
+
+    <script>
+        function loadSubmissions() {
+            const apiUrl = document.getElementById('inpApi').value.trim();
+            if(!apiUrl) { alert("Vui lòng dán link API vào ô trống trước!"); return; }
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('submissionsList').innerHTML = '';
+            document.getElementById('btnRefresh').disabled = true;
+
+            fetch(apiUrl + '?action=get_all_submissions')
+            .then(r => r.json())
+            .then(res => {
+                if(res.status === 'success') {
+                    renderList(res.data);
+                } else alert("Lỗi tải dữ liệu!");
+            }).catch(err => alert("Lỗi kết nối!")).finally(() => { 
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('btnRefresh').disabled = false;
+            });
+        }
+
+        function renderList(data) {
+            const container = document.getElementById('submissionsList');
+            if(data.length === 0) { container.innerHTML = `<p class="text-center text-slate-500 font-bold py-10">Chưa có học viên nào nộp bài.</p>`; return; }
+
+            data.forEach((item, index) => {
+                let isGraded = item.feedback && item.feedback.trim() !== "";
+                let badge = isGraded ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-black"><i class="fas fa-check"></i> Đã chấm</span>` : `<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-black"><i class="fas fa-exclamation-circle"></i> Chờ chấm</span>`;
+
+                let html = `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 p-5 border-b border-slate-200 flex justify-between items-center cursor-pointer" onclick="document.getElementById('body_${index}').classList.toggle('hidden')">
+                        <div>
+                            <h3 class="text-lg font-black text-indigo-800">${item.studentName} <span class="text-sm text-slate-500 font-medium">(${item.department})</span></h3>
+                            <p class="text-xs font-bold text-slate-400 mt-1">Nộp lúc: ${item.timestamp} | Tình huống: <span class="text-indigo-600">${item.exerciseTitle}</span></p>
+                        </div>
+                        <div class="flex items-center gap-4">${badge} <i class="fas fa-chevron-down text-slate-400"></i></div>
+                    </div>
+                    
+                    <div id="body_${index}" class="hidden p-6">
+                        <div class="space-y-4 mb-6">
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs font-black text-slate-500 mb-2">BƯỚC 1: TIẾP CẬN</p><p class="text-sm font-medium whitespace-pre-wrap">${item.ans1 || '(Trống)'}</p></div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs font-black text-slate-500 mb-2">BƯỚC 2: XÁC THỰC</p><p class="text-sm font-medium whitespace-pre-wrap">${item.ans2 || '(Trống)'}</p></div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs font-black text-slate-500 mb-2">BƯỚC 3: KHAI THÁC</p><p class="text-sm font-medium whitespace-pre-wrap">${item.ans3 || '(Trống)'}</p></div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs font-black text-slate-500 mb-2">BƯỚC 4: TƯ VẤN</p><p class="text-sm font-medium whitespace-pre-wrap">${item.ans4 || '(Trống)'}</p></div>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200"><p class="text-xs font-black text-slate-500 mb-2">BƯỚC 5: CHỐT</p><p class="text-sm font-medium whitespace-pre-wrap">${item.ans5 || '(Trống)'}</p></div>
+                        </div>
+
+                        ${item.links ? `<div class="mb-6"><p class="text-xs font-black text-slate-500 mb-2">LINK ẢNH/FILE ĐÍNH KÈM:</p><a href="${item.links}" target="_blank" class="text-sm text-blue-600 underline break-all">${item.links}</a></div>` : ''}
+
+                        <div class="bg-amber-50 p-5 rounded-xl border border-amber-200">
+                            <label class="block text-xs font-black text-amber-800 uppercase mb-2"><i class="fas fa-pen"></i> Ghi nhận xét của bạn vào đây:</label>
+                            <textarea id="fb_${index}" rows="4" class="w-full p-4 rounded-lg border border-amber-300 outline-none text-sm font-medium mb-3">${item.feedback || ''}</textarea>
+                            <button id="btnSend_${index}" onclick="sendFeedback(${index}, '${item.studentName}', '${item.exerciseTitle}')" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-6 py-2.5 rounded-lg shadow-md transition">
+                                <i class="fas fa-paper-plane"></i> Gửi Nhận Xét Cho Học Viên
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function sendFeedback(index, stName, exTitle) {
+            const apiUrl = document.getElementById('inpApi').value.trim();
+            const val = document.getElementById(`fb_${index}`).value;
+            if(!val) { alert("Vui lòng ghi nhận xét!"); return; }
+
+            const btn = document.getElementById(`btnSend_${index}`);
+            const oldText = btn.innerHTML;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang gửi...`; btn.disabled = true;
+
+            const payload = { action: "update_feedback", studentName: stName, exerciseTitle: exTitle, feedback: val };
+
+            fetch(apiUrl, { method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
+            .then(r => r.json()).then(res => {
+                if(res.status === 'success') { alert("Đã gửi nhận xét thành công!"); } else alert("Lỗi!");
+            }).finally(() => { btn.innerHTML = oldText; btn.disabled = false; });
+        }
+    </script>
+</body>
+</html>

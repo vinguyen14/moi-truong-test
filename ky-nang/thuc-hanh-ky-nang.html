@@ -302,7 +302,8 @@
         }
 
         function submitCurrentExercise() {
-            const currentData = stepDataStore[activeScenarioIndex]; const exerciseTitle = currentExercises[activeScenarioIndex].title;
+            const currentData = stepDataStore[activeScenarioIndex]; 
+            const exerciseTitle = currentExercises[activeScenarioIndex].title;
             const apiUrl = APP_CONFIG.API_URL; const courseName = APP_CONFIG.COURSE_NAME;
             if (!apiUrl) { alert("Lỗi: Chưa cấu hình API URL!"); return; }
             const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
@@ -313,13 +314,20 @@
             let promises = []; for(let i = 0; i < pendingFiles.length; i++) { promises.push(compressImage(pendingFiles[i])); }
 
             Promise.all(promises).then(imagesData => {
-                const payload = { studentName: profile.name, department: profile.dept, courseName: courseName, session: "Thực hành Kịch bản", exerciseTitle: exerciseTitle, textAnswers: currentData.textAnswers || [], images: imagesData };
+                // TRUYỀN THÊM BIẾN isUpdate
+                const payload = { 
+                    studentName: profile.name, department: profile.dept, courseName: courseName, 
+                    session: "Thực hành Kịch bản", exerciseTitle: exerciseTitle, 
+                    isUpdate: currentData.isSubmitted || false, // <--- ĐIỂM NÂNG CẤP Ở ĐÂY
+                    textAnswers: currentData.textAnswers || [], images: imagesData 
+                };
                 return fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
             }).then(r => r.json()).then(data => {
                 if(data.status === 'success') {
                     currentData.isSubmitted = true; 
                     if(data.urls) currentData.uploadedUrls = [...new Set([...(currentData.uploadedUrls||[]), ...data.urls])];
-                    localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore)); pendingFiles = []; alert("🎉 NỘP BÀI THÀNH CÔNG!"); backToDashboard(); 
+                    localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore)); pendingFiles = []; 
+                    alert("🎉 NỘP BÀI THÀNH CÔNG!\nHệ thống đã lưu trữ bài làm của bạn."); backToDashboard(); 
                 } else alert("Lỗi server: " + data.message);
             }).catch(err => alert("Lỗi kết nối mạng!")).finally(() => { btnEl.classList.replace('bg-slate-500', 'bg-indigo-600'); btnEl.innerHTML = oldText; btnEl.disabled = false; });
         }

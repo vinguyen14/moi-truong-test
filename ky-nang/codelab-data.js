@@ -1,7 +1,7 @@
 // CẤU HÌNH HỆ THỐNG DÀNH CHO ADMIN
 const APP_CONFIG = {
     // Dán link API của Google Apps Script vào đây (Hiện tại dùng link cũ của bạn)
-    API_URL: "https://script.google.com/macros/s/AKfycbz-4pJyOK87mPmdF1CbWXloGiFkGblq1f2AHV7RyfweZhw9URMJGM-V0Vh20qeGeIlyDw/exec", 
+    API_URL: "https://script.google.com/macros/s/AKfycbyrq0l1TijRxxN7d8btTEL1bpZB08r-25qRmeIlVOZBmpWw1GEWyknD9NdgQD28pl0FGg/exec", 
     COURSE_NAME: "KỸ NĂNG DIRECT SALES" 
 };
 

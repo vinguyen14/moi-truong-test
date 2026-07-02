@@ -20,7 +20,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Hiệu ứng nền */
         .tech-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; background: #f8fafc; overflow: hidden; pointer-events: none; }
         .glow-blob-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; filter: blur(120px); border-radius: 50%; animation: float 15s ease-in-out infinite; background: rgba(79, 70, 229, 0.08); }
         .glow-blob-2 { position: absolute; bottom: -10%; right: -10%; width: 50vw; height: 50vw; filter: blur(120px); border-radius: 50%; animation: float 18s ease-in-out infinite reverse; background: rgba(16, 185, 129, 0.08); }
@@ -29,8 +28,6 @@
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
         .clickable-card { cursor: pointer; transition: all 0.3s ease; }
         .clickable-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-color: rgba(79, 70, 229, 0.4); }
-
-        .notification-dot { position: absolute; top: -1px; right: -1px; width: 9px; height: 9px; background-color: #ef4444; border-radius: 50%; border: 2px solid white; }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden relative selection:bg-indigo-200 selection:text-indigo-900">
@@ -48,7 +45,6 @@
         <div class="flex items-center gap-3 shrink-0">
             <button onclick="fetchFeedback(true)" class="relative flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-2 rounded-lg transition">
                 <i class="fas fa-sync-alt text-amber-600"></i><span class="hidden sm:inline" id="btnFeedbackText">Kiểm tra Nhận Xét</span>
-                <span id="globalNotificationDot" class="hidden absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative rounded-full h-3 w-3 bg-red-500 border-2 border-white"></span></span>
             </button>
             <div class="flex items-center gap-2 text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 px-3 py-2 rounded-lg"><span id="studentLabel" class="text-indigo-600 font-black">👤 Chưa định danh</span></div>
         </div>
@@ -76,7 +72,7 @@
                             <li>Click chọn 1 Tình huống bên dưới để vào không gian làm bài.</li>
                             <li>Viết kịch bản vào từng bước. <b class="text-indigo-700">Bấm LƯU sau mỗi bước</b> để thanh tiến độ tăng lên.</li>
                             <li>Phải hoàn thiện 100% (lưu đủ 5 bước) thì mới có thể nhấn nút <b class="text-indigo-700">Nộp bài</b>.</li>
-                            <li>Hệ thống sẽ tự động tạo file Google Docs lưu trữ bải làm của bạn gửi cho Giảng viên.</li>
+                            <li>Quay lại hệ thống trước giờ học Zoom để xem Nhận xét của Giảng viên.</li>
                         </ul>
                     </div>
                 </div>
@@ -99,7 +95,6 @@
 
     <!-- MÀN HÌNH 2: WORKSPACE (LÀM BÀI) -->
     <main id="workspaceView" class="flex-1 overflow-y-auto custom-scrollbar relative bg-slate-100 hidden flex-col">
-        
         <!-- Workspace Header & Progress -->
         <div class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm px-4 md:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -132,14 +127,37 @@
         </div>
     </main>
 
-    <!-- Các Modal (Auth, Cert) dùng chung -->
-    <!-- (Đã ẩn trong logic nhưng giữ nguyên cấu trúc modal của bản trước) -->
+    <!-- MODAL ĐĂNG NHẬP / ĐỊNH DANH -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full relative border border-slate-200/60">
+            <h2 class="text-2xl font-black text-slate-800 mb-1 flex items-center gap-2">
+                <i class="fas fa-user-shield text-indigo-600"></i> Định danh
+            </h2>
+            <p class="text-xs text-slate-400 font-semibold mb-6">Vui lòng nhập thông tin để lưu bài làm.</p>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Họ và tên *</label>
+                    <input type="text" id="inpName" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-400" placeholder="VD: Nguyễn Văn A">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Phòng ban (Team) *</label>
+                    <input type="text" id="inpDept" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-400" placeholder="VD: DSSGN3">
+                </div>
+                <button onclick="saveProfile()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black py-3.5 rounded-xl shadow-lg transition-all">
+                    Bắt đầu làm bài
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Kịch bản API và Logic -->
     <script src="codelab-data.js"></script>
     <script>
+        // ==========================================
         const SESSION_ID = 'session_kynang'; 
         const STORAGE_KEY = 'kv_codelab_progress_kynang';
         const DATA_KEY = 'kv_codelab_data_kynang'; 
+        // ==========================================
 
         let currentExercises = []; 
         let stepDataStore = {}; 
@@ -153,100 +171,98 @@
             if(profileRaw) { 
                 const profile = JSON.parse(profileRaw); 
                 document.getElementById('studentLabel').innerText = `👤 ${profile.name} - ${profile.dept}`; 
+                loadSessionData();
             } else { 
-                window.location.href = 'index.html'; 
+                // BẬT MODAL NẾU CHƯA ĐỊNH DANH (Chống đơ màn hình)
+                document.getElementById('authModal').classList.remove('hidden');
             }
-
-            loadSessionData();
         });
 
+        function saveProfile() {
+            const name = document.getElementById('inpName').value.trim(); 
+            const dept = document.getElementById('inpDept').value.trim();
+            if(!name || !dept) { alert("Vui lòng điền đủ thông tin!"); return; }
+            localStorage.setItem('kv_trainer_profile', JSON.stringify({ name: name, dept: dept }));
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('studentLabel').innerText = `👤 ${name} - ${dept}`;
+            loadSessionData();
+        }
+
         function loadSessionData() {
-            const session = CODELAB_DATA.find(s => s.id === SESSION_ID); if(!session) return;
-            currentExercises = session.exercises;
-            renderDashboard();
+            try {
+                const session = CODELAB_DATA.find(s => s.id === SESSION_ID); 
+                if(!session) return;
+                currentExercises = session.exercises;
+                renderDashboard();
+                setTimeout(() => { fetchFeedback(false); }, 1000); 
+            } catch(e) { console.error("Lỗi tải dữ liệu:", e); }
         }
 
-        // ==========================================
-        // GIAI ĐOẠN 1: RENDER DASHBOARD (MÀN 1)
-        // ==========================================
         function renderDashboard() {
-            const gridScenarios = document.getElementById('gridScenarios');
-            const gridReferences = document.getElementById('gridReferences');
-            gridScenarios.innerHTML = ''; gridReferences.innerHTML = '';
+            try {
+                const gridScenarios = document.getElementById('gridScenarios');
+                const gridReferences = document.getElementById('gridReferences');
+                gridScenarios.innerHTML = ''; gridReferences.innerHTML = '';
 
-            currentExercises.forEach((ex, index) => {
-                if (ex.isGroupHeader) return;
+                currentExercises.forEach((ex, index) => {
+                    if (ex.isGroupHeader) return;
+                    const myData = stepDataStore[index] || {};
+                    let isRef = ex.title.toLowerCase().includes('tham khảo');
 
-                const myData = stepDataStore[index] || {};
-                let isRef = ex.title.toLowerCase().includes('tham khảo');
-
-                // NẾU LÀ BÀI THAM KHẢO
-                if (isRef) {
-                    let html = `
-                    <div onclick="openReference(${index})" class="glass-panel p-6 rounded-3xl clickable-card flex flex-col h-full bg-amber-50/30 border-amber-200/50">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-black text-lg shadow-sm"><i class="fas fa-book-reader"></i></div>
-                            <h4 class="font-black text-slate-800 text-lg flex-1">${ex.title}</h4>
-                        </div>
-                        <p class="text-slate-500 text-xs leading-relaxed mb-4 flex-1">Nhấn để xem cấu trúc và nội dung kịch bản mẫu chi tiết từng bước.</p>
-                        <div class="text-amber-600 font-bold text-xs flex items-center gap-1 mt-auto pt-3 border-t border-slate-100/50">Xem chi tiết <i class="fas fa-arrow-right"></i></div>
-                    </div>`;
-                    gridReferences.innerHTML += html;
-                } 
-                // NẾU LÀ BÀI THỰC HÀNH TÌNH HUỐNG
-                else {
-                    // Tính phần trăm hoàn thành
-                    let theoryLen = ex.theory ? ex.theory.length : 0;
-                    let filledCount = 0;
-                    if(myData.textAnswers) {
-                        for(let i=0; i<theoryLen; i++) {
-                            if(myData.textAnswers[i] && myData.textAnswers[i].trim() !== "") filledCount++;
+                    if (isRef) {
+                        gridReferences.innerHTML += `
+                        <div onclick="openReference(${index})" class="glass-panel p-6 rounded-3xl clickable-card flex flex-col h-full bg-amber-50/30 border-amber-200/50">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-black text-lg shadow-sm"><i class="fas fa-book-reader"></i></div>
+                                <h4 class="font-black text-slate-800 text-lg flex-1">${ex.title}</h4>
+                            </div>
+                            <p class="text-slate-500 text-xs leading-relaxed mb-4 flex-1">Nhấn để xem cấu trúc và nội dung kịch bản mẫu chi tiết từng bước.</p>
+                            <div class="text-amber-600 font-bold text-xs flex items-center gap-1 mt-auto pt-3 border-t border-slate-100/50">Xem chi tiết <i class="fas fa-arrow-right"></i></div>
+                        </div>`;
+                    } else {
+                        let theoryLen = ex.theory ? ex.theory.length : 0;
+                        let filledCount = 0;
+                        if(myData.textAnswers) {
+                            for(let i=0; i<theoryLen; i++) {
+                                if(myData.textAnswers[i] && myData.textAnswers[i].trim() !== "") filledCount++;
+                            }
                         }
-                    }
-                    let pct = theoryLen === 0 ? 0 : Math.round((filledCount / theoryLen) * 100);
-                    
-                    let statusHtml = '';
-                    let cardStyle = 'glass-panel';
-                    let iconBg = 'bg-blue-100 text-blue-600';
-                    
-                    if (myData.isSubmitted) {
-                        statusHtml = `<div class="absolute top-4 right-4 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-200 flex items-center gap-1 shadow-sm"><i class="fas fa-check-double"></i> ĐÃ NỘP BÀI</div>`;
-                        cardStyle = 'bg-white border-emerald-200 shadow-md';
-                        iconBg = 'bg-emerald-100 text-emerald-600';
-                    } else if (pct > 0) {
-                        statusHtml = `<div class="absolute top-4 right-4 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black border border-amber-200 flex items-center gap-1 shadow-sm"><i class="fas fa-spinner fa-spin"></i> ĐANG LÀM (${pct}%)</div>`;
-                    }
-
-                    // Cảnh báo Feedback
-                    let feedbackHtml = '';
-                    if (myData.isUnread) {
-                        feedbackHtml = `<div class="absolute -top-3 -right-3 bg-red-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full border-2 border-white shadow-md animate-bounce"><i class="fas fa-bell"></i> Có Nhận Xét</div>`;
-                    }
-
-                    let html = `
-                    <div onclick="openScenario(${index})" class="group relative ${cardStyle} p-6 rounded-3xl clickable-card flex flex-col h-full">
-                        ${statusHtml}
-                        ${feedbackHtml}
-                        <div class="w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center font-black text-xl shadow-inner mb-4 transition-transform group-hover:scale-110"><i class="fas fa-keyboard"></i></div>
-                        <h4 class="font-black text-slate-800 text-lg mb-2 group-hover:text-indigo-600 transition-colors">${ex.title}</h4>
-                        <p class="text-slate-500 text-xs leading-relaxed mb-6 flex-1">${ex.hints ? ex.hints[0] : ''}</p>
+                        let pct = theoryLen === 0 ? 0 : Math.round((filledCount / theoryLen) * 100);
                         
-                        <div class="w-full bg-slate-100 h-1.5 rounded-full mb-3 overflow-hidden"><div class="bg-indigo-500 h-full rounded-full transition-all" style="width: ${pct}%"></div></div>
+                        let statusHtml = '';
+                        let cardStyle = 'glass-panel';
+                        let iconBg = 'bg-indigo-100 text-indigo-600';
                         
-                        <div class="text-indigo-600 font-bold text-xs flex items-center gap-1 mt-auto group-hover:gap-2 transition-all">Vào làm bài <i class="fas fa-arrow-right"></i></div>
-                    </div>`;
-                    gridScenarios.innerHTML += html;
-                }
-            }
+                        if (myData.isSubmitted) {
+                            statusHtml = `<div class="absolute top-4 right-4 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-200 flex items-center gap-1 shadow-sm"><i class="fas fa-check-double"></i> ĐÃ NỘP BÀI</div>`;
+                            cardStyle = 'bg-white border-emerald-200 shadow-md';
+                            iconBg = 'bg-emerald-100 text-emerald-600';
+                        } else if (pct > 0) {
+                            statusHtml = `<div class="absolute top-4 right-4 bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black border border-amber-200 flex items-center gap-1 shadow-sm"><i class="fas fa-spinner fa-spin"></i> ĐANG LÀM (${pct}%)</div>`;
+                        }
+
+                        let feedbackHtml = myData.isUnread ? `<div class="absolute -top-3 -right-3 bg-red-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full border-2 border-white shadow-md animate-bounce"><i class="fas fa-bell"></i> Có Nhận Xét</div>` : '';
+                        let hintText = (ex.hints && ex.hints.length > 0) ? ex.hints[0] : '';
+
+                        gridScenarios.innerHTML += `
+                        <div onclick="openScenario(${index})" class="group relative ${cardStyle} p-6 rounded-3xl clickable-card flex flex-col h-full">
+                            ${statusHtml} ${feedbackHtml}
+                            <div class="w-12 h-12 rounded-2xl ${iconBg} flex items-center justify-center font-black text-xl shadow-inner mb-4 transition-transform group-hover:scale-110"><i class="fas fa-keyboard"></i></div>
+                            <h4 class="font-black text-slate-800 text-lg mb-2 group-hover:text-indigo-600 transition-colors">${ex.title}</h4>
+                            <p class="text-slate-500 text-xs leading-relaxed mb-6 flex-1">${hintText}</p>
+                            
+                            <div class="w-full bg-slate-100 h-1.5 rounded-full mb-3 overflow-hidden"><div class="bg-indigo-500 h-full rounded-full transition-all" style="width: ${pct}%"></div></div>
+                            <div class="text-indigo-600 font-bold text-xs flex items-center gap-1 mt-auto group-hover:gap-2 transition-all">Vào làm bài <i class="fas fa-arrow-right"></i></div>
+                        </div>`;
+                    }
+                });
+            } catch(e) { console.error("Lỗi Render Dashboard", e); }
         }
 
-        // ==========================================
-        // GIAI ĐOẠN 2: MỞ BÀI & WORKSPACE (MÀN 2)
-        // ==========================================
         function backToDashboard() {
             document.getElementById('workspaceView').classList.add('hidden');
             document.getElementById('dashboardView').classList.remove('hidden');
-            renderDashboard(); // Re-render để cập nhật % tiến độ ở ngoài
+            renderDashboard(); 
         }
 
         function openReference(index) {
@@ -255,16 +271,18 @@
             document.getElementById('dashboardView').classList.add('hidden');
             document.getElementById('workspaceView').classList.remove('hidden');
             document.getElementById('wsTitle').innerText = ex.title;
-            document.getElementById('wsBottomBar').classList.add('hidden'); // Bài tham khảo ko có nút nộp
+            document.getElementById('wsBottomBar').classList.add('hidden'); 
 
             let html = `<div class="bg-amber-50 border border-amber-200 p-6 md:p-8 rounded-3xl shadow-sm">
                 <h3 class="font-black text-amber-800 text-lg mb-6"><i class="fas fa-book-open"></i> CHI TIẾT KỊCH BẢN MẪU</h3>
                 <div class="space-y-6">`;
             
-            ex.hints.forEach(hint => {
-                let formatted = hint.replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-900 text-sm">$1</strong>').replace(/\n/g, '<br>');
-                html += `<div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm text-slate-700 text-sm leading-relaxed">${formatted}</div>`;
-            });
+            if(ex.hints) {
+                ex.hints.forEach(hint => {
+                    let formatted = hint.replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-900 text-sm">$1</strong>').replace(/\n/g, '<br>');
+                    html += `<div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm text-slate-700 text-sm leading-relaxed">${formatted}</div>`;
+                });
+            }
             html += `</div></div>`;
             document.getElementById('wsContent').innerHTML = html;
             document.getElementById('wsProgressBar').style.width = '100%';
@@ -281,7 +299,6 @@
             document.getElementById('wsBottomBar').classList.remove('hidden');
             document.getElementById('wsTitle').innerText = ex.title;
 
-            // Xử lý đọc Feedback nếu có
             if(myData.isUnread) {
                 myData.isUnread = false; 
                 localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
@@ -289,51 +306,46 @@
 
             let html = ``;
 
-            // Khung Feedback
             if(myData.feedback) {
                 html += `<div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-2xl mb-6 shadow-sm"><h3 class="text-sm font-black text-amber-800 uppercase tracking-widest mb-2"><i class="fas fa-chalkboard-teacher"></i> Giảng viên nhận xét:</h3><p class="text-amber-900 text-sm whitespace-pre-wrap font-medium leading-relaxed">${myData.feedback}</p></div>`;
             }
 
-            // Hint
             if(ex.hints && ex.hints.length > 0) {
                 html += `<div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-8 shadow-sm text-indigo-900 text-sm leading-relaxed">${ex.hints.map(h => `<p class="mb-2 last:mb-0">${h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`).join('')}</div>`;
             }
 
-            // Trạng thái đã nộp
             if(myData.isSubmitted) {
                 html += `<div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl mb-6 flex items-center gap-3 shadow-sm"><i class="fas fa-check-circle text-emerald-600 text-2xl"></i><div><p class="font-black text-emerald-800 text-sm">HỆ THỐNG ĐÃ GHI NHẬN BÀI LÀM CỦA BẠN</p><p class="text-xs text-emerald-600 font-medium">Bạn vẫn có thể sửa lại kịch bản bên dưới và bấm Lưu/Nộp bổ sung nếu muốn.</p></div></div>`;
             }
 
-            // Sinh 5 khung Textarea cho 5 bước
             let answersArr = myData.textAnswers || [];
-            ex.theory.forEach((q, qIndex) => {
-                let ansVal = answersArr[qIndex] || '';
-                let isFilled = ansVal.trim() !== "";
-                
-                let btnStateClass = isFilled ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-300" : "bg-white text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 border-slate-300";
-                let btnText = isFilled ? `<i class="fas fa-check"></i> Đã Lưu` : `<i class="fas fa-save"></i> Lưu bước này`;
+            if(ex.theory) {
+                ex.theory.forEach((q, qIndex) => {
+                    let ansVal = answersArr[qIndex] || '';
+                    let isFilled = ansVal.trim() !== "";
+                    
+                    let btnStateClass = isFilled ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-300" : "bg-white text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 border-slate-300";
+                    let btnText = isFilled ? `<i class="fas fa-check"></i> Đã Lưu` : `<i class="fas fa-save"></i> Lưu bước này`;
 
-                html += `
-                <div class="mb-6 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all focus-within:border-indigo-400 focus-within:shadow-md" id="cardStep_${qIndex}">
-                    <div class="bg-slate-50 p-3 px-5 border-b border-slate-200 flex justify-between items-center">
-                        <p class="text-slate-800 font-black text-sm uppercase tracking-tight">${q}</p>
-                    </div>
-                    <textarea id="inpStep_${qIndex}" rows="4" class="w-full p-5 focus:ring-0 outline-none font-medium text-slate-700 text-sm transition-all resize-y" placeholder="Gõ lời thoại kịch bản của bạn cho bước này...">${ansVal}</textarea>
-                    <div class="bg-slate-50 px-5 py-3 border-t border-slate-100 flex justify-end">
-                        <button id="btnSave_${qIndex}" onclick="saveSingleStep(${qIndex})" class="px-5 py-2 text-xs font-bold rounded-lg border transition-all shadow-sm ${btnStateClass}">
-                            ${btnText}
-                        </button>
-                    </div>
-                </div>`;
-            });
+                    html += `
+                    <div class="mb-6 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all focus-within:border-indigo-400 focus-within:shadow-md" id="cardStep_${qIndex}">
+                        <div class="bg-slate-50 p-3 px-5 border-b border-slate-200 flex justify-between items-center">
+                            <p class="text-slate-800 font-black text-sm uppercase tracking-tight">${q}</p>
+                        </div>
+                        <textarea id="inpStep_${qIndex}" rows="4" class="w-full p-5 focus:ring-0 outline-none font-medium text-slate-700 text-sm transition-all resize-y" placeholder="Gõ lời thoại kịch bản của bạn cho bước này...">${ansVal}</textarea>
+                        <div class="bg-slate-50 px-5 py-3 border-t border-slate-100 flex justify-end">
+                            <button id="btnSave_${qIndex}" onclick="saveSingleStep(${qIndex})" class="px-5 py-2 text-xs font-bold rounded-lg border transition-all shadow-sm ${btnStateClass}">
+                                ${btnText}
+                            </button>
+                        </div>
+                    </div>`;
+                });
+            }
 
             document.getElementById('wsContent').innerHTML = html;
             updateWorkspaceProgress();
         }
 
-        // ==========================================
-        // GIAI ĐOẠN 3: LƯU TỪNG BƯỚC & KHÓA NỘP BÀI
-        // ==========================================
         function saveSingleStep(stepIndex) {
             let val = document.getElementById(`inpStep_${stepIndex}`).value.trim();
             if(!val) { 
@@ -348,7 +360,6 @@
             stepDataStore[activeScenarioIndex].textAnswers[stepIndex] = val;
             localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
 
-            // Đổi màu nút thành Đã lưu (Màu xanh)
             let btn = document.getElementById(`btnSave_${stepIndex}`);
             btn.innerHTML = `<i class="fas fa-check"></i> Đã Lưu`;
             btn.className = "px-5 py-2 text-xs font-bold rounded-lg border transition-all shadow-sm bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-300";
@@ -358,7 +369,7 @@
 
         function updateWorkspaceProgress() {
             let data = stepDataStore[activeScenarioIndex] || {};
-            let theoryLen = currentExercises[activeScenarioIndex].theory.length; // Thường là 5
+            let theoryLen = currentExercises[activeScenarioIndex].theory.length; 
             let filledCount = 0;
             
             if(data.textAnswers) {
@@ -371,11 +382,9 @@
             document.getElementById('wsProgressBar').style.width = pct + '%';
             document.getElementById('wsProgressText').innerText = pct + '%';
 
-            // KHÓA / MỞ KHÓA NÚT SUBMIT
             let submitBtn = document.getElementById('btnSubmitEx');
             if(submitBtn) {
                 if(filledCount === theoryLen && theoryLen > 0) {
-                    // MỞ KHÓA
                     submitBtn.disabled = false;
                     submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     submitBtn.classList.add('hover:scale-105', 'shadow-indigo-500/30');
@@ -385,7 +394,6 @@
                         submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Nộp Kịch Bản Này`;
                     }
                 } else {
-                    // KHÓA LẠI
                     submitBtn.disabled = true;
                     submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
                     submitBtn.classList.remove('hover:scale-105', 'shadow-indigo-500/30');
@@ -394,9 +402,6 @@
             }
         }
 
-        // ==========================================
-        // GIAI ĐOẠN 4: SUBMIT LÊN GOOGLE APPS SCRIPT
-        // ==========================================
         function submitCurrentExercise() {
             const currentData = stepDataStore[activeScenarioIndex];
             const exerciseTitle = currentExercises[activeScenarioIndex].title;
@@ -410,7 +415,7 @@
             const oldText = btnEl.innerHTML;
             btnEl.classList.replace('bg-indigo-600', 'bg-slate-500'); 
             btnEl.classList.add('cursor-not-allowed', 'animate-pulse'); 
-            btnEl.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Hệ thống đang tạo File lưu trữ...`; 
+            btnEl.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang nộp bài...`; 
             btnEl.disabled = true;
 
             const payload = { 
@@ -420,7 +425,7 @@
                 session: document.getElementById('sessionTitle').innerText, 
                 exerciseTitle: exerciseTitle, 
                 textAnswers: currentData.textAnswers || [], 
-                images: [] // Bỏ chức năng upload ảnh vì đã có Google Docs
+                images: [] 
             };
 
             fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
@@ -428,7 +433,7 @@
                 if(data.status === 'success') {
                     currentData.isSubmitted = true; 
                     localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore)); 
-                    alert("🎉 NỘP BÀI THÀNH CÔNG!\nHệ thống đã tạo file Google Docs chứa kịch bản của bạn và gửi cho Giảng viên."); 
+                    alert("🎉 NỘP BÀI THÀNH CÔNG!\nHệ thống đã ghi nhận Kịch bản của bạn. Hãy chờ Giảng viên chấm điểm nhé."); 
                     backToDashboard(); 
                 } else alert("Lỗi server: " + data.message);
             }).catch(err => alert("Lỗi kết nối mạng: Vui lòng thử lại sau."))
@@ -438,6 +443,37 @@
                 btnEl.innerHTML = oldText; 
                 btnEl.disabled = false; 
             });
+        }
+
+        function fetchFeedback(isManualClick) {
+            const apiUrl = APP_CONFIG.API_URL; if(!apiUrl) return;
+            const profileRaw = localStorage.getItem('kv_trainer_profile'); if(!profileRaw) return;
+            const profile = JSON.parse(profileRaw);
+            
+            if(isManualClick) document.getElementById('btnFeedbackText').innerText = "Đang tải...";
+            
+            fetch(`${apiUrl}?studentName=${encodeURIComponent(profile.name)}`)
+            .then(r => r.json()).then(res => {
+                if(res.status === 'success' && res.allData) {
+                    let hasNew = false;
+                    const sessionData = res.allData["Bài tập: Kịch bản Tư vấn Bán hàng"] || {};
+                    for(let i=0; i<currentExercises.length; i++) {
+                        const title = currentExercises[i].title;
+                        if(sessionData[title]) {
+                            if(!stepDataStore[i]) stepDataStore[i] = {};
+                            if(stepDataStore[i].feedback !== sessionData[title]) {
+                                stepDataStore[i].feedback = sessionData[title]; stepDataStore[i].isUnread = true; hasNew = true;
+                            }
+                        }
+                    }
+                    if(hasNew) { localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore)); renderDashboard(); }
+                    if(isManualClick) {
+                        if(hasNew) alert("Bạn có nhận xét mới từ Giảng viên!");
+                        else alert("Chưa có nhận xét mới nào từ Giảng viên.");
+                    }
+                }
+            }).catch(err => console.error(err))
+            .finally(() => { if(isManualClick) document.getElementById('btnFeedbackText').innerText = "Kiểm tra Nhận Xét"; });
         }
     </script>
 </body>

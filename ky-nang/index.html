@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đào tạo Direct Sales - Quy trình tư vấn</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { kiot: '#166def', kiotHover: '#0f52b8', kiotLight: '#e8f0fe' } } } }
+    </script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #334155; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        #sidebarScroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+        /* HIỆU ỨNG ÁNH SÁNG NỀN (GLOW BLOB) */
+        .tech-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; background: #f8fafc; overflow: hidden; pointer-events: none; }
+        .glow-blob-1 { position: absolute; top: -10%; left: -10%; width: 50vw; height: 50vw; filter: blur(120px); border-radius: 50%; animation: float 15s ease-in-out infinite; background: rgba(37, 99, 235, 0.08); }
+        .glow-blob-2 { position: absolute; bottom: -10%; right: -10%; width: 50vw; height: 50vw; filter: blur(120px); border-radius: 50%; animation: float 18s ease-in-out infinite reverse; background: rgba(16, 185, 129, 0.08); }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(30px) scale(1.05); } }
+
+        /* HIỆU ỨNG GLASSMORPHISM (KÍNH MỜ) */
+        .glass-panel { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .glass-header { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+        
+        .clickable-card { cursor: pointer; transition: all 0.3s ease; }
+        .clickable-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border-color: rgba(59, 130, 246, 0.4); }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden selection:bg-blue-200 selection:text-blue-900 relative">
+
+    <div class="tech-bg"><div class="glow-blob-1"></div><div class="glow-blob-2"></div></div>
+
+    <!-- SIDEBAR HƯỚNG DẪN -->
+    <aside id="sidebar" class="w-80 bg-[#1e3a8a] border-r border-white/10 flex flex-col z-30 transition-all duration-300 shrink-0 text-sm shadow-[4px_0_24px_rgba(0,0,0,0.2)] relative overflow-hidden hidden md:flex">
+        
+        <div class="h-16 flex items-center px-5 border-b border-white/10 shrink-0 justify-between relative z-10 md:hidden">
+            <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" class="h-7 brightness-0 invert">
+            <button onclick="toggleSidebar()" class="text-white/50 hover:text-red-400 p-1 transition-colors"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div id="filterArea" class="p-5 flex-1 overflow-y-auto flex flex-col scroll-smooth relative z-10 space-y-5" id="sidebarScroll">
+            <h2 class="text-xs font-extrabold text-blue-200/80 uppercase tracking-widest flex items-center gap-2">
+                <i class="fas fa-info-circle text-blue-300"></i> Hướng Dẫn Thực Hành
+            </h2>
+
+            <div class="space-y-4 text-white/90">
+                <div class="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/10 shadow-inner">
+                    <span class="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-extrabold shrink-0 mt-0.5">1</span>
+                    <p class="text-xs leading-relaxed">
+                        <strong class="text-blue-200">Định danh:</strong> Bấm nút danh tính ở góc trên bên phải để khai báo <em class="not-italic text-blue-200">Họ tên, Phòng ban</em> trước khi làm.
+                    </p>
+                </div>
+                
+                <div class="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/10 shadow-inner">
+                    <span class="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-extrabold shrink-0 mt-0.5">2</span>
+                    <p class="text-xs leading-relaxed">
+                        <strong class="text-blue-200">Cách làm bài:</strong> Lựa chọn <em class="not-italic text-blue-200">ít nhất 1 trong 3 tình huống</em>, gõ trực tiếp kịch bản vào 5 ô tương ứng &rarr; bấm Nộp bài.
+                    </p>
+                </div>
+
+                <div class="flex items-start gap-3 bg-white/5 p-3 rounded-xl border border-white/10 shadow-inner">
+                    <span class="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-extrabold shrink-0 mt-0.5">3</span>
+                    <p class="text-xs leading-relaxed">
+                        <strong class="text-blue-200">Kiểm tra Feedback:</strong> Vào lại hệ thống trước giờ học Zoom để đọc nhận xét của Giảng viên và điều chỉnh kịch bản.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Khung Deadline -->
+            <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl shadow-inner mt-4">
+                <div class="flex items-center gap-2 text-amber-400 font-extrabold text-xs mb-1.5 uppercase tracking-wide">
+                    <i class="fas fa-clock"></i> Hạn Chót
+                </div>
+                <p class="text-[11px] text-amber-200 font-medium leading-relaxed">
+                    Nộp bài trước <strong>15h00 chiều Thứ 3</strong>. Vui lòng làm đầy đủ để được tham gia buổi học thực hành qua Zoom.
+                </p>
+            </div>
+        </div>
+        
+        <div class="p-4 border-t border-white/10 bg-black/20 backdrop-blur-md shrink-0 flex flex-col gap-2 relative z-10 text-center">
+            <span class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">KiotViet Learning & Development</span>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative w-full z-10">
+        
+        <!-- HEADER KÍNH MỜ (GLASS) -->
+        <header class="glass-header h-16 flex items-center justify-between px-6 z-20 shrink-0 w-full sticky top-0">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-500 hover:text-blue-600 p-2 rounded-xl hover:bg-blue-50 transition-colors">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                <a href="index.html" class="flex items-center">
+                    <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="KiotViet Logo" class="h-8">
+                </a>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <!-- Nút định danh -->
+                <button id="btnIdentity" onclick="openAuthModal()" class="flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full border transition shadow-sm bg-red-50 text-red-600 border-red-200 hover:bg-red-100 cursor-pointer animate-pulse">
+                    👤 Đang kiểm tra...
+                </button>
+            </div>
+        </header>
+
+        <!-- KHUNG NỘI DUNG CHÍNH -->
+        <div class="flex-1 overflow-auto p-6 md:p-10 relative custom-scrollbar">
+            <div class="max-w-4xl mx-auto pb-16">
+                
+                <!-- Hướng dẫn cho màn hình Mobile (sẽ ẩn trên Desktop) -->
+                <div class="md:hidden bg-blue-50/90 border border-blue-200/60 rounded-2xl p-5 mb-8 shadow-sm backdrop-blur">
+                    <h3 class="text-sm font-black text-blue-800 mb-3 flex items-center gap-2"><i class="fas fa-info-circle"></i> Hướng Dẫn Thực Hành</h3>
+                    <div class="space-y-2 text-blue-900 text-xs">
+                        <p><strong>1. Định danh:</strong> Bấm nút 👤 ở góc trên bên phải để khai báo thông tin.</p>
+                        <p><strong>2. Làm bài:</strong> Gõ trực tiếp kịch bản &rarr; nhấn <em>Nộp bài</em>.</p>
+                        <p><strong>3. Hạn chót:</strong> Nộp trước 15h00 chiều Thứ 3.</p>
+                    </div>
+                </div>
+
+                <!-- Tiêu đề lớn -->
+                <div class="mb-10 text-center md:text-left">
+                    <h2 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-600 tracking-tight pb-1">
+                        Hệ thống Nộp Bài Tập Kỹ Năng
+                    </h2>
+                    <p class="text-sm md:text-base font-medium text-slate-500 mt-2">
+                        Khóa học: Đào tạo Direct Sales - Quy trình tư vấn
+                    </p>
+                </div>
+
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2 justify-center md:justify-start">
+                    <i class="fas fa-briefcase text-indigo-500 text-base"></i> Nhiệm vụ của bạn
+                </h3>
+                
+                <!-- THẺ BÀI TẬP DUY NHẤT KÍNH MỜ (GLASS CARD) -->
+                <div class="grid grid-cols-1 gap-6">
+                    
+                    <a href="thuc-hanh-ky-nang.html" class="group relative glass-panel p-6 md:p-8 rounded-3xl border border-white/60 hover:shadow-xl transition-all flex flex-col md:flex-row items-center gap-6 md:gap-10 clickable-card">
+                        <div id="notify_session_kynang" class="hidden absolute -top-3 -right-3 bg-red-500 text-white text-[11px] font-black px-3 py-1.5 rounded-full border-2 border-white shadow-md animate-bounce">Có Nhận xét mới</div>
+                        <div id="check_session_kynang" class="hidden absolute top-4 right-4 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[11px] font-black flex items-center gap-1 border border-emerald-200"><i class="fas fa-check-circle"></i> Đã nộp bài</div>
+                        
+                        <div class="w-24 h-24 md:w-32 md:h-32 shrink-0 bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 rounded-2xl flex items-center justify-center font-black text-4xl group-hover:scale-105 transition shadow-inner">
+                            <i class="fas fa-keyboard"></i>
+                        </div>
+                        
+                        <div class="flex-1 text-center md:text-left">
+                            <h4 class="text-xl md:text-2xl font-black text-slate-800 mb-3 group-hover:text-blue-600 transition">Viết Kịch Bản Tư Vấn Khách Hàng</h4>
+                            <p class="text-slate-500 text-sm leading-relaxed mb-6">
+                                Hãy áp dụng quy trình 6 bước tư vấn KiotViet vào thực tế. Yêu cầu: Chọn và viết kịch bản hoàn chỉnh cho <b>ít nhất 1 trong 3 tình huống</b> đã cho (Ngành Mẹ Bé, Tạp Hóa, Thời trang).
+                            </p>
+                            <div class="inline-flex text-white bg-blue-600 hover:bg-blue-700 rounded-xl px-6 py-3 font-bold text-sm items-center gap-2 transition-all shadow-md">
+                                Bấm vào đây để làm bài <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+            
+            <footer class="text-center py-6 mt-auto border-t border-slate-200/50">
+                <div class="flex flex-col items-center gap-3">
+                    <img src="https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg" alt="KiotViet Logo" class="h-5 opacity-50 grayscale">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">© 2026 KiotViet Learning & Development</p>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- MODAL ĐĂNG NHẬP / ĐỊNH DANH (Kính mờ) -->
+    <div id="authModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full relative border border-slate-200/60">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-red-500 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+            <h2 class="text-2xl font-black text-slate-800 mb-1 flex items-center gap-2">
+                <i class="fas fa-user-shield text-blue-600"></i> Đăng nhập
+            </h2>
+            <p class="text-xs text-slate-400 font-semibold mb-6">Vui lòng nhập đúng thông tin để Giảng viên ghi nhận và chấm điểm.</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Họ và tên học viên *</label>
+                    <input type="text" id="inpName" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100/50 transition-all shadow-inner" placeholder="VD: Nguyễn Văn A">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-wider mb-2">Phòng ban (Team) *</label>
+                    <input type="text" id="inpDept" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100/50 transition-all shadow-inner" placeholder="VD: DSSGN3">
+                </div>
+                <button onclick="saveProfile()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-black py-3.5 px-4 rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5 mt-2">
+                    Lưu thông tin & Bắt đầu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tự động kéo API và Data từ file chung -->
+    <script src="codelab-data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderIdentity();
+            const profileRaw = localStorage.getItem('kv_trainer_profile');
+            if(!profileRaw) {
+                openAuthModal();
+            } else {
+                fetchGlobalNotifications();
+            }
+            
+            // Cập nhật key kiểm tra hoàn thành theo Khóa Kỹ Năng
+            checkCompletion('session_kynang', 'kv_codelab_data_kynang', 'check_session_kynang');
+        });
+
+        // HÀM QUÉT NHẬN XÉT GIẢNG VIÊN ĐỂ BẬT CHẤM ĐỎ NOTIFICATION
+        function fetchGlobalNotifications() {
+            if (typeof APP_CONFIG === 'undefined' || !APP_CONFIG.API_URL) return;
+            const apiUrl = APP_CONFIG.API_URL;
+            const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
+            if(!apiUrl || !profile) return;
+            
+            const btnIdent = document.getElementById('btnIdentity');
+            const originalHTML = btnIdent.innerHTML;
+            btnIdent.innerHTML += ` <i class="fas fa-spinner fa-spin ml-1 text-slate-400"></i>`;
+
+            fetch(`${apiUrl}?studentName=${encodeURIComponent(profile.name)}`)
+            .then(r => r.json())
+            .then(res => {
+                if(res.status === 'success' && res.allData) {
+                    checkNotification('session_kynang', 'kv_codelab_data_kynang', 'notify_session_kynang', res.allData);
+                }
+            }).finally(() => { renderIdentity(); });
+        }
+
+        // HÀM SO SÁNH DATA ĐỂ HIỆN CHẤM ĐỎ
+        function checkNotification(sessionId, storageKey, notifyId, allApiData) {
+            const session = CODELAB_DATA.find(s => s.id === sessionId);
+            if(!session) return;
+            
+            const apiSessionData = allApiData[session.title] || {};
+            let hasNew = false;
+            
+            const savedData = localStorage.getItem(storageKey);
+            let store = savedData ? JSON.parse(savedData) : {};
+            
+            for(let i=0; i<session.exercises.length; i++) {
+                let exTitle = session.exercises[i].title;
+                if(apiSessionData[exTitle]) {
+                    if(!store[i]) store[i] = {};
+                    if(store[i].feedback !== apiSessionData[exTitle]) hasNew = true;
+                }
+            }
+            for(let key in store) { if(store[key].isUnread) hasNew = true; }
+            if(hasNew) document.getElementById(notifyId).classList.remove('hidden');
+        }
+
+        // HÀM KIỂM TRA TIẾN ĐỘ ĐỂ BẬT TÍCH XANH HOÀN THÀNH
+        function checkCompletion(sessionId, storageKey, badgeId) {
+            const sessionData = CODELAB_DATA.find(s => s.id === sessionId); if(!sessionData) return;
+            const savedData = localStorage.getItem(storageKey);
+            if(savedData) {
+                const store = JSON.parse(savedData);
+                // Đối với khóa kỹ năng, chỉ cần nộp 1 bài là đã đạt yêu cầu cơ bản
+                let hasSubmittedAny = false;
+                for(let i = 0; i < sessionData.exercises.length; i++) { 
+                    if(store[i] && store[i].isSubmitted) { hasSubmittedAny = true; break; } 
+                }
+                if(hasSubmittedAny) document.getElementById(badgeId).classList.remove('hidden');
+            }
+        }
+
+        function renderIdentity() {
+            const btn = document.getElementById('btnIdentity'); const profileRaw = localStorage.getItem('kv_trainer_profile');
+            if(profileRaw) {
+                const profile = JSON.parse(profileRaw);
+                btn.innerHTML = `👤 ${profile.name} <span class="hidden md:inline">- ${profile.dept}</span> <span class="text-[10px] font-normal opacity-70 underline ml-1">(Sửa)</span>`;
+                btn.className = "flex items-center gap-2 text-xs font-black px-4 py-2 rounded-xl border transition shadow-sm bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 cursor-pointer";
+                document.getElementById('inpName').value = profile.name; document.getElementById('inpDept').value = profile.dept;
+            } else {
+                btn.innerHTML = `👤 Chưa định danh (Bấm để nhập)`;
+                btn.className = "flex items-center gap-2 text-xs font-black px-4 py-2 rounded-xl border transition shadow-sm bg-red-50 text-red-600 border-red-200 hover:bg-red-100 cursor-pointer animate-pulse";
+            }
+        }
+
+        function openAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+        
+        function saveProfile() {
+            const name = document.getElementById('inpName').value.trim(); const dept = document.getElementById('inpDept').value.trim();
+            if(!name || !dept) { alert("Vui lòng điền Họ tên và Phòng ban!"); return; }
+            localStorage.setItem('kv_trainer_profile', JSON.stringify({ name: name, dept: dept }));
+            closeAuthModal(); renderIdentity(); fetchGlobalNotifications();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            if(window.innerWidth < 768) {
+                sidebar.classList.toggle('absolute'); sidebar.classList.toggle('inset-y-0'); sidebar.classList.toggle('left-0');
+            }
+        }
+    </script>
+</body>
+</html>

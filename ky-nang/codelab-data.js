@@ -1,7 +1,136 @@
 // CẤU HÌNH HỆ THỐNG DÀNH CHO ADMIN
 const APP_CONFIG = {
     // Dán link API của Google Apps Script MỚI của bạn vào đây
-    API_URL: "https://script.google.com/macros/s/AKfycbyrq0l1TijRxxN7d8btTEL1bpZB08r-25qRmeIlVOZBmpWw1GEWyknD9NdgQD28pl0FGg/exec", 
+    API_URL: "// Nếu để trống, nó sẽ tự tạo thư mục "Bài tập thực hành KỸ NĂNG" ở Drive của bạn
+const ROOT_FOLDER_ID = ''; 
+
+function getOrCreateSubFolder(parentFolder, folderName) {
+  var folders = parentFolder.getFoldersByName(folderName);
+  if (folders.hasNext()) return folders.next();
+  return parentFolder.createFolder(folderName);
+}
+
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(10000);
+    var data = JSON.parse(e.postData.contents);
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var sheetData = sheet.getDataRange().getValues();
+
+    // LUỒNG 1: GIẢNG VIÊN NHẬN XÉT (Cột M)
+    if (data.action === "update_feedback") {
+      var studentName = data.studentName; var session = data.session; var exerciseTitle = data.exerciseTitle; var feedback = data.feedback;
+      var updated = false;
+      for (var i = sheetData.length - 1; i >= 1; i--) {
+        if (sheetData[i][1] == studentName && sheetData[i][4] == session && sheetData[i][5] == exerciseTitle) {
+          sheet.getRange(i + 1, 13).setValue(feedback);
+          updated = true; break;
+        }
+      }
+      if (updated) return ContentService.createTextOutput(JSON.stringify({ status: 'success' })).setMimeType(ContentService.MimeType.JSON);
+      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Không tìm thấy bài làm' })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // LUỒNG 2: HỌC VIÊN NỘP BÀI KỊCH BẢN
+    var studentName = data.studentName || 'Unknown'; var department = data.department || 'Unknown';
+    var courseName = data.courseName || 'Khóa Mặc Định'; var session = data.session || 'Buổi Unknown';
+    var exerciseTitle = data.exerciseTitle || 'Bài Tập';
+    var textAnswers = data.textAnswers || []; 
+    var images = data.images || [];
+   
+    // 1. TẠO CẤU TRÚC THƯ MỤC TRÊN GOOGLE DRIVE
+    var root = ROOT_FOLDER_ID ? DriveApp.getFolderById(ROOT_FOLDER_ID) : DriveApp.getRootFolder();
+    var level1 = getOrCreateSubFolder(root, "Bài tập thực hành KỸ NĂNG");
+    var level2 = getOrCreateSubFolder(level1, courseName);
+    var level3 = getOrCreateSubFolder(level2, session);
+    var level4 = getOrCreateSubFolder(level3, studentName + " - " + department);
+    
+    var fileUrls = [];
+
+    // 2. LƯU ẢNH (NẾU CÓ)
+    if (images.length > 0) {
+        for (var i = 0; i < images.length; i++) {
+          var img = images[i]; var byteCharacters = Utilities.base64Decode(img.base64Data);
+          var imgName = exerciseTitle.replace(/[\/\\]/g, '') + " - Ảnh " + (i + 1) + ".png";
+          var imgFile = level4.createFile(Utilities.newBlob(byteCharacters, img.mimeType || 'image/png', imgName));
+          imgFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+          fileUrls.push(imgFile.getUrl());
+        }
+    }
+
+    // 3. TẠO FILE GOOGLE DOCS KỊCH BẢN TỰ ĐỘNG
+    var docName = "Kịch Bản: " + studentName + " - " + exerciseTitle;
+    var doc = DocumentApp.create(docName);
+    var docId = doc.getId();
+    var docFile = DriveApp.getFileById(docId);
+    docFile.moveTo(level4); // Di chuyển file Doc vào đúng thư mục của học viên
+    docFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.COMMENT); // Cấp quyền Comment cho Giảng viên
+
+    // Ghi nội dung vào Google Docs
+    var body = doc.getBody();
+    body.insertParagraph(0, "KỊCH BẢN TƯ VẤN DIRECT SALES").setHeading(DocumentApp.ParagraphHeading.HEADING1);
+    body.appendParagraph("Học viên: " + studentName + " | Phòng ban: " + department);
+    body.appendParagraph("Tình huống: " + exerciseTitle + "\n");
+    
+    var stepNames = [
+      "BƯỚC 1: TIẾP CẬN", 
+      "BƯỚC 2: XÁC THỰC", 
+      "BƯỚC 3: KHAI THÁC THÔNG TIN & NHU CÀU", 
+      "BƯỚC 4: TƯ VẤN GIẢI PHÁP", 
+      "BƯỚC 5: DẪN DẮT DEMO & CHỐT"
+    ];
+
+    for(var j = 0; j < 5; j++) {
+      var ans = textAnswers[j] || '(Chưa nhập kịch bản)';
+      body.appendParagraph(stepNames[j]).setHeading(DocumentApp.ParagraphHeading.HEADING2);
+      body.appendParagraph(ans + "\n");
+    }
+    
+    doc.saveAndClose();
+    var docUrl = doc.getUrl();
+    
+    // Đưa link Google Docs lên đầu mảng URL để ghi vào Sheet
+    fileUrls.unshift(docUrl);
+
+    // 4. BÓC TÁCH VÀ GHI VÀO GOOGLE SHEET
+    var ans1 = textAnswers[0] || ''; var ans2 = textAnswers[1] || '';
+    var ans3 = textAnswers[2] || ''; var ans4 = textAnswers[3] || ''; var ans5 = textAnswers[4] || '';
+    var timestamp = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm:ss");
+    var linksStr = fileUrls.join("\n");
+   
+    sheet.appendRow([timestamp, studentName, department, courseName, session, exerciseTitle, ans1, ans2, ans3, ans4, ans5, linksStr]);
+
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success', message: 'Đã lưu thành công!', urls: fileUrls })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: error.toString() })).setMimeType(ContentService.MimeType.JSON);
+  } finally { lock.releaseLock(); }
+}
+
+function doGet(e) {
+  try {
+    var studentName = e.parameter.studentName; var reqSession = e.parameter.session;
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = sheet.getDataRange().getValues();
+    var feedbackData = {};
+    
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      if (row[1] == studentName) {
+        var rowSession = row[4]; var exTitle = row[5];
+        var feedback = row[12]; // Cột M
+        if (feedback && feedback.toString().trim() !== "") {
+          if (!feedbackData[rowSession]) feedbackData[rowSession] = {};
+          if (!feedbackData[rowSession][exTitle]) { feedbackData[rowSession][exTitle] = feedback.toString().trim(); }
+          else { if (!feedbackData[rowSession][exTitle].includes(feedback.toString().trim())) { feedbackData[rowSession][exTitle] += "\n\n-----------------\n\n" + feedback.toString().trim(); } }
+        }
+      }
+    }
+    var returnData = reqSession ? (feedbackData[reqSession] || {}) : feedbackData;
+    return ContentService.createTextOutput(JSON.stringify({ status: 'success', data: returnData, allData: feedbackData })).setMimeType(ContentService.MimeType.JSON);
+  } catch(err) { return ContentService.createTextOutput(JSON.stringify({ status: 'error' })).setMimeType(ContentService.MimeType.JSON); }
+}", 
     COURSE_NAME: "26KV15" 
 };
 

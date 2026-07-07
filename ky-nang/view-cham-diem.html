@@ -7,14 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }</style>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        /* CSS ẨN CẢ WEBSITE KHI IN, CHỈ HIỆN KHUNG PDF */
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; background: white; }
+            .no-print { display: none !important; }
+        }
+    </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <!-- CẤU HÌNH GẮN CỨNG LINK TẠI ĐÂY -->
     <script>
         const CONFIG = {
-            API_URL: "https://script.google.com/macros/s/AKfycbxVvXTNrnUcWHSOkp2pTuHd-AQZru4ms23XylfGQPCeSUrno2MPncFNqd6Tt6KwpB-CYg/exec", 
+            API_URL: "https://script.google.com/macros/s/AKfycbwboyLcD_Vr3JsTW49po8xIO8YpcfnFu1pm-IXZqlZPjDcoMc5rFKorcOyAl33hY37Yfg/exec", 
             SHEET_URL: "https://docs.google.com/spreadsheets/d/161DKBTiYh6CXBy7AGRx6qCjIHcdBD7cZQ_CSOrK1CtY/edit?gid=0#gid=0"
         };
     </script>
@@ -66,11 +74,14 @@
         </div>
     </main>
 
+    <!-- KHUNG ẨN ĐỂ IN PDF LƯU VỀ MÁY TÍNH CỦA GIẢNG VIÊN -->
+    <div id="printArea" class="hidden"></div>
+
     <script>
         let allData = [];
 
         function loadSubmissions() {
-            if(!CONFIG.API_URL || CONFIG.API_URL === "DÁN_LINK_API_CỦA_BẠN_VÀO_ĐÂY") { alert("Vui lòng gắn Link API vào biến CONFIG trong file HTML trước."); return; }
+            if(!CONFIG.API_URL || CONFIG.API_URL === "DÁN_LINK_API_VÀO_ĐÂY") { alert("Vui lòng gắn Link API vào file HTML trước."); return; }
 
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('submissionsList').innerHTML = '';
@@ -88,10 +99,9 @@
 
         function renderList(data) {
             const container = document.getElementById('submissionsList');
-            if(data.length === 0) { container.innerHTML = `<p class="text-center text-slate-500 font-bold py-10">Chưa có bài nào được nộp.</p>`; return; }
+            if(data.length === 0) { container.innerHTML = `<p class="text-center text-slate-500 font-bold py-10">Chưa có bài nào.</p>`; return; }
 
-            let pendingCount = 0;
-            container.innerHTML = '';
+            let pendingCount = 0; container.innerHTML = '';
 
             data.forEach((item, index) => {
                 let isGraded = item.feedback && item.feedback.trim() !== "";
@@ -103,29 +113,21 @@
 
                 let html = `
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
-                    <!-- HEADER THẺ BÀI TẬP -->
                     <div class="bg-white p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50" onclick="document.getElementById('body_${index}').classList.toggle('hidden')">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xl font-black border border-indigo-100"><i class="fas fa-user-edit"></i></div>
                             <div>
-                                <div class="flex items-center gap-3 mb-1">
-                                    <h3 class="text-lg font-black text-slate-800">${item.studentName} <span class="text-sm text-slate-500 font-semibold">(${item.department})</span></h3>
-                                    ${updateBadge}
-                                </div>
+                                <div class="flex items-center gap-3 mb-1"><h3 class="text-lg font-black text-slate-800">${item.studentName} <span class="text-sm text-slate-500 font-semibold">(${item.department})</span></h3>${updateBadge}</div>
                                 <p class="text-xs font-bold text-slate-400">Nộp lúc: ${item.timestamp} &nbsp;|&nbsp; <span class="text-indigo-600">${item.exerciseTitle}</span></p>
                             </div>
                         </div>
                         <div class="flex items-center gap-4">${gradeBadge}</div>
                     </div>
                     
-                    <!-- NỘI DUNG CHI TIẾT BÊN TRONG -->
                     <div id="body_${index}" class="hidden border-t border-slate-100 bg-slate-50/50">
                         <div class="p-6">
-                            <!-- Nút chức năng -->
                             <div class="flex justify-end mb-6">
-                                <button id="btnPdf_${index}" onclick="exportToPDFDrive(${index})" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-sm transition">
-                                    <i class="fas fa-file-pdf text-lg"></i> Đóng gói PDF & Lưu Drive
-                                </button>
+                                <button onclick="exportToLocalPDF(${index})" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-black flex items-center gap-2 shadow-sm transition"><i class="fas fa-print text-lg text-emerald-400"></i> Đóng gói Báo Cáo & In PDF</button>
                             </div>
 
                             <div class="grid grid-cols-1 gap-4 mb-6">
@@ -136,14 +138,13 @@
                                 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm"><p class="text-xs font-black text-indigo-400 mb-3 uppercase tracking-widest">Bước 5: Chốt</p><p class="text-sm text-slate-700 font-medium whitespace-pre-wrap leading-relaxed">${item.ans5 || '(Trống)'}</p></div>
                             </div>
 
-                            ${item.links ? `<div class="mb-8"><p class="text-xs font-black text-slate-500 mb-3">TÀI LIỆU BACKUP & ẢNH TRÊN DRIVE:</p><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col gap-2">${item.links.split('\n').map(link => `<a href="${link}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800 underline break-all font-semibold"><i class="fas fa-external-link-alt mr-1"></i> ${link}</a>`).join('')}</div></div>` : ''}
+                            ${item.links ? `<div class="mb-8"><p class="text-xs font-black text-slate-500 mb-3">TÀI LIỆU/LINK ĐÍNH KÈM:</p><div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm"><a href="${item.links}" target="_blank" class="text-sm text-blue-600 hover:text-blue-800 underline break-all font-semibold"><i class="fas fa-link mr-1"></i> ${item.links}</a></div></div>` : ''}
 
-                            <!-- VÙNG CHẤM ĐIỂM -->
                             <div class="bg-amber-50 p-6 rounded-2xl border border-amber-200 shadow-sm">
                                 <label class="flex items-center gap-2 text-sm font-black text-amber-800 uppercase mb-3"><i class="fas fa-edit"></i> Ghi nhận xét của Giảng Viên:</label>
                                 <textarea id="fb_${index}" rows="4" class="w-full p-4 rounded-xl border border-amber-300 outline-none text-sm font-medium mb-4 focus:ring-4 focus:ring-amber-200/50 bg-white">${item.feedback || ''}</textarea>
                                 <div class="flex justify-end">
-                                    <button id="btnSend_${index}" onclick="sendFeedback(${index})" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-8 py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                                    <button id="btnSend_${index}" onclick="sendFeedback(${index}, '${item.studentName}', '${item.exerciseTitle}')" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-8 py-3 rounded-xl shadow-lg shadow-amber-500/30 transition-all hover:-translate-y-0.5 flex items-center gap-2">
                                         <i class="fas fa-paper-plane"></i> Gửi Điểm Cho Học Viên
                                     </button>
                                 </div>
@@ -153,53 +154,59 @@
                 </div>`;
                 container.innerHTML += html;
             });
-
-            document.getElementById('statTotal').innerText = data.length;
-            document.getElementById('statPending').innerText = pendingCount;
+            document.getElementById('statTotal').innerText = data.length; document.getElementById('statPending').innerText = pendingCount;
         }
 
-        // ĐÓNG GÓI PDF GỌI API LÊN GOOGLE DRIVE
-        function exportToPDFDrive(index) {
+        // HÀM IN PDF VỀ MÁY GIẢNG VIÊN (KHÔNG CẦN GOOGLE DRIVE)
+        function exportToLocalPDF(index) {
             const item = allData[index];
-            const btn = document.getElementById(`btnPdf_${index}`);
-            const oldText = btn.innerHTML;
+            const printArea = document.getElementById('printArea');
             
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin text-lg"></i> Đang nén & lưu lên Drive...`; 
-            btn.disabled = true; btn.classList.add('opacity-70', 'cursor-not-allowed');
+            let printHtml = `
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; border-bottom: 2px solid #4f46e5; margin-bottom: 30px; padding-bottom: 20px;">
+                    <h1 style="font-size: 26px; font-weight: 900; color: #1e3a8a; margin: 0 0 10px 0;">BÁO CÁO LƯU TRỮ KỊCH BẢN</h1>
+                    <p style="font-size: 14px; color: #64748b; margin: 0;">Xuất từ Portal Giảng Viên KiotViet</p>
+                </div>
+                
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+                    <table style="width: 100%; font-size: 14px; line-height: 1.8;">
+                        <tr><td style="width: 120px; font-weight: bold; color: #64748b;">Học viên:</td><td style="font-weight: bold; color: #0f172a;">${item.studentName}</td></tr>
+                        <tr><td style="font-weight: bold; color: #64748b;">Phòng ban:</td><td style="font-weight: bold; color: #0f172a;">${item.department}</td></tr>
+                        <tr><td style="font-weight: bold; color: #64748b;">Tình huống:</td><td style="font-weight: bold; color: #4f46e5;">${item.exerciseTitle}</td></tr>
+                        <tr><td style="font-weight: bold; color: #64748b;">Thời gian nộp:</td><td>${item.timestamp}</td></tr>
+                    </table>
+                </div>
 
-            const payload = { 
-                action: "export_pdf", studentName: item.studentName, department: item.department, 
-                exerciseTitle: item.exerciseTitle, feedback: document.getElementById(`fb_${index}`).value,
-                ans1: item.ans1, ans2: item.ans2, ans3: item.ans3, ans4: item.ans4, ans5: item.ans5
-            };
-
-            fetch(CONFIG.API_URL, { method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
-            .then(r => r.json()).then(res => {
-                if(res.status === 'success') { 
-                    alert("Thành công! File PDF đã được lưu vào thư mục của học viên trên Google Drive."); 
-                    window.open(res.url, '_blank'); // Mở file PDF ra xem luôn
-                } else alert("Lỗi: " + res.message);
-            }).catch(err => alert("Lỗi kết nối!")).finally(() => { 
-                btn.innerHTML = oldText; btn.disabled = false; btn.classList.remove('opacity-70', 'cursor-not-allowed');
-            });
+                <div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 1: TIẾP CẬN</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans1 || '(Trống)'}</div></div>
+                <div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 2: XÁC THỰC</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans2 || '(Trống)'}</div></div>
+                <div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 3: KHAI THÁC</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans3 || '(Trống)'}</div></div>
+                <div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 4: TƯ VẤN</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans4 || '(Trống)'}</div></div>
+                <div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 5: CHỐT</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans5 || '(Trống)'}</div></div>
+                
+                ${item.feedback ? `<div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 15px; margin-top: 20px; page-break-inside: avoid;"><p style="font-weight: bold; font-size: 14px; margin: 0 0 8px 0; color: #b45309;">💬 Giảng viên nhận xét:</p><p style="font-size: 14px; color: #78350f; white-space: pre-wrap; margin: 0; line-height: 1.6;">${item.feedback}</p></div>` : ''}
+            </div>`;
+            
+            printArea.innerHTML = printHtml;
+            printArea.classList.remove('hidden');
+            window.print(); // Trình duyệt tự gọi lệnh In PDF
+            printArea.classList.add('hidden');
         }
 
-        // GỬI NHẬN XÉT
-        function sendFeedback(index) {
+        function sendFeedback(index, stName, exTitle) {
             const val = document.getElementById(`fb_${index}`).value;
-            if(!val) { alert("Vui lòng gõ nhận xét trước khi gửi!"); return; }
+            if(!val) { alert("Vui lòng gõ nhận xét!"); return; }
 
             const btn = document.getElementById(`btnSend_${index}`); const oldText = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang lưu...`; btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang gửi...`; btn.disabled = true;
 
-            const item = allData[index];
-            const payload = { action: "update_feedback", studentName: item.studentName, exerciseTitle: item.exerciseTitle, feedback: val };
+            const payload = { action: "update_feedback", studentName: stName, exerciseTitle: exTitle, feedback: val };
 
             fetch(CONFIG.API_URL, { method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
             .then(r => r.json()).then(res => {
                 if(res.status === 'success') { alert("Gửi nhận xét thành công!"); loadSubmissions(); } 
-                else alert("Lỗi!");
-            }).catch(err => alert("Lỗi kết nối!")).finally(() => { btn.innerHTML = oldText; btn.disabled = false; });
+                else { alert("Lỗi: " + res.message); }
+            }).catch(err => alert("Lỗi kết nối mạng!")).finally(() => { btn.innerHTML = oldText; btn.disabled = false; });
         }
     </script>
 </body>

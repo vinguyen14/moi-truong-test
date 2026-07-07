@@ -1,7 +1,7 @@
 // CẤU HÌNH HỆ THỐNG DÀNH CHO ADMIN
 const APP_CONFIG = {
     // CHỈ DÁN ĐƯỜNG LINK TỪ GOOGLE APPS SCRIPT (CÓ ĐUÔI /exec) VÀO GIỮA 2 DẤU NGOẶC KÉP BÊN DƯỚI:
-    API_URL: "https://script.google.com/macros/s/AKfycbzrvjEs40TPY-6NresMKH-oWzaOIjCRPPPlUJIfxuwFw1X2bchaWesYPui5wiqRADigjg/exec", 
+    API_URL: "https://script.google.com/macros/s/AKfycbx5FccwMePjo_a8Kz4bMap3LwqvCvqgSzYHpJ-2anE4rH_a4G45FsBdp3Rg87WjsLr1SA/exec", 
     COURSE_NAME: "KỸ NĂNG DIRECT SALES" 
 };
 

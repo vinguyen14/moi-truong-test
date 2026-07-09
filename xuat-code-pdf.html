@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trainer OS - Presentation PDF Builder</title>
+    <title>Trainer OS - Pro Presentation Builder</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -133,8 +133,8 @@
                 <div class="flex items-center gap-3">
                     <label class="text-sm font-semibold text-slate-700">Tỷ lệ giả lập hiển thị:</label>
                     <select id="canvas-size" class="text-sm border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-slate-700 font-medium" onchange="updateScale()">
-                        <option value="1920x1080" selected>🖥️ Kích thước Slide Chuẩn (1920x1080)</option>
-                        <option value="1366x768">💻 Kích thước Laptop (1366x768)</option>
+                        <option value="1024x576" selected>🖥️ Slide Chuẩn theo Code Gốc (1024x576)</option>
+                        <option value="1920x1080">🖥️ Slide Khổ Lớn Full HD (1920x1080)</option>
                     </select>
                 </div>
                 <div class="flex items-center gap-2">
@@ -171,6 +171,7 @@
             
             if (!container || !wrapper) return;
 
+            // Lấy chính xác width/height từ Select box (1024x576)
             const [w, h] = size.split('x').map(Number);
             wrapper.style.width = w + 'px';
             wrapper.style.height = h + 'px';
@@ -186,6 +187,7 @@
             wrapper.style.transform = `scale(${scale})`;
             zoomLabel.innerText = `Scale: ${Math.round(scale * 100)}%`;
 
+            // Gọi hàm tiêm CSS khóa PDF
             injectPresentationLock();
         }
 
@@ -202,7 +204,6 @@
             setTimeout(updateScale, 100); 
         });
 
-        // Tự động lưu
         let typingTimer;
         htmlInput.addEventListener('input', () => {
             clearTimeout(typingTimer);
@@ -220,7 +221,7 @@
         });
 
         // ==========================================
-        // 2. RENDER GIAO DIỆN VÀO IFRAME
+        // 2. RENDER GIAO DIỆN VÀO IFRAME & CHIẾM QUYỀN NÚT IN
         // ==========================================
         function renderHTML() {
             const codeInput = htmlInput.value;
@@ -235,6 +236,19 @@
             const iframeDoc = iframe.contentWindow.document;
             iframeDoc.open();
             iframeDoc.write(codeInput);
+            
+            // Script để "Chiếm quyền" lệnh window.print() từ code gốc của User
+            iframeDoc.write(`
+                <script>
+                    window.print = function() {
+                        // Kích hoạt ngược lại lệnh in của Tool cha
+                        if (window.parent && window.parent.exportToPDF) {
+                            window.parent.exportToPDF();
+                        }
+                    };
+                <\/script>
+            `);
+            
             iframeDoc.write('<style id="dynamic-print-style"></style>');
             iframeDoc.close();
             
@@ -261,7 +275,7 @@
         }
 
         // ==========================================
-        // 3. THUẬT TOÁN ÉP PAGE SIZE THÀNH 16:9 TRÌNH CHIẾU FULL-SCREEN
+        // 3. THUẬT TOÁN KHÓA TỶ LỆ PDF THÀNH 1024x576 (CHUẨN 16:9)
         // ==========================================
         function injectPresentationLock() {
             const iframe = document.getElementById('slide-preview-frame');
@@ -271,19 +285,22 @@
             const styleTag = iframeDoc.getElementById('dynamic-print-style');
             if (!styleTag) return; 
             
+            const sizeSelect = document.getElementById('canvas-size').value;
+            const [w, h] = sizeSelect.split('x').map(Number);
+            
             styleTag.innerHTML = `
                 @media print {
-                    /* Bước 1: Ép khổ PDF thành 1920x1080px (Chuẩn 16:9) thay vì A4 */
+                    /* ÉP KHỔ GIẤY PDF đúng tỷ lệ của bản mô phỏng */
                     @page { 
-                        size: 1920px 1080px !important; 
+                        size: ${w}px ${h}px !important; 
                         margin: 0 !important; 
                     }
                     
-                    /* Bước 2: Ép hệ thống vẽ giao diện như Desktop để không kích hoạt Responsive Mobile */
+                    /* Bắt buộc khung hình gốc không được co bóp */
                     html, body {
-                        width: 1920px !important;
+                        width: ${w}px !important;
                         height: auto !important;
-                        min-width: 1920px !important;
+                        min-width: ${w}px !important;
                         margin: 0 !important;
                         padding: 0 !important;
                         -webkit-print-color-adjust: exact !important;
@@ -291,34 +308,33 @@
                         background-color: transparent !important;
                     }
                     
-                    /* Bước 3: Đánh bại class w-full max-w-5xl, ép nó tràn lề 1920px */
+                    /* Mở khóa giới hạn của class gốc */
                     .w-full.max-w-5xl {
-                        max-width: 1920px !important;
-                        width: 1920px !important;
+                        max-width: ${w}px !important;
+                        width: ${w}px !important;
                         padding: 0 !important;
                         margin: 0 !important;
                     }
 
-                    /* Bước 4: Biến mỗi slide-card thành 1 màn hình Full HD, lấp đầy 1 trang PDF */
+                    /* Ép từng thẻ slide-card vừa khít với 1 trang PDF */
                     .slide-card {
-                        width: 1920px !important;
-                        height: 1080px !important;
-                        min-height: 1080px !important;
-                        max-height: 1080px !important;
-                        margin: 0 !important;      /* Bỏ lề để tràn viền */
-                        padding: 80px 100px !important; /* Căn chỉnh nội dung thụt vào cho đẹp nếu cần */
-                        border: none !important;   /* Bỏ viền của UI mô phỏng */
-                        border-radius: 0 !important; /* Bỏ bo góc */
-                        box-shadow: none !important; /* Bỏ đổ bóng */
+                        width: ${w}px !important;
+                        height: ${h}px !important;
+                        min-height: ${h}px !important;
+                        max-height: ${h}px !important;
+                        margin: 0 !important;
+                        padding: 40px 60px !important; /* Thu nhỏ đệm lại 1 chút cho cân đối với 1024px */
+                        border: none !important;
+                        border-radius: 0 !important;
+                        box-shadow: none !important;
                         
-                        /* Lệnh này ép máy in: Kết thúc thẻ này thì tự động ngắt sang trang PDF mới */
                         page-break-inside: avoid !important;
                         page-break-after: always !important;
                         break-inside: avoid !important;
                         break-after: page !important;
                     }
                     
-                    /* Ẩn Header Top bar khi in */
+                    /* Ẩn thanh header và các phần không cần in */
                     header, .no-print {
                         display: none !important;
                     }
@@ -338,8 +354,10 @@
                 return;
             }
 
+            // Gọi hàm tiêm CSS lần cuối để chắc chắn tỷ lệ đã bị khóa
             injectPresentationLock();
 
+            // Kích hoạt in trực tiếp
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
         }

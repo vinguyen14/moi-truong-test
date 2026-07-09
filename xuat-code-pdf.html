@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trainer OS - Slide Builder & PDF Exporter</title>
+    <title>Trainer OS - Slide Builder & PDF Exporter (Iframe Engine)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Thư viện html2pdf.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     
     <script>
         tailwind.config = {
@@ -53,20 +51,12 @@
             background-color: #e2e8f0;
         }
         
-        /* Khu vực xem trước Slide cố định tỷ lệ 16:9 */
-        #slide-preview-container {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background-color: white;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        /* Để html2pdf capture tốt, nội dung bên trong cần hiển thị đầy đủ */
-        #slide-preview {
+        /* Chỉnh Iframe full khung, cho phép scroll độc lập */
+        #slide-preview-frame {
             width: 100%;
             height: 100%;
-            box-sizing: border-box;
+            border: none;
+            background-color: white;
         }
     </style>
 </head>
@@ -75,29 +65,29 @@
     <!-- Top Header -->
     <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
         <div class="flex items-center gap-3">
-            <div class="bg-primary text-white p-2 rounded">
+            <div class="bg-primary text-white p-2 rounded shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-slate-900">Công cụ tạo Slide (HTML to PDF)</h1>
+                <h1 class="text-xl font-bold text-slate-900">Slide Builder (Iframe Sandbox)</h1>
                 <p class="text-sm text-slate-500">Trainer OS Enterprise L&D</p>
             </div>
         </div>
         <div class="flex gap-3">
-            <button onclick="renderHTML()" class="btn-secondary flex items-center gap-2">
+            <button onclick="renderHTML()" class="btn-secondary flex items-center gap-2" title="Ctrl + Enter để xem nhanh">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                Xem trước giao diện
+                Render Giao Diện
             </button>
-            <button onclick="exportToPDF()" class="btn-primary flex items-center gap-2">
+            <button onclick="exportToPDF()" class="btn-primary flex items-center gap-2 shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Tải xuống PDF
+                In / Lưu PDF 16:9
             </button>
         </div>
     </header>
@@ -106,89 +96,116 @@
     <main class="flex-1 p-6 flex gap-6 overflow-hidden">
         
         <!-- Cột trái: Nhập HTML -->
-        <div class="w-1/3 flex flex-col gap-2">
+        <div class="w-1/3 flex flex-col gap-2 relative">
             <label for="html-input" class="font-semibold text-slate-700 flex justify-between items-center">
                 Mã nguồn HTML / CSS
-                <span class="text-xs font-normal text-slate-500 bg-slate-200 px-2 py-1 rounded">Chấp nhận Tailwind classes</span>
+                <span id="save-status" class="text-xs font-normal text-emerald-600 bg-emerald-50 px-2 py-1 rounded hidden transition-all">Đã lưu nháp!</span>
             </label>
-            <textarea id="html-input" class="saas-card w-full flex-1 p-4 font-mono text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder="Nhập mã HTML vào đây...&#10;&#10;Ví dụ:&#10;<div class='p-10 bg-blue-50 h-full flex flex-col justify-center items-center'>&#10;    <h1 class='text-5xl font-bold text-blue-600 mb-4'>Tiêu đề Slide</h1>&#10;    <p class='text-xl text-gray-700'>Nội dung chi tiết của slide nằm ở đây...</p>&#10;</div>"></textarea>
+            <textarea id="html-input" class="saas-card w-full flex-1 p-4 font-mono text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder="Dán toàn bộ mã HTML của bạn vào đây..."></textarea>
         </div>
 
-        <!-- Cột phải: Khung xem trước (Canvas/Slide) -->
+        <!-- Cột phải: Khung xem trước (Iframe Sandbox) -->
         <div class="w-2/3 flex flex-col gap-2">
-            <label class="font-semibold text-slate-700">Màn hình xem trước (Tỷ lệ 16:9)</label>
-            <div class="saas-card flex-1 bg-slate-200 flex items-center justify-center p-6 overflow-y-auto">
-                <!-- Vùng hiển thị sẽ được render -->
-                <div id="slide-preview-container" class="shadow-lg">
-                    <div id="slide-preview">
-                        <!-- Nội dung mặc định hướng dẫn -->
-                        <div class="flex flex-col h-full items-center justify-center bg-white text-slate-400 p-8 text-center border-2 border-dashed border-slate-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <p class="text-lg">Khu vực hiển thị Slide</p>
-                            <p class="text-sm mt-2">Nhập mã HTML ở bên trái và bấm <strong>"Xem trước giao diện"</strong></p>
-                        </div>
-                    </div>
-                </div>
+            <label class="font-semibold text-slate-700 flex justify-between items-center">
+                Màn hình xem trước (Cách ly hoàn toàn)
+                <span class="text-xs font-normal text-slate-500 bg-slate-200 px-2 py-1 rounded">Hỗ trợ cuộn nhiều trang</span>
+            </label>
+            <div class="saas-card flex-1 bg-slate-200 overflow-hidden relative">
+                <!-- IFRAME ENGINE: Không lo đơ máy, không lo xung đột CSS -->
+                <iframe id="slide-preview-frame" sandbox="allow-same-origin allow-scripts"></iframe>
             </div>
         </div>
 
     </main>
 
-    <!-- Overlay Loading khi đang xuất PDF -->
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex flex-col items-center justify-center z-50 hidden">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
-        <p class="text-white font-medium text-lg">Đang tạo file PDF, vui lòng đợi...</p>
-    </div>
-
     <script>
-        // Hàm xử lý hiển thị HTML từ Textarea vào Khung xem trước
+        const LOCAL_STORAGE_KEY = 'kv_slide_builder_draft';
+        const htmlInput = document.getElementById('html-input');
+        const saveStatus = document.getElementById('save-status');
+
+        // Khi vừa mở trang, load lại code cũ nếu có
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedCode = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (savedCode) {
+                htmlInput.value = savedCode;
+                // Render ngay lập tức đoạn code vừa load
+                renderHTML();
+            } else {
+                // Nếu chưa có gì, render màn hình hướng dẫn mặc định vào iframe
+                renderDefaultInstruction();
+            }
+        });
+
+        // Tự động lưu code vào LocalStorage mỗi khi gõ
+        let typingTimer;
+        htmlInput.addEventListener('input', () => {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                localStorage.setItem(LOCAL_STORAGE_KEY, htmlInput.value);
+                // Hiện thông báo đã lưu
+                saveStatus.classList.remove('hidden');
+                setTimeout(() => saveStatus.classList.add('hidden'), 2000);
+            }, 1000); // Đợi 1 giây sau khi ngừng gõ mới lưu
+        });
+
+        // Hỗ trợ phím tắt: Ctrl + Enter để Render
+        htmlInput.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                renderHTML();
+            }
+        });
+
+        // Hàm xử lý đẩy HTML từ Textarea vào Iframe
         function renderHTML() {
-            const codeInput = document.getElementById('html-input').value;
-            const previewArea = document.getElementById('slide-preview');
+            const codeInput = htmlInput.value;
+            const iframe = document.getElementById('slide-preview-frame');
             
             if (!codeInput.trim()) {
                 alert("Vui lòng nhập mã HTML trước khi xem trước.");
+                renderDefaultInstruction();
                 return;
             }
             
-            // Render HTML vào khung
-            previewArea.innerHTML = codeInput;
+            // Xóa rỗng Iframe và ghi lại nội dung mới (Sandbox Write)
+            const iframeDoc = iframe.contentWindow.document;
+            iframeDoc.open();
+            iframeDoc.write(codeInput);
+            iframeDoc.close();
         }
 
-        // Hàm xử lý xuất PDF bằng html2pdf
+        // Giao diện hướng dẫn ban đầu trong Iframe
+        function renderDefaultInstruction() {
+            const iframe = document.getElementById('slide-preview-frame');
+            const iframeDoc = iframe.contentWindow.document;
+            const instructionHTML = `
+                <html lang="vi">
+                <body style="font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; align-items: center; justify-content: center; background-color: #ffffff; color: #94a3b8; text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" style="height: 64px; width: 64px; margin-bottom: 16px; color: #cbd5e1;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p style="font-size: 1.125rem;">Khu vực hiển thị Slide an toàn (Iframe Sandbox)</p>
+                    <p style="font-size: 0.875rem; margin-top: 8px;">Dán mã code có chứa @media print vào cột trái<br>và bấm <strong>Render Giao diện</strong> (hoặc Ctrl + Enter)</p>
+                </body>
+                </html>
+            `;
+            iframeDoc.open();
+            iframeDoc.write(instructionHTML);
+            iframeDoc.close();
+        }
+
+        // Hàm xử lý gọi hộp thoại in chuẩn của trình duyệt từ Iframe
         function exportToPDF() {
-            const previewArea = document.getElementById('slide-preview');
-            const overlay = document.getElementById('loading-overlay');
+            const iframe = document.getElementById('slide-preview-frame');
+            const codeInput = htmlInput.value;
             
-            // Kiểm tra xem đã có nội dung để xuất chưa
-            if (previewArea.innerText.includes("Khu vực hiển thị Slide") && !document.getElementById('html-input').value.trim()) {
+            if (!codeInput.trim()) {
                 alert("Bạn chưa có nội dung Slide nào để xuất PDF.");
                 return;
             }
 
-            // Hiển thị loading
-            overlay.classList.remove('hidden');
-
-            // Cấu hình thư viện html2pdf
-            const opt = {
-                margin:       0,
-                filename:     'Trainer_Slide_' + new Date().getTime() + '.pdf',
-                image:        { type: 'jpeg', quality: 1.0 },
-                html2canvas:  { scale: 2, useCORS: true, logging: false },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' } // Hướng ngang (landscape) cho slide
-            };
-
-            // Gọi hàm tạo PDF
-            html2pdf().set(opt).from(previewArea).save().then(() => {
-                // Ẩn loading sau khi tải xong
-                overlay.classList.add('hidden');
-            }).catch(err => {
-                console.error("Lỗi khi xuất PDF:", err);
-                alert("Có lỗi xảy ra khi xuất PDF. Vui lòng kiểm tra console (F12).");
-                overlay.classList.add('hidden');
-            });
+            // Focus vào iframe và gọi lệnh in nội bộ
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
         }
     </script>
 </body>

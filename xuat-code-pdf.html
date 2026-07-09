@@ -93,8 +93,8 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-slate-900">Device Simulator & Print Preview</h1>
-                <p class="text-sm text-slate-500">Giả lập hiển thị và In ấn chuẩn xác</p>
+                <h1 class="text-xl font-bold text-slate-900">Device Simulator & Dynamic Print</h1>
+                <p class="text-sm text-slate-500">Giả lập hiển thị và Ghi đè cấu hình in (Override Print)</p>
             </div>
         </div>
         <div class="flex gap-3">
@@ -108,7 +108,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Mở Tab In (Bản Chuẩn)
+                In PDF Theo Khổ Giả Lập
             </button>
         </div>
     </header>
@@ -144,7 +144,7 @@
                         </optgroup>
                         <optgroup label="Thiết bị di động">
                             <option value="768x1024">📱 Tablet (768x1024)</option>
-                            <option value="375x812">📱 Mobile (375x812)</option>
+                            <option value="375x812">📱 Mobile iPhone (375x812)</option>
                         </optgroup>
                     </select>
                 </div>
@@ -182,28 +182,22 @@
             if (!container || !wrapper) return;
 
             if (size === 'responsive') {
-                // Chế độ Tự do: Bám sát 100% diện tích hiện có
                 wrapper.style.width = '100%';
                 wrapper.style.height = '100%';
                 wrapper.style.transform = 'scale(1)';
                 zoomLabel.innerText = 'Scale: Khớp';
             } else {
-                // Chế độ Cố định: Lấy Width và Height
                 const [w, h] = size.split('x').map(Number);
-                
-                // Ép iframe wrapper thành kích thước vật lý mong muốn
                 wrapper.style.width = w + 'px';
                 wrapper.style.height = h + 'px';
                 
-                // Thuật toán tính toán Tỉ lệ thu nhỏ để vừa vặn vào màn hình hiện tại
-                const padding = 64; // Cách lề 32px mỗi bên cho đẹp
+                const padding = 64; 
                 const availableWidth = container.clientWidth - padding;
                 const availableHeight = container.clientHeight - padding;
                 
                 const scaleW = availableWidth / w;
                 const scaleH = availableHeight / h;
                 
-                // Chỉ thu nhỏ, không phóng to (tối đa scale 1)
                 const scale = Math.min(scaleW, scaleH, 1);
                 
                 wrapper.style.transform = `scale(${scale})`;
@@ -211,10 +205,8 @@
             }
         }
 
-        // Lắng nghe sự kiện kéo thay đổi cửa sổ trình duyệt để tính lại Zoom
         window.addEventListener('resize', updateScale);
 
-        // Khởi tạo ban đầu
         window.addEventListener('DOMContentLoaded', () => {
             const savedCode = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedCode) {
@@ -223,11 +215,9 @@
             } else {
                 renderDefaultInstruction();
             }
-            // Khởi tạo Zoom (Sẽ tự chọn A4 Ngang mặc định)
             setTimeout(updateScale, 100); 
         });
 
-        // Tự động lưu
         let typingTimer;
         htmlInput.addEventListener('input', () => {
             clearTimeout(typingTimer);
@@ -238,14 +228,12 @@
             }, 1000);
         });
 
-        // Ctrl + Enter
         htmlInput.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 renderHTML();
             }
         });
 
-        // Đẩy HTML vào Iframe
         function renderHTML() {
             const codeInput = htmlInput.value;
             const iframe = document.getElementById('slide-preview-frame');
@@ -261,7 +249,6 @@
             iframeDoc.write(codeInput);
             iframeDoc.close();
             
-            // Ép tính toán lại layout ngay khi render xong để iframe không bị giật
             updateScale();
         }
 
@@ -275,7 +262,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <p style="font-size: 1.125rem;">Khu vực Xem Trước & Giả Lập</p>
-                    <p style="font-size: 0.875rem; margin-top: 8px;">Mã của bạn sẽ được hiển thị và tự động thu nhỏ ở đây<br>để đảm bảo không bị vỡ Layout.</p>
                 </body>
                 </html>
             `;
@@ -284,9 +270,12 @@
             iframeDoc.close();
         }
 
-        // In ấn (Mở tab mới lấy giao diện Desktop chuẩn nhất)
+        // ==========================================
+        // LÕI XỬ LÝ CSS OVERRIDE KHI IN (DYNAMIC PRINT)
+        // ==========================================
         function exportToPDF() {
             const codeInput = htmlInput.value;
+            const sizeSelect = document.getElementById('canvas-size').value;
             
             if (!codeInput.trim()) {
                 alert("Không có dữ liệu để in.");
@@ -299,11 +288,66 @@
                 return;
             }
 
+            // Tiêm CSS mạnh nhất (!important) để đánh bại các hardcode của file gốc
+            let printOverrideCSS = '';
+            if (sizeSelect !== 'responsive') {
+                const [w, h] = sizeSelect.split('x').map(Number);
+                // Xác định in dọc hay ngang dựa trên kích thước bạn đang chọn
+                const orientation = w > h ? 'landscape' : 'portrait';
+
+                printOverrideCSS = `
+                <!-- DEV INJECTION: OVERRIDE PRINT SETTINGS CHO GIẢ LẬP -->
+                <style>
+                    @media print {
+                        /* 1. Ép hướng tờ giấy A4 */
+                        @page {
+                            size: A4 ${orientation} !important;
+                            margin: 0 !important;
+                        }
+                        
+                        /* 2. Ép tờ giấy in có nền màu xám nhạt để làm nổi bật thiết bị ảo */
+                        html, body {
+                            width: 100% !important;
+                            height: auto !important;
+                            background-color: #e2e8f0 !important; 
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            margin: 0 !important;
+                            padding: 10mm 0 !important;
+                        }
+
+                        /* 3. Ép chiều rộng và canh giữa (Đánh bại max-w-5xl, slide-card cũ) */
+                        .w-full.max-w-5xl, .slide-card, body > div {
+                            width: ${w}px !important;
+                            max-width: ${w}px !important;
+                            margin-left: auto !important;
+                            margin-right: auto !important;
+                        }
+
+                        /* 4. Định hình lại các thẻ nội dung (bo góc, đổ bóng giống điện thoại/tablet đặt trên giấy) */
+                        .slide-card {
+                            height: auto !important;
+                            min-height: ${h}px !important;
+                            margin-bottom: 15mm !important;
+                            border: 1px solid #cbd5e1 !important;
+                            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+                            border-radius: 12px !important;
+                            overflow: hidden !important;
+                            /* Reset ngắt trang nếu cần */
+                            page-break-inside: avoid !important;
+                        }
+                    }
+                </style>`;
+            }
+
+            // Nối đoạn CSS override vào dòng cuối cùng của code để nắm quyền kiểm soát cao nhất
+            const finalHTML = codeInput + printOverrideCSS;
+
             newWindow.document.open();
-            newWindow.document.write(codeInput);
+            newWindow.document.write(finalHTML);
             newWindow.document.close();
 
-            // Đợi 1.5s rồi gọi hộp thoại in
+            // Đợi 1.5s load CSS rồi in
             setTimeout(() => {
                 newWindow.focus();
                 newWindow.print();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trainer OS - Slide Builder & PDF Exporter (New Tab Engine)</title>
+    <title>Trainer OS - Pro Preview & Print Emulator</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -20,7 +20,7 @@
         }
     </script>
     <style>
-        /* Class chuẩn của hệ thống Trainer OS */
+        /* Class chuẩn hệ thống */
         .saas-card {
             background-color: white;
             border-radius: 0.5rem;
@@ -51,43 +51,64 @@
             background-color: #e2e8f0;
         }
         
-        /* Chỉnh Iframe full khung, cho phép scroll độc lập */
+        /* Nền caro mô phỏng bàn làm việc (Canvas) */
+        .canvas-bg {
+            background-color: #e2e8f0;
+            background-image: 
+                linear-gradient(45deg, #cbd5e1 25%, transparent 25%, transparent 75%, #cbd5e1 75%, #cbd5e1), 
+                linear-gradient(45deg, #cbd5e1 25%, transparent 25%, transparent 75%, #cbd5e1 75%, #cbd5e1);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+        }
+
+        /* Iframe bọc trong wrapper để xử lý Zoom */
+        #iframe-wrapper {
+            transform-origin: center center;
+            transition: transform 0.2s ease-out;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            background: white;
+        }
         #slide-preview-frame {
             width: 100%;
             height: 100%;
             border: none;
             background-color: white;
         }
+        
+        /* Custom scrollbar cho textarea */
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col">
 
     <!-- Top Header -->
-    <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0">
+    <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shrink-0 z-10 shadow-sm">
         <div class="flex items-center gap-3">
             <div class="bg-primary text-white p-2 rounded shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-slate-900">Slide Builder (New Tab Print)</h1>
-                <p class="text-sm text-slate-500">Trainer OS Enterprise L&D</p>
+                <h1 class="text-xl font-bold text-slate-900">Device Simulator & Print Preview</h1>
+                <p class="text-sm text-slate-500">Giả lập hiển thị và In ấn chuẩn xác</p>
             </div>
         </div>
         <div class="flex gap-3">
             <button onclick="renderHTML()" class="btn-secondary flex items-center gap-2" title="Ctrl + Enter để xem nhanh">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
-                Render Xem Trước
+                Làm mới (Render)
             </button>
             <button onclick="exportToPDF()" class="btn-primary flex items-center gap-2 shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                Xuất PDF Chuẩn Khổ Lớn
+                Mở Tab In (Bản Chuẩn)
             </button>
         </div>
     </header>
@@ -96,23 +117,51 @@
     <main class="flex-1 p-6 flex gap-6 overflow-hidden">
         
         <!-- Cột trái: Nhập HTML -->
-        <div class="w-1/3 flex flex-col gap-2 relative">
+        <div class="w-1/3 flex flex-col gap-2 relative h-full">
             <label for="html-input" class="font-semibold text-slate-700 flex justify-between items-center">
                 Mã nguồn HTML / CSS
-                <span id="save-status" class="text-xs font-normal text-emerald-600 bg-emerald-50 px-2 py-1 rounded hidden transition-all">Đã lưu nháp!</span>
+                <span id="save-status" class="text-xs font-normal text-emerald-600 bg-emerald-50 px-2 py-1 rounded hidden transition-all border border-emerald-200">Đã lưu nháp!</span>
             </label>
-            <textarea id="html-input" class="saas-card w-full flex-1 p-4 font-mono text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder="Dán toàn bộ mã HTML của bạn vào đây..."></textarea>
+            <textarea id="html-input" class="saas-card w-full flex-1 p-4 font-mono text-[13px] text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none leading-relaxed" placeholder="Dán toàn bộ mã HTML của bạn vào đây..."></textarea>
         </div>
 
-        <!-- Cột phải: Khung xem trước -->
-        <div class="w-2/3 flex flex-col gap-2">
-            <label class="font-semibold text-slate-700 flex justify-between items-center">
-                Màn hình xem trước
-                <span class="text-xs font-normal text-slate-500 bg-slate-200 px-2 py-1 rounded">Chế độ hiển thị thu gọn</span>
-            </label>
-            <div class="saas-card flex-1 bg-slate-200 overflow-hidden relative">
-                <!-- Đã gỡ bỏ sandbox để cho phép localStorage chạy -->
-                <iframe id="slide-preview-frame"></iframe>
+        <!-- Cột phải: Khung xem trước & Giả lập -->
+        <div class="w-2/3 flex flex-col gap-2 h-full">
+            
+            <!-- Toolbar kích thước -->
+            <div class="flex justify-between items-center bg-white px-4 py-2 rounded-lg border border-slate-200 shadow-sm shrink-0">
+                <div class="flex items-center gap-3">
+                    <label class="text-sm font-semibold text-slate-700">Kích thước giả lập:</label>
+                    <select id="canvas-size" class="text-sm border border-slate-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary text-slate-700 font-medium" onchange="updateScale()">
+                        <option value="responsive">🌐 Tự do (Vừa vặn khung)</option>
+                        <optgroup label="Bản Trình Bày (Desktop)">
+                            <option value="1920x1080">🖥️ Desktop / Slide 16:9 (1920x1080)</option>
+                            <option value="1366x768">💻 Laptop Nhỏ (1366x768)</option>
+                        </optgroup>
+                        <optgroup label="Khổ Giấy In (Print)">
+                            <option value="1123x794" selected>📄 Giấy A4 - Nằm Ngang (1123x794)</option>
+                            <option value="794x1123">📄 Giấy A4 - Nằm Dọc (794x1123)</option>
+                        </optgroup>
+                        <optgroup label="Thiết bị di động">
+                            <option value="768x1024">📱 Tablet (768x1024)</option>
+                            <option value="375x812">📱 Mobile (375x812)</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded border border-slate-200" id="zoom-level">Scale: 100%</span>
+                </div>
+            </div>
+
+            <!-- Khu vực mặt bàn Canvas -->
+            <div id="preview-container" class="saas-card flex-1 canvas-bg overflow-hidden flex items-center justify-center relative rounded-lg border border-slate-300 inset-shadow">
+                
+                <!-- Wrapper xử lý Scale -->
+                <div id="iframe-wrapper">
+                    <!-- Khung Iframe độc lập -->
+                    <iframe id="slide-preview-frame"></iframe>
+                </div>
+                
             </div>
         </div>
 
@@ -123,7 +172,49 @@
         const htmlInput = document.getElementById('html-input');
         const saveStatus = document.getElementById('save-status');
 
-        // Khi vừa mở trang, load lại code cũ nếu có
+        // Logic Xử lý Kích thước và Tỉ lệ Zoom
+        function updateScale() {
+            const size = document.getElementById('canvas-size').value;
+            const container = document.getElementById('preview-container');
+            const wrapper = document.getElementById('iframe-wrapper');
+            const zoomLabel = document.getElementById('zoom-level');
+            
+            if (!container || !wrapper) return;
+
+            if (size === 'responsive') {
+                // Chế độ Tự do: Bám sát 100% diện tích hiện có
+                wrapper.style.width = '100%';
+                wrapper.style.height = '100%';
+                wrapper.style.transform = 'scale(1)';
+                zoomLabel.innerText = 'Scale: Khớp';
+            } else {
+                // Chế độ Cố định: Lấy Width và Height
+                const [w, h] = size.split('x').map(Number);
+                
+                // Ép iframe wrapper thành kích thước vật lý mong muốn
+                wrapper.style.width = w + 'px';
+                wrapper.style.height = h + 'px';
+                
+                // Thuật toán tính toán Tỉ lệ thu nhỏ để vừa vặn vào màn hình hiện tại
+                const padding = 64; // Cách lề 32px mỗi bên cho đẹp
+                const availableWidth = container.clientWidth - padding;
+                const availableHeight = container.clientHeight - padding;
+                
+                const scaleW = availableWidth / w;
+                const scaleH = availableHeight / h;
+                
+                // Chỉ thu nhỏ, không phóng to (tối đa scale 1)
+                const scale = Math.min(scaleW, scaleH, 1);
+                
+                wrapper.style.transform = `scale(${scale})`;
+                zoomLabel.innerText = `Scale: ${Math.round(scale * 100)}%`;
+            }
+        }
+
+        // Lắng nghe sự kiện kéo thay đổi cửa sổ trình duyệt để tính lại Zoom
+        window.addEventListener('resize', updateScale);
+
+        // Khởi tạo ban đầu
         window.addEventListener('DOMContentLoaded', () => {
             const savedCode = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedCode) {
@@ -132,9 +223,11 @@
             } else {
                 renderDefaultInstruction();
             }
+            // Khởi tạo Zoom (Sẽ tự chọn A4 Ngang mặc định)
+            setTimeout(updateScale, 100); 
         });
 
-        // Tự động lưu code vào LocalStorage mỗi khi gõ
+        // Tự động lưu
         let typingTimer;
         htmlInput.addEventListener('input', () => {
             clearTimeout(typingTimer);
@@ -145,20 +238,20 @@
             }, 1000);
         });
 
-        // Hỗ trợ phím tắt: Ctrl + Enter để Render
+        // Ctrl + Enter
         htmlInput.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                 renderHTML();
             }
         });
 
-        // Hàm xử lý đẩy HTML từ Textarea vào Iframe để xem trước
+        // Đẩy HTML vào Iframe
         function renderHTML() {
             const codeInput = htmlInput.value;
             const iframe = document.getElementById('slide-preview-frame');
             
             if (!codeInput.trim()) {
-                alert("Vui lòng nhập mã HTML trước khi xem trước.");
+                alert("Vui lòng nhập mã HTML.");
                 renderDefaultInstruction();
                 return;
             }
@@ -167,20 +260,22 @@
             iframeDoc.open();
             iframeDoc.write(codeInput);
             iframeDoc.close();
+            
+            // Ép tính toán lại layout ngay khi render xong để iframe không bị giật
+            updateScale();
         }
 
-        // Giao diện hướng dẫn ban đầu trong Iframe
         function renderDefaultInstruction() {
             const iframe = document.getElementById('slide-preview-frame');
             const iframeDoc = iframe.contentWindow.document;
             const instructionHTML = `
                 <html lang="vi">
-                <body style="font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; align-items: center; justify-content: center; background-color: #ffffff; color: #94a3b8; text-align: center;">
+                <body style="font-family: sans-serif; display: flex; flex-direction: column; height: 100%; margin: 0; align-items: center; justify-content: center; background-color: #ffffff; color: #94a3b8; text-align: center;">
                     <svg xmlns="http://www.w3.org/2000/svg" style="height: 64px; width: 64px; margin-bottom: 16px; color: #cbd5e1;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p style="font-size: 1.125rem;">Khu vực Xem Trước Trực Tiếp</p>
-                    <p style="font-size: 0.875rem; margin-top: 8px;">Dán mã code vào cột trái<br>và bấm <strong>Render Xem Trước</strong> (hoặc Ctrl + Enter)</p>
+                    <p style="font-size: 1.125rem;">Khu vực Xem Trước & Giả Lập</p>
+                    <p style="font-size: 0.875rem; margin-top: 8px;">Mã của bạn sẽ được hiển thị và tự động thu nhỏ ở đây<br>để đảm bảo không bị vỡ Layout.</p>
                 </body>
                 </html>
             `;
@@ -189,31 +284,26 @@
             iframeDoc.close();
         }
 
-        // Kỹ thuật mở Tab mới để hiển thị format Desktop chuẩn 100% rồi tự động gọi In
+        // In ấn (Mở tab mới lấy giao diện Desktop chuẩn nhất)
         function exportToPDF() {
             const codeInput = htmlInput.value;
             
             if (!codeInput.trim()) {
-                alert("Bạn chưa có nội dung Slide nào để xuất PDF.");
+                alert("Không có dữ liệu để in.");
                 return;
             }
 
-            // Mở tab mới
             const newWindow = window.open('', '_blank');
-            
-            // Kiểm tra nếu trình duyệt chặn Pop-up
             if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                alert("Trình duyệt đã chặn cửa sổ bật lên (Pop-up). Vui lòng cho phép mở Pop-up để sử dụng tính năng in PDF chuẩn.");
+                alert("Vui lòng cho phép mở Pop-up để hệ thống chạy tính năng in.");
                 return;
             }
 
-            // Ghi nội dung HTML vào Tab mới
             newWindow.document.open();
             newWindow.document.write(codeInput);
             newWindow.document.close();
 
-            // Cài đặt một khoảng trễ 1.5 giây để chờ Tailwind, CSS, Font và Ảnh tải xong
-            // Sau đó tự động kích hoạt hộp thoại In (Print)
+            // Đợi 1.5s rồi gọi hộp thoại in
             setTimeout(() => {
                 newWindow.focus();
                 newWindow.print();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trainer OS - Slide Builder & PDF Exporter (Iframe Engine)</title>
+    <title>Trainer OS - Slide Builder & PDF Exporter (New Tab Engine)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -71,7 +71,7 @@
                 </svg>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-slate-900">Slide Builder (Iframe Sandbox)</h1>
+                <h1 class="text-xl font-bold text-slate-900">Slide Builder (New Tab Print)</h1>
                 <p class="text-sm text-slate-500">Trainer OS Enterprise L&D</p>
             </div>
         </div>
@@ -81,13 +81,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
-                Render Giao Diện
+                Render Xem Trước
             </button>
             <button onclick="exportToPDF()" class="btn-primary flex items-center gap-2 shadow-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
-                In / Lưu PDF 16:9
+                Xuất PDF Chuẩn Khổ Lớn
             </button>
         </div>
     </header>
@@ -104,15 +104,15 @@
             <textarea id="html-input" class="saas-card w-full flex-1 p-4 font-mono text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none" placeholder="Dán toàn bộ mã HTML của bạn vào đây..."></textarea>
         </div>
 
-        <!-- Cột phải: Khung xem trước (Iframe Sandbox) -->
+        <!-- Cột phải: Khung xem trước -->
         <div class="w-2/3 flex flex-col gap-2">
             <label class="font-semibold text-slate-700 flex justify-between items-center">
-                Màn hình xem trước (Cách ly hoàn toàn)
-                <span class="text-xs font-normal text-slate-500 bg-slate-200 px-2 py-1 rounded">Hỗ trợ cuộn nhiều trang</span>
+                Màn hình xem trước
+                <span class="text-xs font-normal text-slate-500 bg-slate-200 px-2 py-1 rounded">Chế độ hiển thị thu gọn</span>
             </label>
             <div class="saas-card flex-1 bg-slate-200 overflow-hidden relative">
-                <!-- IFRAME ENGINE: Không lo đơ máy, không lo xung đột CSS -->
-                <iframe id="slide-preview-frame" sandbox="allow-same-origin allow-scripts"></iframe>
+                <!-- Đã gỡ bỏ sandbox để cho phép localStorage chạy -->
+                <iframe id="slide-preview-frame"></iframe>
             </div>
         </div>
 
@@ -128,10 +128,8 @@
             const savedCode = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (savedCode) {
                 htmlInput.value = savedCode;
-                // Render ngay lập tức đoạn code vừa load
                 renderHTML();
             } else {
-                // Nếu chưa có gì, render màn hình hướng dẫn mặc định vào iframe
                 renderDefaultInstruction();
             }
         });
@@ -142,10 +140,9 @@
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
                 localStorage.setItem(LOCAL_STORAGE_KEY, htmlInput.value);
-                // Hiện thông báo đã lưu
                 saveStatus.classList.remove('hidden');
                 setTimeout(() => saveStatus.classList.add('hidden'), 2000);
-            }, 1000); // Đợi 1 giây sau khi ngừng gõ mới lưu
+            }, 1000);
         });
 
         // Hỗ trợ phím tắt: Ctrl + Enter để Render
@@ -155,7 +152,7 @@
             }
         });
 
-        // Hàm xử lý đẩy HTML từ Textarea vào Iframe
+        // Hàm xử lý đẩy HTML từ Textarea vào Iframe để xem trước
         function renderHTML() {
             const codeInput = htmlInput.value;
             const iframe = document.getElementById('slide-preview-frame');
@@ -166,7 +163,6 @@
                 return;
             }
             
-            // Xóa rỗng Iframe và ghi lại nội dung mới (Sandbox Write)
             const iframeDoc = iframe.contentWindow.document;
             iframeDoc.open();
             iframeDoc.write(codeInput);
@@ -183,8 +179,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" style="height: 64px; width: 64px; margin-bottom: 16px; color: #cbd5e1;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p style="font-size: 1.125rem;">Khu vực hiển thị Slide an toàn (Iframe Sandbox)</p>
-                    <p style="font-size: 0.875rem; margin-top: 8px;">Dán mã code có chứa @media print vào cột trái<br>và bấm <strong>Render Giao diện</strong> (hoặc Ctrl + Enter)</p>
+                    <p style="font-size: 1.125rem;">Khu vực Xem Trước Trực Tiếp</p>
+                    <p style="font-size: 0.875rem; margin-top: 8px;">Dán mã code vào cột trái<br>và bấm <strong>Render Xem Trước</strong> (hoặc Ctrl + Enter)</p>
                 </body>
                 </html>
             `;
@@ -193,9 +189,8 @@
             iframeDoc.close();
         }
 
-        // Hàm xử lý gọi hộp thoại in chuẩn của trình duyệt từ Iframe
+        // Kỹ thuật mở Tab mới để hiển thị format Desktop chuẩn 100% rồi tự động gọi In
         function exportToPDF() {
-            const iframe = document.getElementById('slide-preview-frame');
             const codeInput = htmlInput.value;
             
             if (!codeInput.trim()) {
@@ -203,9 +198,26 @@
                 return;
             }
 
-            // Focus vào iframe và gọi lệnh in nội bộ
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
+            // Mở tab mới
+            const newWindow = window.open('', '_blank');
+            
+            // Kiểm tra nếu trình duyệt chặn Pop-up
+            if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                alert("Trình duyệt đã chặn cửa sổ bật lên (Pop-up). Vui lòng cho phép mở Pop-up để sử dụng tính năng in PDF chuẩn.");
+                return;
+            }
+
+            // Ghi nội dung HTML vào Tab mới
+            newWindow.document.open();
+            newWindow.document.write(codeInput);
+            newWindow.document.close();
+
+            // Cài đặt một khoảng trễ 1.5 giây để chờ Tailwind, CSS, Font và Ảnh tải xong
+            // Sau đó tự động kích hoạt hộp thoại In (Print)
+            setTimeout(() => {
+                newWindow.focus();
+                newWindow.print();
+            }, 1500);
         }
     </script>
 </body>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nộp Bài Tập | Zero to SaaS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 font-sans">
+
+    <!-- KHUNG FORM NỘP BÀI -->
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+        
+        <!-- Header của Form -->
+        <div class="bg-indigo-600 px-6 py-8 text-center relative overflow-hidden">
+            <!-- Vòng tròn trang trí background -->
+            <div class="absolute top-0 right-0 -mr-8 -mt-8 w-24 h-24 rounded-full bg-white opacity-10"></div>
+            <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-24 h-24 rounded-full bg-white opacity-10"></div>
+            
+            <i class="fa-solid fa-cloud-arrow-up text-4xl text-white mb-3"></i>
+            <h2 class="text-2xl font-bold text-white">Nộp Bài Thực Hành</h2>
+            <p class="text-indigo-100 text-sm mt-1">Khóa học Zero to SaaS Masterclass</p>
+        </div>
+
+        <!-- Nội dung nhập liệu -->
+        <div class="p-6 md:p-8 space-y-5">
+            
+            <!-- Ô Tên học viên -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Tên của bạn <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-regular fa-user text-slate-400"></i>
+                    </div>
+                    <input type="text" id="studentName" class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="VD: Trần Văn A">
+                </div>
+            </div>
+
+            <!-- Ô Link bài tập -->
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1">Link dự án (Google Drive, Github...) <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-link text-slate-400"></i>
+                    </div>
+                    <input type="url" id="projectLink" class="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" placeholder="https://...">
+                </div>
+            </div>
+
+            <!-- Nút Submit -->
+            <button id="btnSubmit" onclick="submitData()" class="w-full mt-4 bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-200 transition-all flex items-center justify-center">
+                <i class="fa-solid fa-paper-plane mr-2" id="iconSubmit"></i>
+                <span id="textSubmit">Gửi bài tập lên hệ thống</span>
+            </button>
+
+            <!-- Khung báo trạng thái (ẩn mặc định) -->
+            <div id="alertBox" class="hidden p-3 rounded-lg text-sm flex items-start mt-4">
+                <i id="alertIcon" class="fa-solid fa-circle-info mt-0.5 mr-2"></i>
+                <span id="alertMessage">Thông báo ở đây</span>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- LOGIC XỬ LÝ (JAVASCRIPT) -->
+    <script>
+        // 🛑 QUAN TRỌNG: Dán link Web App (Google Apps Script) của bạn vào đây
+        const API_URL = "ĐIỀN_LINK_CỦA_BẠN_VÀO_ĐÂY";
+
+        function submitData() {
+            // 1. Lấy dữ liệu từ các ô nhập
+            const name = document.getElementById('studentName').value.trim();
+            const link = document.getElementById('projectLink').value.trim();
+
+            // 2. Kiểm tra xem người dùng đã nhập đủ chưa
+            if (!name || !link) {
+                showAlert("error", "Lỗi: Vui lòng nhập đầy đủ Tên và Link dự án!");
+                return;
+            }
+
+            // 3. Chuẩn bị gói hàng (Payload) để gửi lên API
+            const payload = {
+                action: "submit",
+                student_name: name,
+                project_link: link
+            };
+
+            // 4. Hiển thị hiệu ứng Loading trên nút bấm
+            setLoadingState(true);
+            showAlert("info", "Đang gửi dữ liệu lên máy chủ, vui lòng đợi...");
+
+            // 5. Gọi API bằng Fetch (Áp dụng đúng chuẩn Text/Plain để tránh lỗi CORS)
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                setLoadingState(false);
+                if (data.status === "success") {
+                    showAlert("success", data.message);
+                    // Xóa trắng form sau khi gửi thành công
+                    document.getElementById('studentName').value = "";
+                    document.getElementById('projectLink').value = "";
+                } else {
+                    showAlert("error", data.message);
+                }
+            })
+            .catch(error => {
+                setLoadingState(false);
+                showAlert("error", "Lỗi kết nối mạng: " + error.message);
+            });
+        }
+
+        // --- CÁC HÀM PHỤ TRỢ (UI) ---
+
+        // Đổi trạng thái nút bấm (Loading)
+        function setLoadingState(isLoading) {
+            const btn = document.getElementById('btnSubmit');
+            const icon = document.getElementById('iconSubmit');
+            const text = document.getElementById('textSubmit');
+
+            if (isLoading) {
+                btn.disabled = true;
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+                icon.className = "fa-solid fa-spinner fa-spin mr-2"; // Icon xoay
+                text.innerText = "Đang xử lý...";
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+                icon.className = "fa-solid fa-paper-plane mr-2"; // Icon máy bay giấy
+                text.innerText = "Gửi bài tập lên hệ thống";
+            }
+        }
+
+        // Hiển thị khung thông báo
+        function showAlert(type, message) {
+            const alertBox = document.getElementById('alertBox');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertMessage = document.getElementById('alertMessage');
+            
+            alertBox.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700', 'bg-blue-50', 'text-blue-700');
+            
+            if (type === "error") {
+                alertBox.classList.add('bg-red-50', 'text-red-700');
+                alertIcon.className = "fa-solid fa-circle-exclamation mt-0.5 mr-2";
+            } else if (type === "success") {
+                alertBox.classList.add('bg-green-50', 'text-green-700');
+                alertIcon.className = "fa-solid fa-circle-check mt-0.5 mr-2";
+            } else { // info
+                alertBox.classList.add('bg-blue-50', 'text-blue-700');
+                alertIcon.className = "fa-solid fa-circle-info mt-0.5 mr-2";
+            }
+            
+            alertMessage.innerText = message;
+        }
+    </script>
+</body>
+</html>

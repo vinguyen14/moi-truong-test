@@ -142,39 +142,122 @@
             <!-- BÀI 2 -->
             <section id="lesson-2" class="lesson-content max-w-3xl mx-auto" data-title="Phase 1 / Kiến trúc Tối giản">
                 <h1 class="text-3xl font-extrabold text-slate-900 mb-4">2. Kiến trúc Tối giản & Cách làm việc với AI</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Để một người không rành công nghệ có thể code được, bạn cần một người bạn đồng hành. Và AI chính là người bạn đó.</p>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Để một người không rành công nghệ có thể tự tay làm ra một hệ thống SaaS, bạn cần hai thứ: Một kiến trúc không cần cài đặt, và một người trợ lý AI hiểu việc.</p>
                 
                 <div class="prose prose-slate max-w-none">
-                    <p class="mb-4">Bí quyết để ra lệnh cho AI (Prompting) viết code đúng ý là: <strong>Hãy đóng vai một Tester trước khi đóng vai Developer.</strong></p>
+                    <h3 class="text-xl font-bold mt-2 mb-4">A. Kiến trúc "Zero-Setup" (Không cài đặt)</h3>
+                    <p class="mb-4">Thông thường, lập trình viên sẽ bắt bạn cài Node.js, thiết lập Server, mua Database (MySQL). Thật sự rất đau đầu! Trong Masterclass này, chúng ta dùng mô hình tối giản nhất thế giới:</p>
                     
-                    <h3 class="text-xl font-bold mt-8 mb-4">Ví dụ một cấu trúc Prompt chuẩn:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                        <div class="border border-slate-200 p-4 rounded-xl bg-white shadow-sm">
+                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center mb-3"><i class="fa-brands fa-html5 text-xl"></i></div>
+                            <h4 class="font-bold text-slate-800">1. Frontend (Giao diện)</h4>
+                            <p class="text-sm text-slate-600">Dùng HTML + Tailwind CSS. Mọi thứ được lưu gọn trong 1 file duy nhất, mở bằng Google Chrome là chạy, không cần server.</p>
+                        </div>
+                        <div class="border border-slate-200 p-4 rounded-xl bg-white shadow-sm">
+                            <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center mb-3"><i class="fa-solid fa-database text-xl"></i></div>
+                            <h4 class="font-bold text-slate-800">2. Backend (Database & API)</h4>
+                            <p class="text-sm text-slate-600">Sử dụng Google Apps Script (GAS) và Google Sheets. Miễn phí, bảo mật cao, và bạn có thể nhìn thấy dữ liệu của mình bằng mắt thường dưới dạng bảng tính.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-8 mb-4">B. Công thức Prompt (Ra lệnh) cho AI</h3>
+                    <p class="mb-4">Bạn không cần học thuộc code, bạn chỉ cần học cách ra lệnh. Bí quyết để ra lệnh cho AI (như ChatGPT, Claude) viết code đúng ý là: <strong>Hãy đóng vai một Tester / Quản lý Dự án trước khi đóng vai Developer.</strong></p>
                     
                     <!-- Khối Code Block -->
-                    <div class="bg-slate-800 rounded-lg overflow-hidden my-6">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono">
-                            <span>prompt-template.txt</span>
-                            <button class="hover:text-white"><i class="fa-regular fa-copy"></i> Copy</button>
+                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
+                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
+                            <span>prompt-template.txt (Công thức chuẩn)</span>
                         </div>
-                        <div class="p-4 text-sm font-mono text-emerald-400 overflow-x-auto whitespace-pre">
-[Role] Đóng vai là Senior Fullstack Developer.
-[Context] Tôi đang làm tính năng A cho dự án B.
-[Rule] Chỉ dùng HTML, Tailwind và JS thuần. Không dùng framework.
-[Task] Viết giao diện form nộp bài tập. Khi bấm nộp thì gọi hàm save()
-[Note] Nhớ xử lý lỗi nếu người dùng không nhập tên.</div>
+                        <div class="p-5 text-sm font-mono text-emerald-400 overflow-x-auto whitespace-pre leading-loose">
+<span class="text-pink-400">[Role - Đóng vai]</span> Bạn là Senior Fullstack Developer kiêm UI/UX Designer.
+<span class="text-pink-400">[Context - Ngữ cảnh]</span> Tôi đang làm tính năng Nộp bài tập cho dự án E-Learning.
+<span class="text-pink-400">[Rule - Quy tắc]</span> Chỉ dùng HTML, Tailwind CSS qua CDN. Không dùng React hay thư viện khác.
+<span class="text-pink-400">[Task - Nhiệm vụ]</span> Viết giao diện Form gồm: Tên, Link bài tập, và nút "Nộp bài".
+<span class="text-pink-400">[Tester Mindset]</span> Nhớ bọc cảnh báo màu đỏ nếu user bấm Nộp mà để trống ô Tên.</div>
                     </div>
                     
-                    <p>Trong bài tập thực hành tới, chúng ta sẽ dùng cấu trúc Prompt này để ra lệnh cho AI tạo toàn bộ giao diện Tool chấm bài tự động!</p>
+                    <p class="mt-4">Trong bài tập thực hành ở Phase 3, chúng ta sẽ copy nguyên mẫu câu lệnh này để nhờ AI tạo ra toàn bộ giao diện Tool chấm bài tự động!</p>
                 </div>
             </section>
 
             <!-- BÀI 3 -->
             <section id="lesson-3" class="lesson-content max-w-3xl mx-auto" data-title="Phase 2 / Tailwind CSS cơ bản">
-                <div class="flex items-center justify-center h-64 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50">
-                    <div class="text-center">
-                        <i class="fa-solid fa-laptop-code text-4xl text-slate-400 mb-3"></i>
-                        <h2 class="text-xl font-bold text-slate-600">Nội dung đang được cập nhật</h2>
-                        <p class="text-sm text-slate-500 mt-2">Phần này sẽ đi sâu vào cách kéo thả và dùng class Tailwind.</p>
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">3. Tailwind CSS: Vẽ giao diện như ráp Lego</h1>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Nếu như trước đây, muốn làm một cái nút màu xanh, bạn phải viết 1 file HTML, sau đó tạo 1 file CSS riêng rồi liên kết chúng lại. Với Tailwind, mọi thứ hoàn toàn khác.</p>
+                
+                <div class="prose prose-slate max-w-none">
+                    <p class="mb-4">Tailwind CSS cung cấp sẵn cho chúng ta hàng ngàn "mảnh ghép Lego" (gọi là <strong>Utility classes</strong>). Việc của bạn chỉ là chọn từ khóa và gắn thẳng vào thẻ HTML.</p>
+                    
+                    <h3 class="text-xl font-bold mt-8 mb-4">Các quy tắc cơ bản dễ nhớ nhất:</h3>
+                    <ul class="list-none space-y-3 mb-8 pl-0">
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-droplet text-blue-500 mt-1 mr-3 w-4"></i>
+                            <div><strong>Màu sắc (Colors):</strong> Cú pháp <code class="bg-slate-100 text-pink-600 px-1 rounded">bg-[màu]-[độ đậm]</code> (VD: bg-blue-500, text-red-600).</div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-border-all text-blue-500 mt-1 mr-3 w-4"></i>
+                            <div><strong>Khoảng cách (Spacing):</strong> Chữ <code>p</code> là Padding (lõi bên trong), chữ <code>m</code> là Margin (cách bên ngoài). VD: <code class="bg-slate-100 text-pink-600 px-1 rounded">p-4</code>, <code class="bg-slate-100 text-pink-600 px-1 rounded">mt-2</code> (margin-top).</div>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-regular fa-square text-blue-500 mt-1 mr-3 w-4"></i>
+                            <div><strong>Bo góc & Đổ bóng:</strong> <code class="bg-slate-100 text-pink-600 px-1 rounded">rounded-lg</code> (bo góc tròn), <code class="bg-slate-100 text-pink-600 px-1 rounded">shadow-md</code> (đổ bóng cho nổi khối lên).</div>
+                        </li>
+                    </ul>
+
+                    <h3 class="text-xl font-bold mt-8 mb-4">Ví dụ thực tế: Thiết kế "Thẻ học viên"</h3>
+                    <p class="mb-4">Hãy xem cách chúng ta ráp các class Tailwind lại để tạo ra một cái Card (Thẻ) học viên tuyệt đẹp cực kỳ nhanh chóng.</p>
+
+                    <!-- Ví dụ UI & Code Side-by-side (Stacked on mobile) -->
+                    <div class="flex flex-col xl:flex-row gap-6 my-6 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        
+                        <!-- Cột hiển thị (Kết quả) -->
+                        <div class="flex-1 flex flex-col items-center justify-center">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Kết quả Giao diện</span>
+                            <!-- Khối Card Giao diện mẫu -->
+                            <div class="bg-white p-5 rounded-xl shadow-lg border border-slate-100 w-full max-w-sm transform hover:-translate-y-1 transition-transform">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold">
+                                        T
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-slate-800 leading-tight">Trần Văn A</h4>
+                                        <p class="text-sm text-slate-500">Khóa: Zero to SaaS</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                                    <span class="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded-md">Đang học</span>
+                                    <button class="text-sm text-indigo-600 font-semibold hover:text-indigo-800">Xem tiến độ &rarr;</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cột hiển thị Code -->
+                        <div class="flex-1 w-full max-w-full overflow-hidden">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 block">Mã HTML (Tailwind)</span>
+                            <div class="bg-slate-800 rounded-xl overflow-hidden w-full">
+                                <div class="p-4 text-xs font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
+&lt;<span class="text-pink-400">div</span> class="<span class="text-yellow-200">bg-white p-5 rounded-xl shadow-lg</span>"&gt;
+
+  &lt;<span class="text-pink-400">div</span> class="<span class="text-yellow-200">flex items-center space-x-4</span>"&gt;
+    &lt;<span class="text-pink-400">div</span> class="<span class="text-yellow-200">w-12 h-12 bg-indigo-100 rounded-full</span>"&gt;
+       T
+    &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;<span class="text-pink-400">div</span>&gt;
+      &lt;<span class="text-pink-400">h4</span> class="<span class="text-yellow-200">font-bold text-slate-800</span>"&gt;Trần Văn A&lt;/<span class="text-pink-400">h4</span>&gt;
+    &lt;/<span class="text-pink-400">div</span>&gt;
+  &lt;/<span class="text-pink-400">div</span>&gt;
+
+&lt;/<span class="text-pink-400">div</span>&gt;</div>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 my-6 rounded-r-lg">
+                        <h4 class="font-bold text-amber-800 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Lời khuyên vàng</h4>
+                        <p class="text-amber-900 text-sm">Bạn không cần phải tự gõ các class này. Hãy dùng mẫu Prompt ở Bài 2, AI sẽ sinh ra đoạn code này cho bạn. Khóa học này dạy bạn cách <strong>"ĐỌC & HIỂU"</strong> xem AI đang viết gì để chỉnh sửa (ví dụ muốn chữ màu đỏ thì đổi <code class="bg-amber-100 px-1">text-slate-800</code> thành <code class="bg-amber-100 px-1">text-red-500</code>).</p>
+                    </div>
+
                 </div>
             </section>
 

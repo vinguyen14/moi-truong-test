@@ -8,7 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome (Icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Be Vietnam Pro -->
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        /* Áp dụng Font mới cho toàn bộ trang web */
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
         /* Tùy chỉnh Scrollbar cho giống Document Reader */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -134,98 +138,240 @@
         <!-- Khung chứa nội dung bài học có thể scroll -->
         <div class="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth" id="lesson-container">
             
-            <!-- BÀI 1 -->
-            <section id="lesson-1" class="lesson-content max-w-3xl mx-auto active" data-title="Phase 1 / Tư duy làm Product">
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">1. Tư duy làm Product: Không phải là viết Code</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Chào mừng bạn đến với khóa học. Bài học đầu tiên là bài học quan trọng nhất: Định hình lại tư duy của một người làm sản phẩm.</p>
+            <!-- BÀI 1: TƯ DUY LÀM SẢN PHẨM -->
+            <section id="lesson-1" class="lesson-content max-w-4xl mx-auto active" data-title="Phase 1 / Tư duy Sản phẩm">
                 
-                <div class="prose prose-slate max-w-none">
-                    <p class="mb-4">Nhiều người nghĩ rằng làm ra một trang web SaaS (Software as a Service) thì phải rất giỏi lập trình, phải biết các ngôn ngữ phức tạp. Nhưng thực tế, <strong>Code chỉ là công cụ, Sản phẩm sinh ra là để giải quyết Vấn đề.</strong></p>
+                <div class="text-center mb-10">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">1. Bạn là "Kiến Trúc Sư", không phải thợ xây</h1>
+                    <p class="text-lg text-slate-500">Hãy quên đi những đoạn code phức tạp. Để tạo ra một phần mềm web, bạn chỉ cần 3 tư duy cốt lõi sau đây:</p>
+                </div>
+
+                <!-- 3 Khối Tư Duy (Cards) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                     
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6 rounded-r-lg">
-                        <h4 class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>The Golden Rule</h4>
-                        <p class="text-blue-900 text-sm">Trước khi viết bất kỳ dòng code nào, hãy tự hỏi: "Nếu không có tính năng này, người dùng có chết không?". Nếu câu trả lời là không, hãy để nó làm sau. Hãy tập trung vào luồng chính (Core value).</p>
+                    <!-- Khối 1 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-400 hover:shadow-lg transition-all text-center group cursor-default">
+                        <div class="w-16 h-16 mx-auto bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Giải quyết nỗi đau</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">Người dùng không quan tâm web của bạn làm bằng ngôn ngữ gì. Họ chỉ quan tâm: <strong>"Nó có giúp tôi làm việc nhanh hơn không?"</strong></p>
                     </div>
 
-                    <h3 class="text-xl font-bold mt-8 mb-4">Tại sao chúng ta không dùng Framework phức tạp?</h3>
-                    <p class="mb-4">Trong khóa học này, chúng ta sẽ xây dựng mọi thứ bằng HTML, Tailwind CSS và Vanilla Javascript kết hợp cùng Google Apps Script (GAS). Vì sao?</p>
-                    <ul class="list-disc pl-6 space-y-2 mb-6 text-slate-700">
-                        <li><strong>Chi phí 0 đồng:</strong> GAS miễn phí, lưu trữ trên Google Drive miễn phí.</li>
-                        <li><strong>Dễ hiểu:</strong> Bạn có thể mở file ra, lưu lại và chạy thẳng trên trình duyệt mà không cần cài đặt Node.js hay chạy server.</li>
-                        <li><strong>Tốc độ:</strong> Nhờ Tailwind CSS, bạn làm giao diện đẹp chuẩn Enterprise chỉ trong vài phút.</li>
-                    </ul>
+                    <!-- Khối 2 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-400 hover:shadow-lg transition-all text-center group cursor-default">
+                        <div class="w-16 h-16 mx-auto bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Thuê AI làm "thợ"</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">Bạn có ý tưởng, bạn mô tả nó bằng tiếng Việt. <strong>Trí tuệ nhân tạo (AI)</strong> sẽ là người kỹ sư cặm cụi gõ từng dòng code cho bạn.</p>
+                    </div>
+
+                    <!-- Khối 3 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-400 hover:shadow-lg transition-all text-center group cursor-default">
+                        <div class="w-16 h-16 mx-auto bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-scissors"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Cắt bỏ sự rườm rà</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed">Đừng vẽ vời tính năng. Hãy làm ra tính năng quan trọng nhất trước. Ví dụ: Làm web chấm bài thì chỉ cần <strong>Form Nộp</strong> và <strong>Form Chấm</strong> là đủ.</p>
+                    </div>
+
+                </div>
+
+                <!-- Box thông điệp -->
+                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-5 rounded-r-xl flex items-start">
+                    <i class="fa-solid fa-lightbulb text-indigo-500 text-xl mt-1 mr-4"></i>
+                    <div>
+                        <h4 class="font-bold text-indigo-900 mb-1">Quy Tắc Tối Giản của Masterclass</h4>
+                        <p class="text-indigo-800 text-sm">Trong khóa học này, ta KHÔNG mua Server phức tạp. Ta sẽ dùng <strong>Trình duyệt web</strong> làm màn hình giao diện, và dùng <strong>Google Sheet</strong> làm kho chứa dữ liệu. Hoàn toàn miễn phí 0 đồng!</p>
+                    </div>
                 </div>
             </section>
 
-            <!-- BÀI 2: HƯỚNG DẪN AI STUDIO & PROMPT -->
-            <section id="lesson-2" class="lesson-content max-w-3xl mx-auto" data-title="Phase 1 / Bí kíp điều khiển AI">
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">2. Bí kíp biến AI thành Kỹ sư Trưởng</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Bạn không cần phải nhớ code. Nhưng bạn phải biết cách ra lệnh cho máy móc. Nền tảng chúng ta sử dụng là <strong>Google AI Studio</strong> (với mô hình Gemini Pro Preview) - nơi cho phép bạn "cài đặt nhân cách" cho AI.</p>
+            <!-- BÀI 2: ĐIỀU KHIỂN AI -->
+            <section id="lesson-2" class="lesson-content max-w-4xl mx-auto" data-title="Phase 1 / Bí kíp điều khiển AI">
                 
-                <div class="prose prose-slate max-w-none">
-                    
-                    <h3 class="text-xl font-bold mt-4 mb-3">Bước 1: Vào phòng điều khiển AI</h3>
-                    <ul class="list-decimal pl-5 space-y-2 text-slate-700">
-                        <li>Truy cập <a href="https://aistudio.google.com/" target="_blank" class="text-indigo-600 hover:underline">aistudio.google.com</a> và đăng nhập bằng Gmail.</li>
-                        <li>Bấm nút <strong>Create New Prompt</strong> (Tạo luồng chat mới).</li>
-                        <li>Ở cột bên phải, phần <em>Model</em>, hãy chọn <strong>Gemini Pro (Preview)</strong> - đây là bộ não thông minh nhất hiện tại.</li>
-                    </ul>
+                <div class="text-center mb-10">
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">2. Biến AI thành Kỹ Sư Trưởng</h1>
+                    <p class="text-lg text-slate-500">Giống như thuê một người thợ xây, nếu bạn nói "Xây cho tôi cái nhà", họ sẽ xây lung tung. Bạn phải giao cho họ một <strong>Bộ Quy Tắc</strong> rõ ràng.</p>
+                </div>
 
-                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 my-6 rounded-r-lg">
-                        <h4 class="font-bold text-amber-800 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Chú ý cực kỳ quan trọng</h4>
-                        <p class="text-amber-900 text-sm">Trong AI Studio có một ô tên là <strong>System Instructions (Hướng dẫn hệ thống)</strong> nằm ở góc trên/hoặc bên trái. Đây là nơi bạn "nhập hồn" cho AI, bắt nó phải tuân thủ luật lệ của bạn trước khi bắt đầu chat bình thường.</p>
+                <!-- Timeline 3 Bước -->
+                <div class="space-y-8">
+                    
+                    <!-- Bước 1 -->
+                    <div class="flex flex-col md:flex-row bg-white p-5 rounded-2xl border border-slate-200 shadow-sm items-start md:items-center">
+                        <div class="w-12 h-12 shrink-0 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 md:mb-0 md:mr-6">1</div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 mb-1">Mở Trạm Điều Khiển AI</h3>
+                            <p class="text-slate-600 text-sm">Vào trang <a href="https://aistudio.google.com/" target="_blank" class="text-indigo-600 font-bold hover:underline">aistudio.google.com</a> (đăng nhập bằng Gmail). Bấm nút <strong>Create New Prompt</strong>. Chọn mô hình <strong>Gemini Pro</strong>. Đây là bộ não thông minh nhất hiện nay của Google.</p>
+                        </div>
                     </div>
 
-                    <h3 class="text-xl font-bold mt-8 mb-4">Bước 2: Câu thần chú "System Prompt"</h3>
-                    <p class="mb-4">Hãy copy toàn bộ đoạn chữ dưới đây và dán vào ô <strong>System Instructions</strong>. Đây là bí kíp được dùng để xây dựng các dự án lớn, giúp AI luôn trả về kết quả an toàn, không xóa mất tính năng cũ và luôn giải thích dễ hiểu.</p>
-                    
-                    <!-- Khối Code Block Prompt -->
-                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
-                            <span>System-Prompt.txt (Dán vào System Instructions)</span>
-                        </div>
-                        <div class="p-5 text-sm font-mono text-emerald-400 overflow-x-auto whitespace-pre leading-loose">
+                    <!-- Bước 2 -->
+                    <div class="flex flex-col md:flex-row bg-white p-5 rounded-2xl border border-blue-200 bg-blue-50/50 shadow-sm items-start">
+                        <div class="w-12 h-12 shrink-0 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 md:mb-0 md:mr-6">2</div>
+                        <div class="w-full">
+                            <h3 class="text-lg font-bold text-blue-900 mb-2 flex items-center">
+                                Gắn "Kỷ Luật" cho AI <span class="bg-red-100 text-red-600 text-xs px-2 py-1 rounded ml-3">Rất Quan Trọng</span>
+                            </h3>
+                            <p class="text-slate-700 text-sm mb-4">Tìm ô <strong>System Instructions (Hướng dẫn hệ thống)</strong> trên màn hình. Copy đoạn kỷ luật dưới đây dán vào đó. Nó giúp AI không bao giờ cãi lời bạn.</p>
+                            
+                            <!-- Box Code Đẹp -->
+                            <div class="bg-slate-900 rounded-xl p-4 text-sm font-mono text-emerald-400 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">
 # VAI TRÒ CỦA BẠN
-Bạn là một Lập trình viên cấp cao kiêm Người Kiểm duyệt chất lượng (QA/Tester). Bạn giỏi HTML, Tailwind CSS, Javascript và Google Apps Script. 
-Bạn đang hướng dẫn tôi xây dựng trang web. Tôi là người không rành công nghệ, nên hãy giải thích mọi thứ thật đơn giản, không dùng thuật ngữ học thuật.
+Bạn là một Lập trình viên cấp cao kiêm Người Kiểm duyệt chất lượng (QA/Tester). 
+Hãy giải thích mọi thứ thật đơn giản, tuyệt đối không dùng thuật ngữ học thuật.
 
 # QUY TẮC TỐI THƯỢNG (KHÔNG ĐƯỢC VI PHẠM)
-1. BẢO TOÀN CODE CŨ: Khi tôi nhờ thêm tính năng, phải gắn nó vào code cũ. Tuyệt đối không viết lại file làm mất các tính năng đang chạy.
-2. NGUYÊN BẢN NGÔN NGỮ: Giữ nguyên các đoạn chữ tiếng Việt, không tự ý dịch sang tiếng Anh.
-3. KHÔNG VIẾT TẮT CODE: Khi xuất code, phải in ra 100% hoàn chỉnh. Nếu sửa 1 đoạn nhỏ, phải chỉ rõ: "Tìm dòng chữ A -> Thay bằng mã B".
+1. BẢO TOÀN CODE CŨ: Khi tôi nhờ thêm tính năng, phải gắn nó vào code cũ. 
+2. NGUYÊN BẢN NGÔN NGỮ: Giữ nguyên các đoạn chữ tiếng Việt, không tự dịch.
+3. KHÔNG VIẾT TẮT CODE: Khi xuất code, phải in ra 100% hoàn chỉnh.
 
-# QUY TRÌNH LÀM VIỆC (PHẢI TUÂN THỦ 3 BƯỚC)
-- BƯỚC 1: LẬP KẾ HOẠCH. Đừng vội viết code. Hãy liệt kê ý tưởng ra và hỏi tôi: "[1] Bạn muốn làm giao diện trước? hay [2] Làm dữ liệu trước?". Chờ tôi chọn rồi mới làm.
-- BƯỚC 2: TỰ KIỂM TRA (TESTER). Trước khi đưa code, hãy tự suy nghĩ xem: "Nếu mạng lag thì sao?", "Nếu tôi nhập sai thì web có sập không?". In suy nghĩ đó ra cho tôi xem.
-- BƯỚC 3: XUẤT CODE & HƯỚNG DẪN. Cung cấp code và chỉ cho tôi bước tiếp theo cần làm gì.
-
-# CHUẨN GIAO TIẾP
-Luôn dùng Tailwind CSS (gắn thẳng class vào HTML, không cần file CSS riêng). Gọi dữ liệu bằng Fetch API an toàn.</div>
+# QUY TRÌNH LÀM VIỆC (PHẢI TUÂN THỦ)
+- BƯỚC 1: LẬP KẾ HOẠCH. Chờ tôi duyệt ý tưởng.
+- BƯỚC 2: TỰ KIỂM TRA (TESTER). Báo trước cho tôi rủi ro lỗi.
+- BƯỚC 3: XUẤT CODE & HƯỚNG DẪN.</div>
+                        </div>
                     </div>
 
-                    <h3 class="text-xl font-bold mt-8 mb-4">Bước 3: Bắt đầu nhờ AI làm việc</h3>
-                    <p>Sau khi cài đặt xong "Nhân vật" ở trên. Xuống ô Chat bình thường và gõ: <em>"Chào bạn, tôi muốn tạo 1 giao diện Form nộp bài tập gồm 2 ô: Tên và Link. Hãy giúp tôi làm Bước 1"</em>. Lúc này, bạn sẽ thấy AI làm việc chuyên nghiệp như một Kỹ sư thực thụ!</p>
+                    <!-- Bước 3 -->
+                    <div class="flex flex-col md:flex-row bg-white p-5 rounded-2xl border border-slate-200 shadow-sm items-start md:items-center">
+                        <div class="w-12 h-12 shrink-0 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-xl mb-4 md:mb-0 md:mr-6">3</div>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 mb-1">Giao việc như một Giám Đốc</h3>
+                            <p class="text-slate-600 text-sm">Kéo xuống ô Chat bình thường, gõ một câu lệnh (Prompt) như sau: <br><span class="italic text-slate-500 mt-2 block">"Chào Kỹ sư trưởng, tôi muốn tạo 1 Form gồm ô Tên, ô Link và nút Nộp Bài. Hãy giúp tôi làm giao diện trước."</span><br>Và thế là... Phép thuật xảy ra!</p>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 
-            <!-- BÀI 3: TAILWIND CSS CƠ BẢN -->
-            <section id="lesson-3" class="lesson-content max-w-3xl mx-auto" data-title="Phase 2 / Tailwind CSS cơ bản">
-                <!-- Vẫn giữ nguyên nội dung bài 3 mà chúng ta đã làm ở bước trước -->
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">3. Tailwind CSS: Vẽ giao diện như ráp Lego</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Tailwind CSS cung cấp sẵn cho chúng ta hàng ngàn "mảnh ghép Lego". Việc của bạn chỉ là nhờ AI gọi tên mảnh ghép đó và gắn vào khối (thẻ) HTML.</p>
+            <!-- BÀI 3: VẼ GIAO DIỆN (TAILWIND) -->
+            <section id="lesson-3" class="lesson-content max-w-4xl mx-auto" data-title="Phase 2 / Giao diện & Tailwind">
                 
+                <div class="text-center mb-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-100 text-sky-500 mb-4 shadow-sm">
+                        <i class="fa-solid fa-paintbrush text-3xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">3. Vẽ web đẹp như ráp Lego</h1>
+                    <p class="text-lg text-slate-500">Hãy tưởng tượng: HTML là những viên gạch xây nên khung nhà thô. Còn <strong>Tailwind</strong> chính là đội Thợ Sơn và Thợ Nội Thất trang trí cho ngôi nhà đó.</p>
+                </div>
+
                 <div class="prose prose-slate max-w-none">
-                    <h3 class="text-xl font-bold mt-8 mb-4">Các quy tắc cơ bản dễ hiểu nhất:</h3>
-                    <ul class="list-none space-y-3 mb-8 pl-0">
-                        <li class="flex items-start">
-                            <i class="fa-solid fa-droplet text-blue-500 mt-1 mr-3 w-4"></i>
-                            <div><strong>Màu sắc (Colors):</strong> <code class="bg-slate-100 text-pink-600 px-1 rounded">bg-[màu]</code> là màu nền, <code class="bg-slate-100 text-pink-600 px-1 rounded">text-[màu]</code> là màu chữ.</div>
-                        </li>
-                        <li class="flex items-start">
-                            <i class="fa-solid fa-border-all text-blue-500 mt-1 mr-3 w-4"></i>
-                            <div><strong>Khoảng cách:</strong> Chữ <code>p</code> là lót nệm bên trong, chữ <code>m</code> là đẩy ra bên ngoài. VD: <code class="bg-slate-100 text-pink-600 px-1 rounded">p-4</code>.</div>
-                        </li>
-                    </ul>
+                    <p class="text-center mb-8">Thay vì phải tự pha màu vất vả, Tailwind cung cấp cho bạn hàng ngàn <strong>"Từ khóa ma thuật" (Class)</strong> đã làm sẵn. Bạn chỉ việc gọi tên, giao diện sẽ đẹp ngay lập tức.</p>
+                    
+                    <!-- 3 Cây Đũa Phép (Cards) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
+                        
+                        <!-- Card 1: Màu sắc -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="flex items-center mb-3">
+                                <i class="fa-solid fa-palette text-pink-500 text-xl mr-3"></i>
+                                <h3 class="font-bold text-slate-800 m-0">1. Đổ màu sắc</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 mb-3">Dùng chữ <strong>bg</strong> (Nền) hoặc <strong>text</strong> (Chữ) + Tên màu.</p>
+                            <div class="space-y-2">
+                                <div class="text-xs bg-slate-50 border border-slate-100 p-2 rounded flex justify-between items-center">
+                                    <code class="text-pink-600 font-bold">bg-blue-500</code>
+                                    <span class="w-4 h-4 rounded-full bg-blue-500"></span>
+                                </div>
+                                <div class="text-xs bg-slate-50 border border-slate-100 p-2 rounded flex justify-between items-center">
+                                    <code class="text-pink-600 font-bold">text-red-600</code>
+                                    <span class="text-red-600 font-bold">Chữ đỏ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Khoảng cách -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="flex items-center mb-3">
+                                <i class="fa-solid fa-arrows-up-down-left-right text-emerald-500 text-xl mr-3"></i>
+                                <h3 class="font-bold text-slate-800 m-0">2. Bơm khoảng trống</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 mb-3">Dùng chữ <strong>p</strong> (Lót nệm bên trong) hoặc <strong>m</strong> (Đẩy ra bên ngoài).</p>
+                            <div class="space-y-2">
+                                <div class="text-xs bg-slate-50 border border-slate-100 p-2 rounded text-center">
+                                    <code class="text-emerald-600 font-bold">p-4</code> = Nệm dày mức 4
+                                </div>
+                                <div class="text-xs bg-slate-50 border border-slate-100 p-2 rounded text-center">
+                                    <code class="text-emerald-600 font-bold">mt-2</code> = Cách phía trên mức 2
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Hình khối -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <div class="flex items-center mb-3">
+                                <i class="fa-regular fa-square text-amber-500 text-xl mr-3"></i>
+                                <h3 class="font-bold text-slate-800 m-0">3. Bo góc & Đổ bóng</h3>
+                            </div>
+                            <p class="text-sm text-slate-600 mb-3">Gọt dũa cho khối hình vuông vức trở nên mềm mại.</p>
+                            <div class="space-y-2">
+                                <div class="text-xs bg-slate-50 border border-slate-100 p-2 rounded flex justify-between items-center">
+                                    <code class="text-amber-600 font-bold">rounded-xl</code>
+                                    <div class="w-6 h-4 bg-slate-300 rounded-xl"></div>
+                                </div>
+                                <div class="text-xs bg-slate-50 border border-slate-100 p-2 rounded flex justify-between items-center">
+                                    <code class="text-amber-600 font-bold">shadow-lg</code>
+                                    <div class="w-6 h-4 bg-white shadow-lg border border-slate-100"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-8 mb-4 text-center">Ví dụ: Cách ráp lệnh tạo ra "Thẻ học viên"</h3>
+                    
+                    <!-- Ví dụ UI & Code Side-by-side -->
+                    <div class="flex flex-col xl:flex-row gap-0 my-6 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        
+                        <!-- Cột hiển thị (Kết quả) -->
+                        <div class="flex-1 flex flex-col items-center justify-center p-8 bg-slate-50 border-b xl:border-b-0 xl:border-r border-slate-200">
+                            <span class="bg-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-6">Kết quả trên Web</span>
+                            
+                            <!-- Khối Card Giao diện mẫu -->
+                            <div class="bg-white p-5 rounded-xl shadow-lg border border-slate-100 w-full max-w-xs transform hover:-translate-y-1 transition-transform">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-xl font-bold">
+                                        T
+                                    </div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-slate-800 leading-tight">Trần Văn A</h4>
+                                        <p class="text-sm text-slate-500">Khóa: Zero to SaaS</p>
+                                    </div>
+                                </div>
+                                <button class="w-full mt-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold py-2 rounded-lg transition-colors">
+                                    Xem tiến độ
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Cột hiển thị Code -->
+                        <div class="flex-1 w-full max-w-full p-6 bg-slate-900 relative">
+                            <span class="absolute top-4 right-4 bg-slate-800 text-slate-400 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Bản thiết kế (Code)</span>
+                            <div class="mt-8 text-xs font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
+<span class="text-slate-500">&lt;!-- Khối Hộp Bên Ngoài (Nền trắng, Bo góc lớn, Đổ bóng lớn) --&gt;</span>
+&lt;<span class="text-pink-400">div</span> class="<span class="text-yellow-200">bg-white rounded-xl shadow-lg p-5</span>"&gt;
+
+  <span class="text-slate-500">&lt;!-- Vòng tròn Avatar (Rộng 12, Nền xanh nhạt, Bo tròn xoe) --&gt;</span>
+  &lt;<span class="text-pink-400">div</span> class="<span class="text-yellow-200">w-12 h-12 bg-indigo-100 rounded-full</span>"&gt; T &lt;/<span class="text-pink-400">div</span>&gt;
+  
+  <span class="text-slate-500">&lt;!-- Tên Học viên (Chữ đậm, Màu xám đậm) --&gt;</span>
+  &lt;<span class="text-pink-400">h4</span> class="<span class="text-yellow-200">font-bold text-slate-800</span>"&gt; Trần Văn A &lt;/<span class="text-pink-400">h4</span>&gt;
+
+&lt;/<span class="text-pink-400">div</span>&gt;</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-5 mt-8 rounded-r-xl flex items-start">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mt-1 mr-4"></i>
+                        <div>
+                            <h4 class="font-bold text-amber-900 mb-1">Tin vui dành cho bạn</h4>
+                            <p class="text-amber-800 text-sm leading-relaxed">Bạn <strong>KHÔNG CẦN</strong> phải học thuộc lòng các "từ khóa" này. Ở các bước sau, AI sẽ tự động gõ mã Code đó cho bạn. Bạn chỉ cần học cách <strong>"Đọc hiểu"</strong> để có thể tự sửa (Ví dụ: Thấy chữ màu đỏ chưa đẹp, bạn tìm từ khóa <code>text-red-500</code> đổi thành <code>text-blue-500</code> là xong!).</p>
+                        </div>
+                    </div>
+
                 </div>
             </section>
 

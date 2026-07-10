@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero to SaaS | Học làm Product từ số 0</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Tùy chỉnh Scrollbar cho giống Document Reader */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .lesson-content { display: none; }
+        .lesson-content.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex overflow-hidden">
+
+    <!-- OVERLAY CHO MOBILE -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR (MENU BÀI HỌC) -->
+    <aside id="sidebar" class="w-72 bg-white border-r border-slate-200 h-full flex flex-col fixed md:relative z-30 transition-transform duration-300 transform -translate-x-full md:translate-x-0">
+        <!-- Logo & Tên Khóa học -->
+        <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+            <div>
+                <h1 class="text-lg font-bold text-indigo-600"><i class="fa-solid fa-rocket mr-2"></i>Zero to SaaS</h1>
+                <p class="text-xs text-slate-500 mt-1">Product Builder Masterclass</p>
+            </div>
+            <button class="md:hidden text-slate-500 text-xl" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Menu Navigation -->
+        <nav class="flex-1 overflow-y-auto p-4 space-y-6" id="nav-menu">
+            <!-- Phase 1 -->
+            <div>
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Phase 1: Mindset & Blueprint</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <button onclick="loadLesson('lesson-1')" id="nav-lesson-1" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-regular fa-circle-play mr-2 w-4"></i>1. Tư duy làm Product</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-1"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="loadLesson('lesson-2')" id="nav-lesson-2" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-regular fa-file-code mr-2 w-4"></i>2. Kiến trúc Tối giản</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-2"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Phase 2 -->
+            <div>
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Phase 2: UI/UX & Frontend</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <button onclick="loadLesson('lesson-3')" id="nav-lesson-3" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-laptop-code mr-2 w-4"></i>3. Tailwind CSS cơ bản</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-3"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Phase 3 (Dự án thực hành) -->
+            <div>
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Phase 3: Capstone Project</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <button onclick="loadLesson('lesson-4')" id="nav-lesson-4" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-hammer mr-2 w-4"></i>4. Xây Tool Chấm bài (UI)</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-4"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        
+        <!-- Tiến độ khóa học (Sidebar Bottom) -->
+        <div class="p-4 border-t border-slate-200 bg-slate-50">
+            <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>Tiến độ của bạn</span>
+                <span id="progress-text" class="text-indigo-600">0%</span>
+            </div>
+            <div class="w-full bg-slate-200 rounded-full h-2">
+                <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <button onclick="resetProgress()" class="mt-3 w-full text-xs text-red-500 hover:underline text-center">Reset toàn bộ dữ liệu</button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full bg-white relative">
+        <!-- Top Header -->
+        <header class="h-16 border-b border-slate-200 flex items-center justify-between px-6 bg-white sticky top-0 z-10">
+            <div class="flex items-center">
+                <button class="md:hidden text-slate-600 text-xl mr-4" onclick="toggleSidebar()">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="text-sm text-slate-500 font-medium breadcrumb-text" id="header-breadcrumb">Phase 1 / Bài 1</div>
+            </div>
+            <div>
+                <a href="#" class="text-sm text-indigo-600 font-semibold hover:underline"><i class="fa-brands fa-github mr-1"></i>Mã nguồn</a>
+            </div>
+        </header>
+
+        <!-- Khung chứa nội dung bài học có thể scroll -->
+        <div class="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth" id="lesson-container">
+            
+            <!-- BÀI 1 -->
+            <section id="lesson-1" class="lesson-content max-w-3xl mx-auto active" data-title="Phase 1 / Tư duy làm Product">
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">1. Tư duy làm Product: Không phải là viết Code</h1>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Chào mừng bạn đến với khóa học. Bài học đầu tiên là bài học quan trọng nhất: Định hình lại tư duy của một người làm sản phẩm.</p>
+                
+                <div class="prose prose-slate max-w-none">
+                    <p class="mb-4">Nhiều người nghĩ rằng làm ra một trang web SaaS (Software as a Service) thì phải rất giỏi lập trình, phải biết các ngôn ngữ phức tạp. Nhưng thực tế, <strong>Code chỉ là công cụ, Sản phẩm sinh ra là để giải quyết Vấn đề.</strong></p>
+                    
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6 rounded-r-lg">
+                        <h4 class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-lightbulb mr-2"></i>The Golden Rule</h4>
+                        <p class="text-blue-900 text-sm">Trước khi viết bất kỳ dòng code nào, hãy tự hỏi: "Nếu không có tính năng này, người dùng có chết không?". Nếu câu trả lời là không, hãy để nó làm sau. Hãy tập trung vào luồng chính (Core value).</p>
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-8 mb-4">Tại sao chúng ta không dùng Framework phức tạp?</h3>
+                    <p class="mb-4">Trong khóa học này, chúng ta sẽ xây dựng mọi thứ bằng HTML, Tailwind CSS và Vanilla Javascript kết hợp cùng Google Apps Script (GAS). Vì sao?</p>
+                    <ul class="list-disc pl-6 space-y-2 mb-6 text-slate-700">
+                        <li><strong>Chi phí 0 đồng:</strong> GAS miễn phí, lưu trữ trên Google Drive miễn phí.</li>
+                        <li><strong>Dễ hiểu:</strong> Bạn có thể mở file ra, lưu lại và chạy thẳng trên trình duyệt mà không cần cài đặt Node.js hay chạy server.</li>
+                        <li><strong>Tốc độ:</strong> Nhờ Tailwind CSS, bạn làm giao diện đẹp chuẩn Enterprise chỉ trong vài phút.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- BÀI 2 -->
+            <section id="lesson-2" class="lesson-content max-w-3xl mx-auto" data-title="Phase 1 / Kiến trúc Tối giản">
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">2. Kiến trúc Tối giản & Cách làm việc với AI</h1>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Để một người không rành công nghệ có thể code được, bạn cần một người bạn đồng hành. Và AI chính là người bạn đó.</p>
+                
+                <div class="prose prose-slate max-w-none">
+                    <p class="mb-4">Bí quyết để ra lệnh cho AI (Prompting) viết code đúng ý là: <strong>Hãy đóng vai một Tester trước khi đóng vai Developer.</strong></p>
+                    
+                    <h3 class="text-xl font-bold mt-8 mb-4">Ví dụ một cấu trúc Prompt chuẩn:</h3>
+                    
+                    <!-- Khối Code Block -->
+                    <div class="bg-slate-800 rounded-lg overflow-hidden my-6">
+                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono">
+                            <span>prompt-template.txt</span>
+                            <button class="hover:text-white"><i class="fa-regular fa-copy"></i> Copy</button>
+                        </div>
+                        <div class="p-4 text-sm font-mono text-emerald-400 overflow-x-auto whitespace-pre">
+[Role] Đóng vai là Senior Fullstack Developer.
+[Context] Tôi đang làm tính năng A cho dự án B.
+[Rule] Chỉ dùng HTML, Tailwind và JS thuần. Không dùng framework.
+[Task] Viết giao diện form nộp bài tập. Khi bấm nộp thì gọi hàm save()
+[Note] Nhớ xử lý lỗi nếu người dùng không nhập tên.</div>
+                    </div>
+                    
+                    <p>Trong bài tập thực hành tới, chúng ta sẽ dùng cấu trúc Prompt này để ra lệnh cho AI tạo toàn bộ giao diện Tool chấm bài tự động!</p>
+                </div>
+            </section>
+
+            <!-- BÀI 3 -->
+            <section id="lesson-3" class="lesson-content max-w-3xl mx-auto" data-title="Phase 2 / Tailwind CSS cơ bản">
+                <div class="flex items-center justify-center h-64 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50">
+                    <div class="text-center">
+                        <i class="fa-solid fa-laptop-code text-4xl text-slate-400 mb-3"></i>
+                        <h2 class="text-xl font-bold text-slate-600">Nội dung đang được cập nhật</h2>
+                        <p class="text-sm text-slate-500 mt-2">Phần này sẽ đi sâu vào cách kéo thả và dùng class Tailwind.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BÀI 4 -->
+            <section id="lesson-4" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / Xây Tool Chấm bài">
+                <div class="flex items-center justify-center h-64 border-2 border-dashed border-slate-300 rounded-xl bg-slate-50">
+                    <div class="text-center">
+                        <i class="fa-solid fa-hammer text-4xl text-slate-400 mb-3"></i>
+                        <h2 class="text-xl font-bold text-slate-600">Dự án Capstone (Bài tập thực hành)</h2>
+                        <p class="text-sm text-slate-500 mt-2">Chúng ta sẽ cùng xây dựng Tool nộp & chấm bài từ con số 0 ở đây.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOOTER CỦA BÀI HỌC (CHỨA NÚT CHUYỂN BÀI) -->
+            <div class="max-w-3xl mx-auto mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 pb-12">
+                <button id="btn-prev" onclick="goPrev()" class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 w-full sm:w-auto transition-colors hidden">
+                    <i class="fa-solid fa-arrow-left mr-2"></i>Bài trước
+                </button>
+                
+                <button id="btn-complete" onclick="markCurrentAsComplete()" class="px-6 py-2.5 text-sm font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 w-full sm:w-auto transition-all flex items-center justify-center">
+                    <i class="fa-solid fa-check mr-2"></i>Đã hiểu & Hoàn thành bài này
+                </button>
+
+                <button id="btn-next" onclick="goNext()" class="px-5 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 w-full sm:w-auto transition-colors">
+                    Bài tiếp theo <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white px-4 py-3 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center">
+        <i class="fa-solid fa-circle-check mr-2"></i>
+        <span id="toast-msg">Đã lưu tiến độ!</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Cấu hình tổng số bài học (dùng mảng id)
+        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4'];
+        let currentLessonId = 'lesson-1';
+        let completedLessons = [];
+
+        // 1. Khởi tạo khi load trang
+        document.addEventListener('DOMContentLoaded', () => {
+            // Đọc LocalStorage xem đã học đến đâu
+            const savedData = localStorage.getItem('kv_course_progress');
+            if (savedData) {
+                completedLessons = JSON.parse(savedData);
+            }
+            
+            // Render lại trạng thái UI (Tick xanh, Progress Bar)
+            updateProgressUI();
+            
+            // Load bài học hiện tại (mặc định bài 1, hoặc bài cuối cùng đang học)
+            // Tìm bài học đầu tiên chưa hoàn thành
+            const firstUncompleted = lessons.find(id => !completedLessons.includes(id)) || lessons[0];
+            loadLesson(firstUncompleted);
+        });
+
+        // 2. Hàm chuyển đổi bài học
+        function loadLesson(lessonId) {
+            currentLessonId = lessonId;
+            
+            // Ẩn tất cả bài học
+            document.querySelectorAll('.lesson-content').forEach(el => el.classList.remove('active'));
+            // Hiện bài được chọn
+            const targetEl = document.getElementById(lessonId);
+            targetEl.classList.add('active');
+
+            // Cập nhật Breadcrumb (Thanh Header)
+            const title = targetEl.getAttribute('data-title');
+            document.getElementById('header-breadcrumb').innerText = title;
+
+            // Đổi màu Sidebar Button để nhận diện đang ở bài nào
+            document.querySelectorAll('[id^="nav-lesson-"]').forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'text-indigo-700', 'font-semibold');
+                btn.classList.add('text-slate-600');
+            });
+            const activeBtn = document.getElementById(`nav-${lessonId}`);
+            activeBtn.classList.remove('text-slate-600');
+            activeBtn.classList.add('bg-indigo-50', 'text-indigo-700', 'font-semibold');
+
+            // Xử lý ẩn/hiện nút Prev, Next, Nút Hoàn thành
+            const currentIndex = lessons.indexOf(lessonId);
+            document.getElementById('btn-prev').style.display = currentIndex === 0 ? 'none' : 'block';
+            document.getElementById('btn-next').style.display = currentIndex === lessons.length - 1 ? 'none' : 'block';
+
+            // Nếu bài này đã hoàn thành rồi, đổi text nút
+            const btnComplete = document.getElementById('btn-complete');
+            if(completedLessons.includes(lessonId)) {
+                btnComplete.innerHTML = '<i class="fa-solid fa-rotate-left mr-2"></i>Đã hoàn thành (Học lại)';
+                btnComplete.classList.replace('bg-indigo-600', 'bg-emerald-500');
+                btnComplete.classList.replace('hover:bg-indigo-700', 'hover:bg-emerald-600');
+            } else {
+                btnComplete.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Đã hiểu & Hoàn thành bài này';
+                btnComplete.classList.replace('bg-emerald-500', 'bg-indigo-600');
+                btnComplete.classList.replace('hover:bg-emerald-600', 'hover:bg-indigo-700');
+            }
+
+            // Scroll cuộn lên đầu bài học
+            document.getElementById('lesson-container').scrollTo(0, 0);
+
+            // Đóng sidebar nếu đang mở trên Mobile
+            if(window.innerWidth < 768) {
+                toggleSidebar(true); // true = force close
+            }
+        }
+
+        // 3. Hàm đánh dấu hoàn thành bài học
+        function markCurrentAsComplete() {
+            if (!completedLessons.includes(currentLessonId)) {
+                completedLessons.push(currentLessonId);
+                localStorage.setItem('kv_course_progress', JSON.stringify(completedLessons));
+                updateProgressUI();
+                showToast("Tuyệt vời! Đã hoàn thành bài học.");
+                
+                // Tự động nhảy sang bài tiếp theo sau 1 giây
+                setTimeout(() => { goNext(); }, 1200);
+            }
+        }
+
+        // 4. Update các UI liên quan đến tiến độ
+        function updateProgressUI() {
+            // Hiện tick xanh ở Sidebar
+            completedLessons.forEach(id => {
+                const checkmark = document.getElementById(`check-${id}`);
+                if(checkmark) checkmark.classList.remove('hidden');
+            });
+
+            // Tính % Progress Bar
+            const percent = Math.round((completedLessons.length / lessons.length) * 100);
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText = `${percent}%`;
+        }
+
+        // 5. Nút Prev/Next
+        function goNext() {
+            const currentIndex = lessons.indexOf(currentLessonId);
+            if (currentIndex < lessons.length - 1) {
+                loadLesson(lessons[currentIndex + 1]);
+            }
+        }
+
+        function goPrev() {
+            const currentIndex = lessons.indexOf(currentLessonId);
+            if (currentIndex > 0) {
+                loadLesson(lessons[currentIndex - 1]);
+            }
+        }
+
+        // 6. Responsive Sidebar (Mobile)
+        function toggleSidebar(forceClose = false) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full') && !forceClose) {
+                // Đang đóng -> Mở ra
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                // Đang mở -> Đóng lại
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        // 7. Utility: Thông báo Toast & Reset dữ liệu (cho mục đích test)
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function resetProgress() {
+            if(confirm('Bạn có chắc muốn xóa tiến độ học tập để test lại từ đầu không?')) {
+                localStorage.removeItem('kv_course_progress');
+                location.reload(); // Tải lại trang
+            }
+        }
+    </script>
+</body>
+</html>

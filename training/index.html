@@ -77,14 +77,20 @@
                 <ul class="space-y-1">
                     <li>
                         <button onclick="loadLesson('lesson-4')" id="nav-lesson-4" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-database mr-2 w-4"></i>4. Database & API (Học viên)</span>
+                            <span class="truncate"><i class="fa-solid fa-database mr-2 w-4"></i>4. API Nhận bài (GAS)</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-4"></i>
                         </button>
                     </li>
                     <li>
                         <button onclick="loadLesson('lesson-5')" id="nav-lesson-5" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-user-tie mr-2 w-4"></i>5. API (Giảng viên)</span>
+                            <span class="truncate"><i class="fa-solid fa-user-tie mr-2 w-4"></i>5. API Chấm điểm (GAS)</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-5"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="loadLesson('lesson-6')" id="nav-nav-lesson-6" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-browser mr-2 w-4"></i>6. Web Nộp Bài (Frontend)</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-6"></i>
                         </button>
                     </li>
                 </ul>
@@ -375,6 +381,76 @@ Luôn dùng Tailwind CSS (gắn thẳng class vào HTML, không cần file CSS r
                     </div>
                 </div>
             </section>
+          <!-- BÀI 6: GIAO DIỆN NỘP BÀI (FRONTEND) -->
+            <section id="lesson-6" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / Web Nộp Bài (Frontend)">
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">6. Xây Dựng Giao Diện Nộp Bài</h1>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Chúng ta đã có "Tủ hồ sơ" (Google Sheet) và "Chú bảo vệ" (API). Bây giờ, ta cần làm một cái Bưu điện (Giao diện Web) để học viên đến gửi thư.</p>
+                
+                <div class="prose prose-slate max-w-none">
+                    
+                    <h3 class="text-xl font-bold mt-4 mb-3">Bước 1: Tạo Form nhập liệu (HTML)</h3>
+                    <p>Hãy mở máy tính của bạn, tạo một file tên là <code>student.html</code>. Dùng câu thần chú ở Bài 2, yêu cầu AI viết cho bạn một cái Form nhập Tên và Link bằng Tailwind CSS. Ta sẽ có đoạn mã dạng như sau:</p>
+
+                    <!-- Code HTML -->
+                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
+                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
+                            <span>student.html (Phần Giao diện)</span>
+                        </div>
+                        <div class="p-4 text-sm font-mono text-pink-300 overflow-x-auto whitespace-pre leading-relaxed">
+&lt;<span class="text-pink-400">input</span> id="<span class="text-yellow-200">studentName</span>" placeholder="<span class="text-green-300">Nhập tên của bạn</span>" class="<span class="text-yellow-200">border p-2</span>"&gt;
+&lt;<span class="text-pink-400">input</span> id="<span class="text-yellow-200">projectLink</span>" placeholder="<span class="text-green-300">Link bài tập</span>" class="<span class="text-yellow-200">border p-2</span>"&gt;
+
+&lt;<span class="text-pink-400">button</span> onclick="<span class="text-yellow-200">submitData()</span>" class="<span class="text-yellow-200">bg-blue-600 text-white</span>"&gt;
+    Nộp bài
+&lt;/<span class="text-pink-400">button</span>&gt;</div>
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-8 mb-4">Bước 2: Thuê "Anh Shipper" (Lập trình JavaScript)</h3>
+                    <p>Khi học viên bấm nút "Nộp bài", dữ liệu vẫn nằm trên máy tính của họ. Ta cần viết một đoạn mã JavaScript (Anh Shipper) để lấy dữ liệu đó và chạy tới địa chỉ API của ta. Trong lập trình, "Anh Shipper" này tên là <code>fetch()</code>.</p>
+
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 my-6 rounded-r-lg">
+                        <h4 class="font-bold text-amber-800 mb-2"><i class="fa-solid fa-key mr-2"></i>Quy tắc Vàng chống Lỗi CORS</h4>
+                        <p class="text-amber-900 text-sm">Rất nhiều bạn mới làm bị lỗi trình duyệt chặn gửi dữ liệu (CORS Error). Bí quyết là luôn phải bọc gói hàng bằng giấy gói <strong>text/plain</strong>. Hãy xem đoạn mã bên dưới.</p>
+                    </div>
+
+                    <!-- Code JS -->
+                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
+                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
+                            <span>Thêm thẻ &lt;script&gt; vào dưới cùng file student.html</span>
+                        </div>
+                        <div class="p-5 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
+<span class="text-slate-500">// 1. Dán đường link API (Web App) lấy từ Bài 4 vào đây</span>
+<span class="text-pink-400">const</span> API_URL = <span class="text-green-300">"https://script.google.com/macros/s/.../exec"</span>;
+
+<span class="text-pink-400">function</span> <span class="text-yellow-200">submitData</span>() {
+  <span class="text-slate-500">// 2. Lấy dữ liệu người dùng gõ vào ô nhập</span>
+  <span class="text-pink-400">const</span> name = document.getElementById(<span class="text-green-300">'studentName'</span>).value;
+  <span class="text-pink-400">const</span> link = document.getElementById(<span class="text-green-300">'projectLink'</span>).value;
+
+  <span class="text-slate-500">// 3. Đóng gói hàng hóa</span>
+  <span class="text-pink-400">const</span> payload = {
+      action: <span class="text-green-300">"submit"</span>,
+      student_name: name,
+      project_link: link
+  };
+
+  <span class="text-slate-500">// 4. Gọi Shipper (fetch) mang đi giao</span>
+  <span class="text-yellow-200">fetch</span>(API_URL, {
+      method: <span class="text-green-300">'POST'</span>,
+      headers: { <span class="text-green-300">'Content-Type'</span>: <span class="text-green-300">'text/plain;charset=utf-8'</span> }, <span class="text-slate-500">// Bí kíp chống CORS</span>
+      body: JSON.stringify(payload)
+  })
+  .then(response => response.json())
+  .then(data => {
+      <span class="text-yellow-200">alert</span>(data.message); <span class="text-slate-500">// Báo thành công!</span>
+  });
+}</div>
+                    </div>
+                    
+                    <p><strong>Chúc mừng!</strong> Bạn đã hoàn thành một chu trình Fullstack hoàn chỉnh. Hãy thử mở file <code>student.html</code> của bạn lên, nhập dữ liệu và xem điều kỳ diệu xảy ra trong Google Sheet nhé!</p>
+
+                </div>
+            </section>
 
             <!-- FOOTER CỦA BÀI HỌC (CHỨA NÚT CHUYỂN BÀI) -->
             <div class="max-w-3xl mx-auto mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 pb-12">
@@ -403,7 +479,7 @@ Luôn dùng Tailwind CSS (gắn thẳng class vào HTML, không cần file CSS r
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Cấu hình tổng số bài học (dùng mảng id)
-        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5'];
+        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5', 'lesson-6'];
         let currentLessonId = 'lesson-1';
         let completedLessons = [];
 

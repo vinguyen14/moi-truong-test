@@ -88,9 +88,15 @@
                         </button>
                     </li>
                     <li>
-                        <button onclick="loadLesson('lesson-6')" id="nav-nav-lesson-6" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-browser mr-2 w-4"></i>6. Web Nộp Bài (Frontend)</span>
+                        <button onclick="loadLesson('lesson-6')" id="nav-lesson-6" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-window-maximize mr-2 w-4"></i>6. Web Nộp Bài (Frontend)</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-6"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="loadLesson('lesson-7')" id="nav-lesson-7" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-chalkboard-user mr-2 w-4"></i>7. Web Giảng viên (Frontend)</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-7"></i>
                         </button>
                     </li>
                 </ul>
@@ -451,6 +457,73 @@ Luôn dùng Tailwind CSS (gắn thẳng class vào HTML, không cần file CSS r
 
                 </div>
             </section>
+          <!-- BÀI 7: GIAO DIỆN QUẢN TRỊ GIẢNG VIÊN -->
+            <section id="lesson-7" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / Web Giảng viên (Frontend)">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white mb-4 shadow-lg shadow-indigo-200">
+                        <i class="fa-solid fa-trophy text-2xl"></i>
+                    </div>
+                    <h1 class="text-3xl font-extrabold text-slate-900 mb-2">7. Trạm Chấm Bài (Teacher Dashboard)</h1>
+                    <p class="text-lg text-slate-500">Mảnh ghép cuối cùng để hoàn thiện một Hệ thống SaaS thực thụ.</p>
+                </div>
+                
+                <div class="prose prose-slate max-w-none">
+                    <p>Khác với học viên chỉ có chức năng Gửi dữ liệu đi. Ở giao diện Giảng viên, chúng ta cần làm 2 việc: <strong>Lấy danh sách về (Đọc)</strong> và <strong>Chấm điểm (Ghi đè)</strong>.</p>
+                    
+                    <h3 class="text-xl font-bold mt-4 mb-3">1. Lấy dữ liệu về Bảng (Table)</h3>
+                    <p>Ta sẽ tạo một file <code>teacher.html</code>. Dùng AI thiết kế một cái Bảng danh sách. Sau đó, nhờ "Anh Shipper" (hàm fetch) mang theo lời nhắn <code>action: 'get_list'</code> chạy lên Google Sheet gom hết bài tập mang về.</p>
+
+                    <!-- Khối Code JS Fetch Get List -->
+                    <div class="bg-slate-800 rounded-xl overflow-hidden my-4 shadow-lg">
+                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
+                            <span>Lệnh lấy danh sách bài nộp</span>
+                        </div>
+                        <div class="p-4 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
+<span class="text-yellow-200">fetch</span>(API_URL, {
+  method: <span class="text-green-300">'POST'</span>,
+  headers: { <span class="text-green-300">'Content-Type'</span>: <span class="text-green-300">'text/plain'</span> },
+  body: JSON.stringify({ action: <span class="text-green-300">'get_list'</span> }) <span class="text-slate-500">// Báo API biết là tôi muốn lấy danh sách</span>
+})
+.then(res => res.json())
+.then(response => {
+  <span class="text-slate-500">// Nhận được danh sách, dùng Javascript vẽ nó ra thành các hàng &lt;tr&gt; &lt;td&gt; trên web</span>
+  <span class="text-yellow-200">console.log</span>(<span class="text-green-300">"Đã lấy được: "</span>, response.data);
+});</div>
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-8 mb-3">2. Chấm điểm & Trả kết quả</h3>
+                    <p>Khi giảng viên nhập điểm 10 và bấm Lưu. Ta lại đóng gói một kiện hàng mới, gồm 3 thông tin quan trọng: <strong>Mã Bài Tập (ID), Điểm, và Lời phê</strong>. Bắn thẳng lên API.</p>
+
+                    <!-- Khối Code JS Fetch Grade -->
+                    <div class="bg-slate-800 rounded-xl overflow-hidden my-4 shadow-lg">
+                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
+                            <span>Lệnh chấm điểm cập nhật Google Sheet</span>
+                        </div>
+                        <div class="p-4 text-sm font-mono text-pink-300 overflow-x-auto whitespace-pre leading-relaxed">
+<span class="text-pink-400">const</span> payload = {
+  action: <span class="text-green-300">"grade"</span>,
+  id: <span class="text-green-300">"SUB-12345"</span>,  <span class="text-slate-500">// Để API biết đang chấm bài của ai</span>
+  score: <span class="text-green-300">"10"</span>,
+  feedback: <span class="text-green-300">"Làm rất tốt!"</span>
+};
+
+<span class="text-yellow-200">fetch</span>(API_URL, {
+  method: <span class="text-green-300">'POST'</span>,
+  headers: { <span class="text-green-300">'Content-Type'</span>: <span class="text-green-300">'text/plain'</span> },
+  body: JSON.stringify(payload)
+})
+.then(res => res.json())
+.then(data => <span class="text-yellow-200">alert</span>(<span class="text-green-300">"Đã lưu điểm thành công!"</span>));</div>
+                    </div>
+                    
+                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 my-8 rounded-r-xl">
+                        <h4 class="font-bold text-indigo-900 mb-2 text-xl">🎉 TỔNG KẾT KHÓA HỌC</h4>
+                        <p class="text-indigo-800 mb-3">Chúc mừng bạn! Từ một người chưa rành công nghệ, bạn đã đi qua một hành trình tuyệt vời. Bạn đã biết cách thiết kế Frontend (Tailwind), biết lưu trữ Backend (Google Sheets), và dùng AI làm Kỹ sư viết code (Prompting).</p>
+                        <p class="text-indigo-800 font-medium">Bây giờ, với tư duy này, bạn có thể tự mình xây dựng hệ thống Quản lý nhân sự, Quản lý kho, hay bất cứ phần mềm SaaS nào bạn muốn. Giới hạn duy nhất là trí tưởng tượng của bạn!</p>
+                    </div>
+
+                </div>
+            </section>
 
             <!-- FOOTER CỦA BÀI HỌC (CHỨA NÚT CHUYỂN BÀI) -->
             <div class="max-w-3xl mx-auto mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 pb-12">
@@ -479,7 +552,7 @@ Luôn dùng Tailwind CSS (gắn thẳng class vào HTML, không cần file CSS r
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Cấu hình tổng số bài học (dùng mảng id)
-        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5', 'lesson-6'];
+        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5', 'lesson-6', 'lesson-7'];
         let currentLessonId = 'lesson-1';
         let completedLessons = [];
 

@@ -77,8 +77,14 @@
                 <ul class="space-y-1">
                     <li>
                         <button onclick="loadLesson('lesson-4')" id="nav-lesson-4" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-hammer mr-2 w-4"></i>4. Xây Tool Chấm bài (UI)</span>
+                            <span class="truncate"><i class="fa-solid fa-database mr-2 w-4"></i>4. Database & API (Học viên)</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-4"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="loadLesson('lesson-5')" id="nav-lesson-5" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-user-tie mr-2 w-4"></i>5. API (Giảng viên)</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-5"></i>
                         </button>
                     </li>
                 </ul>
@@ -277,6 +283,98 @@ Luôn dùng Tailwind CSS (gắn thẳng class vào HTML, không cần file CSS r
 
                 </div>
             </section>
+            <!-- BÀI 5: BACKEND (GIẢNG VIÊN) -->
+            <section id="lesson-5" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / API Giảng viên">
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">5. Tool Chấm Bài (Phần 2): Quyền lực của Giảng viên</h1>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Ở Bài 4, học viên đã có thể nộp bài vào Kho (Google Sheet). Bây giờ, chúng ta sẽ mở rộng khả năng của "Chú bảo vệ" (API) để phục vụ Giảng viên: Lấy danh sách bài tập về xem, và Chấm điểm.</p>
+                
+                <div class="prose prose-slate max-w-none">
+                    <h3 class="text-xl font-bold mt-4 mb-3">Nâng cấp "Cái Tủ Hồ Sơ"</h3>
+                    <p>Mở file Google Sheet <code>Submissions</code> của bạn ra. Hãy thêm 2 cột nữa vào cạnh cột <code>status</code>: Đó là cột <strong>score</strong> (Điểm) và cột <strong>feedback</strong> (Lời phê).</p>
+                    
+                    <h3 class="text-xl font-bold mt-8 mb-4">Bổ sung Lệnh cho Chú bảo vệ (Apps Script)</h3>
+                    <p>Quay lại trang viết code ban nãy. Chúng ta sẽ <strong>nối thêm</strong> tính năng vào phía dưới đoạn code của Bài 4. Cụ thể, ta thêm lệnh <code>get_list</code> và <code>grade</code>.</p>
+
+                    <!-- Khối Code Backend Cập nhật -->
+                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
+                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
+                            <span>Code.gs (Bản nâng cấp Hoàn chỉnh)</span>
+                        </div>
+                        <div class="p-5 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
+<span class="text-pink-400">function</span> <span class="text-yellow-200">doPost</span>(e) {
+  <span class="text-pink-400">try</span> {
+    <span class="text-pink-400">var</span> data = JSON.parse(e.postData.contents);
+    <span class="text-pink-400">var</span> sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(<span class="text-green-300">"Submissions"</span>);
+    
+    <span class="text-slate-500">// 1. TÍNH NĂNG NỘP BÀI (HỌC VIÊN) - Như Bài 4</span>
+    <span class="text-pink-400">if</span> (data.action === <span class="text-green-300">'submit'</span>) {
+      <span class="text-pink-400">if</span>(!data.student_name || !data.project_link) <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Thiếu thông tin!"</span>);
+      
+      <span class="text-pink-400">var</span> newId = <span class="text-green-300">"SUB-"</span> + <span class="text-yellow-200">new Date</span>().getTime();
+      <span class="text-slate-500">// Các cột: id | timestamp | student_name | project_link | status | score | feedback</span>
+      sheet.appendRow([newId, <span class="text-yellow-200">new Date</span>(), data.student_name, data.project_link, <span class="text-green-300">"Chờ chấm"</span>, <span class="text-green-300">""</span>, <span class="text-green-300">""</span>]);
+      
+      <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Nộp bài thành công!"</span>);
+    }
+    
+    <span class="text-slate-500">// 2. TÍNH NĂNG LẤY DANH SÁCH (GIẢNG VIÊN)</span>
+    <span class="text-pink-400">else if</span> (data.action === <span class="text-green-300">'get_list'</span>) {
+      <span class="text-slate-500">// Lấy toàn bộ dữ liệu trong bảng</span>
+      <span class="text-pink-400">var</span> rows = sheet.getDataRange().getValues();
+      <span class="text-pink-400">var</span> result = [];
+      
+      <span class="text-slate-500">// Bỏ qua dòng số 1 (tiêu đề), bắt đầu đọc từ dòng 2 (i=1)</span>
+      <span class="text-pink-400">for</span> (<span class="text-pink-400">var</span> i = 1; i < rows.length; i++) {
+        result.push({
+          id: rows[i][0],
+          timestamp: rows[i][1],
+          student_name: rows[i][2],
+          project_link: rows[i][3],
+          status: rows[i][4],
+          score: rows[i][5],
+          feedback: rows[i][6]
+        });
+      }
+      <span class="text-slate-500">// Gửi danh sách về cho trang web hiển thị</span>
+      <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Lấy dữ liệu thành công"</span>, result);
+    }
+
+    <span class="text-slate-500">// 3. TÍNH NĂNG CHẤM ĐIỂM (GIẢNG VIÊN)</span>
+    <span class="text-pink-400">else if</span> (data.action === <span class="text-green-300">'grade'</span>) {
+      <span class="text-pink-400">var</span> rows = sheet.getDataRange().getValues();
+      <span class="text-slate-500">// Tìm xem mã bài tập nằm ở dòng số mấy</span>
+      <span class="text-pink-400">for</span> (<span class="text-pink-400">var</span> i = 1; i < rows.length; i++) {
+        <span class="text-pink-400">if</span> (rows[i][0] === data.id) {
+          <span class="text-slate-500">// Cập nhật cột Trạng thái (cột 5), Điểm (cột 6), Lời phê (cột 7)</span>
+          sheet.getRange(i + 1, 5).setValue(<span class="text-green-300">"Đã chấm"</span>);
+          sheet.getRange(i + 1, 6).setValue(data.score);
+          sheet.getRange(i + 1, 7).setValue(data.feedback);
+          <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Chấm điểm thành công!"</span>);
+        }
+      }
+      <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Không tìm thấy bài tập này!"</span>);
+    }
+    
+  } <span class="text-pink-400">catch</span> (error) {
+    <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Lỗi: "</span> + error.toString());
+  }
+}
+
+<span class="text-slate-500">// Hàm phụ: Cập nhật hàm này để có thể gửi kèm dữ liệu (data) về web</span>
+<span class="text-pink-400">function</span> <span class="text-yellow-200">responseJSON</span>(status, message, data = <span class="text-pink-400">null</span>) {
+  <span class="text-pink-400">var</span> output = { <span class="text-green-300">"status"</span>: status, <span class="text-green-300">"message"</span>: message };
+  <span class="text-pink-400">if</span> (data) output.data = data;
+  <span class="text-pink-400">return</span> ContentService.createTextOutput(JSON.stringify(output))
+                       .setMimeType(ContentService.MimeType.JSON);
+}</div>
+                    </div>
+                    
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6 rounded-r-lg">
+                        <h4 class="font-bold text-blue-800 mb-2">Cập nhật Phiên bản (Deploy)</h4>
+                        <p class="text-blue-900 text-sm">Mỗi lần sửa code, bạn phải tạo phiên bản mới. Bấm <strong>Deploy > Manage Deployments (Quản lý bản triển khai)</strong>, bấm vào hình cây bút (Edit), ở chỗ Version chọn <strong>New version</strong> và bấm Deploy. Link URL cũ vẫn giữ nguyên không đổi!</p>
+                    </div>
+                </div>
+            </section>
 
             <!-- FOOTER CỦA BÀI HỌC (CHỨA NÚT CHUYỂN BÀI) -->
             <div class="max-w-3xl mx-auto mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 pb-12">
@@ -305,7 +403,7 @@ Luôn dùng Tailwind CSS (gắn thẳng class vào HTML, không cần file CSS r
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Cấu hình tổng số bài học (dùng mảng id)
-        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4'];
+        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5'];
         let currentLessonId = 'lesson-1';
         let completedLessons = [];
 

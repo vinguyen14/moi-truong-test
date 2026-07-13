@@ -20,11 +20,10 @@
         .lesson-content.active { display: block; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Hiệu ứng cho Video Simulator */
+        /* Hiệu ứng cho Video Simulator (Bài 1) */
         .sim-packet { transition: all 1s ease-in-out; opacity: 0; }
         .sim-typing::after { content: '|'; animation: blink 1s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
-        @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5); } 100% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); } }
         .active-panel { ring: 4px; ring-color: #3b82f6; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); transform: scale(1.02); transition: all 0.3s; border-color: #3b82f6;}
     </style>
 </head>
@@ -126,7 +125,7 @@
 
         <div class="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth bg-slate-50/30" id="lesson-container">
             
-            <!-- BÀI 1: DEMO MÔ PHỎNG -->
+            <!-- BÀI 1: DEMO MÔ PHỎNG (VIDEO) -->
             <section id="lesson-1" class="lesson-content max-w-6xl mx-auto active" data-title="Bức tranh toàn cảnh">
                 
                 <div class="text-center mb-10">
@@ -148,8 +147,8 @@
                     </div>
 
                     <!-- Lời thoại giải thích (Subtitles) -->
-                    <div class="text-center mb-8 h-12 flex items-center justify-center">
-                        <p id="sim-subtitle" class="text-white text-xl font-medium bg-slate-800/80 backdrop-blur px-6 py-2 rounded-full border border-slate-600 shadow-lg">Bấm nút "Chạy mô phỏng" để bắt đầu...</p>
+                    <div class="text-center mb-8 h-12 flex items-center justify-center mt-12 md:mt-0">
+                        <p id="sim-subtitle" class="text-white text-base md:text-xl font-medium bg-slate-800/80 backdrop-blur px-6 py-2 rounded-full border border-slate-600 shadow-lg">Bấm nút "Chạy mô phỏng" để bắt đầu...</p>
                     </div>
 
                     <!-- 3 Màn hình mô phỏng -->
@@ -220,35 +219,42 @@
 
             <!-- BÀI 2: CHUẨN BỊ & AI -->
             <section id="lesson-2" class="lesson-content max-w-5xl mx-auto" data-title="Bước 1 / Chuẩn bị & Trạm AI">
-                <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 border-b border-slate-200 pb-4">Bước 1: Hiểu Luật Chơi & Vẽ Bản Đồ</h1>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 border-b border-slate-200 pb-4">Bước 1: Chuẩn bị Đầu vào & Cấu hình AI</h1>
                 
-                <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-code text-blue-500 mr-2"></i>1. Nhận diện các loại "Ngôn ngữ"</h3>
-                <p class="text-base text-slate-600 mb-6 leading-relaxed">Bạn không cần tự viết, nhưng khi AI nhả code ra, bạn phải biết nó thuộc loại nào để dán cho đúng.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="font-bold text-orange-500 text-lg mb-2"><i class="fa-brands fa-html5 mr-1"></i> HTML</div>
-                        <p class="text-sm text-slate-600 leading-relaxed">Là <strong>BỘ KHUNG</strong> (tường, cột). Nó định hình xem web có mấy nút bấm, mấy ô nhập chữ.</p>
+                <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-box-open text-blue-500 mr-2"></i>1. Chuẩn bị Tài nguyên Kế thừa</h3>
+                <p class="text-base text-slate-600 mb-4 leading-relaxed">Đừng bao giờ bắt AI viết từ số 0. Hãy ném cho nó file dự án cũ (lưu trên Google Docs) để nó hiểu "Gốc rễ" phong cách code của bạn.</p>
+                
+                <!-- MOCKUP GOOGLE DOCS -->
+                <div class="bg-white border border-slate-200 rounded-lg shadow-sm mt-3 overflow-hidden font-sans select-none mb-10 max-w-2xl">
+                    <div class="bg-blue-50 border-b border-blue-100 px-3 py-2 flex items-center text-sm">
+                        <i class="fa-solid fa-file-lines text-blue-500 text-lg mr-2"></i>
+                        <div>
+                            <div class="font-medium text-slate-700 text-xs">code html v1 (Bản cũ) <i class="fa-regular fa-star text-slate-400 ml-1"></i></div>
+                            <div class="text-[10px] text-slate-500 space-x-2"><span>Tệp</span><span>Chỉnh sửa</span><span>Xem</span></div>
+                        </div>
                     </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="font-bold text-sky-500 text-lg mb-2"><i class="fa-brands fa-css3-alt mr-1"></i> CSS (Tailwind)</div>
-                        <p class="text-sm text-slate-600 leading-relaxed">Là <strong>LỚP SƠN</strong>. Tạo màu sắc, hiệu ứng kính mờ, bo tròn góc cho giao diện đẹp mắt.</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="font-bold text-yellow-500 text-lg mb-2"><i class="fa-brands fa-js mr-1"></i> JS / Apps Script</div>
-                        <p class="text-sm text-slate-600 leading-relaxed">Là <strong>ĐỘNG CƠ</strong>. Các đoạn code bắt đầu bằng chữ <code>function</code>. Giúp web tính toán, lưu dữ liệu.</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                        <div class="font-bold text-slate-700 text-lg mb-2"><i class="fa-solid fa-cubes mr-1"></i> JSON</div>
-                        <p class="text-sm text-slate-600 leading-relaxed">Là <strong>GÓI HÀNG</strong>. Dữ liệu gói gọn để truyền mượt mà từ Web sang Google Sheet.</p>
+                    <div class="flex h-32">
+                        <div class="w-1/2 bg-slate-50 p-3 border-r border-slate-100">
+                            <div class="text-xs font-bold text-slate-600 mb-2">Các thẻ trong tài liệu</div>
+                            <div class="space-y-1">
+                                <div class="text-xs text-slate-500 pl-6 border-l-2 border-transparent py-0.5"><i class="fa-brands fa-html5 mr-1 text-slate-400"></i> index.html</div>
+                                <div class="text-xs text-slate-500 pl-6 border-l-2 border-transparent py-0.5"><i class="fa-brands fa-js mr-1 text-slate-400"></i> codelab-data.js</div>
+                                <div class="text-xs text-blue-600 pl-6 border-l-2 border-blue-400 font-bold bg-blue-50 py-0.5"><i class="fa-solid fa-code mr-1"></i> code.gs</div>
+                            </div>
+                        </div>
+                        <div class="w-1/2 p-4 flex flex-col gap-2">
+                            <div class="w-full h-2 bg-slate-200 rounded"></div>
+                            <div class="w-3/4 h-2 bg-slate-200 rounded"></div>
+                            <div class="w-5/6 h-2 bg-slate-200 rounded"></div>
+                            <div class="w-1/2 h-2 bg-slate-200 rounded"></div>
+                        </div>
                     </div>
                 </div>
 
                 <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-microchip text-indigo-500 mr-2"></i>2. Trạm điều khiển AI Studio</h3>
                 <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm mb-8">
-                    <p class="text-base text-slate-700 mb-4 leading-relaxed">Truy cập <strong>aistudio.google.com</strong>. Chọn mô hình <strong>Gemini 3.1 Pro Preview</strong>. (Dùng tài khoản Citigold để AI đủ thông minh đọc mã code dài ngàn dòng mà không quên luồng).</p>
+                    <p class="text-base text-slate-700 mb-4 leading-relaxed">Truy cập <strong>aistudio.google.com</strong>. Chọn mô hình <strong>Gemini 3.1 Pro Preview</strong>. Dán lệnh Kỷ luật sau vào <strong>System Instructions</strong>:</p>
                     <div class="bg-slate-900 rounded-xl p-5 text-sm font-mono text-emerald-400 overflow-x-auto whitespace-pre leading-relaxed shadow-lg border-l-4 border-emerald-500">
-<span class="text-slate-400">// Copy đoạn sau dán vào ô "System Instructions" để tạo kỷ luật cho AI:</span>
-
 # ROLE & CONTEXT
 Bạn là Senior Fullstack Developer kiêm QA/Tester (HTML, Tailwind CSS, Vanilla JS, Google Apps Script).
 
@@ -261,16 +267,24 @@ Bạn là Senior Fullstack Developer kiêm QA/Tester (HTML, Tailwind CSS, Vanill
 1. API BẮT BUỘC dùng method 'POST', header 'text/plain'.</div>
                 </div>
 
-                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl flex items-start gap-4">
-                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-600 text-3xl mt-1"></i>
-                    <div>
-                        <h4 class="font-bold text-indigo-900 text-lg mb-2">Tuyệt chiêu Prompt Giao diện (UI)</h4>
-                        <p class="text-base text-indigo-800 leading-relaxed">Khi nhờ AI làm web, hãy chèn thêm các câu thần chú sau để web nhìn xịn như hàng chục ngàn đô:</p>
-                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-indigo-800 font-medium">
-                            <li>"Làm giao diện phong cách <strong>Glassmorphism</strong> (Kính mờ, trong suốt)."</li>
-                            <li>"Dùng Google Font <strong>Be Vietnam Pro</strong> hoặc Nunito."</li>
-                            <li>"Chừa sẵn thẻ &lt;img&gt; dạng tròn để tôi tự dán link <strong>Logo</strong> vào sau."</li>
-                        </ul>
+                <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-wand-magic-sparkles text-purple-500 mr-2"></i>3. Mẹo Prompt vẽ Giao diện (UI) đẹp</h3>
+                <!-- MOCKUP PROMPT UI -->
+                <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm mb-4 space-y-5 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-pink-300 to-purple-400 opacity-10 rounded-full blur-3xl"></div>
+                    
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 shadow"><i class="fa-brands fa-apple text-2xl text-slate-600"></i></div>
+                        <div><strong class="text-base text-slate-800">Chèn Logo:</strong> <p class="text-sm text-slate-600 mt-1">"Chừa sẵn thẻ &lt;img&gt; dạng tròn trên Header để tôi tự dán link logo công ty vào sau."</p></div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4">
+                        <div class="px-4 py-2 rounded-xl bg-white/60 backdrop-blur-md border border-white/40 shadow-sm shrink-0"><span class="text-base font-bold text-purple-700">Glassmorphism</span></div>
+                        <div><strong class="text-base text-slate-800">Hiệu ứng Kính (Kính mờ):</strong> <p class="text-sm text-slate-600 mt-1">"Thiết kế giao diện theo phong cách Glassmorphism (nền trong suốt, mờ ảo, viền mỏng)."</p></div>
+                    </div>
+                    
+                    <div class="flex items-start gap-4">
+                        <div class="text-base shrink-0 font-[Nunito] font-extrabold text-blue-600 tracking-wider w-12 text-center">Aa</div>
+                        <div><strong class="text-base text-slate-800">Font chữ hiện đại:</strong> <p class="text-sm text-slate-600 mt-1">"Nhúng link Google Font 'Be Vietnam Pro' để giao diện nhìn bo tròn, thân thiện."</p></div>
                     </div>
                 </div>
             </section>
@@ -280,24 +294,65 @@ Bạn là Senior Fullstack Developer kiêm QA/Tester (HTML, Tailwind CSS, Vanill
                 <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 border-b border-slate-200 pb-4">Bước 2: Dựng Database (Google Sheet)</h1>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <!-- Khối Tạo bảng & App Script Menu -->
                     <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3 text-sm">1</span>Tạo Bảng dữ liệu</h3>
-                        <p class="text-base text-slate-600 leading-relaxed">Tạo file Google Sheet mới. Gõ các <strong>Tiêu đề cột</strong> (Ví dụ: Thời gian, Học viên, Nội dung...) ở dòng số 1.</p>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center mr-3 text-sm">1</span>Mở Apps Script</h3>
+                        <p class="text-base text-slate-600 leading-relaxed mb-4">Tạo file Sheet mới. Vào <strong>Tiện ích > Apps Script</strong>.</p>
+                        
+                        <!-- MOCKUP GOOGLE SHEET MENU -->
+                        <div class="bg-white border border-slate-200 rounded-lg shadow-sm mt-3 overflow-hidden font-sans select-none mb-3">
+                            <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 flex items-center text-[11px] text-slate-600 space-x-3">
+                                <span>Tệp</span><span>Chỉnh sửa</span><span>Xem</span><span>Chèn</span>
+                                <span class="bg-slate-200 px-1.5 py-0.5 rounded text-slate-800 font-medium relative cursor-pointer group">Tiện ích
+                                    <!-- Dropdown Mô phỏng -->
+                                    <div class="absolute top-full left-0 mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-md py-1 z-10 hidden group-hover:block">
+                                        <div class="px-3 py-1.5 hover:bg-slate-100 flex items-center"><i class="fa-solid fa-puzzle-piece mr-2 text-slate-400"></i> Tiện ích bổ sung</div>
+                                        <div class="px-3 py-1.5 hover:bg-slate-100 flex items-center"><i class="fa-solid fa-play mr-2 text-slate-400"></i> Macro</div>
+                                        <div class="px-3 py-1.5 bg-blue-50 text-blue-700 font-bold flex items-center"><img src="https://www.gstatic.com/images/branding/product/1x/apps_script_48dp.png" class="w-4 h-4 mr-2"> Apps Script</div>
+                                    </div>
+                                </span>
+                                <span>Trợ giúp</span>
+                            </div>
+                            <div class="p-4 bg-white min-h-[80px]">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tr class="bg-slate-100 border-b border-slate-200"><th class="border-r border-slate-200 px-2 text-slate-400">A</th><th class="px-2 text-slate-400">B</th></tr>
+                                    <tr><td class="border-r border-slate-200 border-b px-2 py-1 font-bold">Ngày</td><td class="border-b px-2 py-1 font-bold">Họ và Tên</td></tr>
+                                </table>
+                            </div>
+                        </div>
                     </div>
 
+                    <!-- Khối Deploy API -->
                     <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 text-sm">2</span>Gắn Code Backend</h3>
-                        <p class="text-base text-slate-600 mb-4 leading-relaxed">Vào <strong>Tiện ích > Apps Script</strong>. Xóa mã cũ, dán mã của AI vào. Bấm <kbd class="bg-slate-100 border border-slate-300 rounded px-2 py-0.5 text-sm shadow-sm mx-1">Ctrl + S</kbd> để Lưu.</p>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 text-sm">2</span>Deploy lấy Link API</h3>
+                        <p class="text-base text-slate-600 mb-4 leading-relaxed">Dán code Backend của AI vào. Bấm <kbd class="bg-slate-100 border shadow-sm px-1 text-sm">Ctrl+S</kbd>. Chọn <strong>Triển khai</strong>.</p>
+                        
+                        <!-- MOCKUP APPS SCRIPT DEPLOY -->
+                        <div class="bg-white border border-slate-200 rounded-lg shadow-sm w-full overflow-hidden font-sans select-none">
+                            <div class="flex justify-between items-center bg-white p-3 border-b border-slate-200">
+                                <div class="text-slate-700 text-xs font-bold flex items-center"><i class="fa-solid fa-code text-blue-600 mr-2 text-base"></i> Code.gs</div>
+                                <!-- Nút Triển khai -->
+                                <div class="relative group">
+                                    <div class="bg-blue-600 text-white text-xs font-bold rounded hover:bg-blue-700 flex cursor-pointer">
+                                        <span class="px-3 py-1.5 border-r border-blue-500">Triển khai</span>
+                                        <span class="px-2 py-1.5"><i class="fa-solid fa-caret-down"></i></span>
+                                    </div>
+                                    <div class="absolute right-0 mt-1 w-56 bg-white border border-slate-200 shadow-xl rounded-md py-1 z-10 hidden group-hover:block">
+                                        <div class="px-3 py-2 text-xs hover:bg-slate-50 cursor-pointer font-bold text-blue-600">Tùy chọn triển khai mới</div>
+                                        <div class="px-3 py-2 text-xs hover:bg-slate-50 cursor-pointer text-slate-600">Quản lý các tùy chọn triển khai</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-slate-50 min-h-[100px] text-xs font-mono text-slate-500">
+                                <span class="text-blue-500">function</span> <span class="text-slate-800">doPost</span>(e) {<br>&nbsp;&nbsp;<span class="text-green-600">// Nhận JSON & Lưu vào Sheet</span><br>}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 p-6 md:p-8 rounded-2xl border border-slate-200">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mr-3 text-sm">3</span>Khởi chạy (Deploy) & Lấy Link API</h3>
-                    <p class="text-base text-slate-700 mb-4 leading-relaxed">Bấm <strong>Triển khai > Tùy chọn triển khai mới</strong> (chọn Web App, quyền Bất kỳ ai). Bạn sẽ nhận được 1 đường Link (URL).</p>
-                    <div class="bg-white p-5 rounded-xl border border-red-200 border-l-4 border-l-red-500 shadow-sm">
-                        <span class="text-sm font-black text-red-600 uppercase tracking-widest block mb-2">Cực kỳ quan trọng: Copy Link API dán vào đâu?</span>
-                        <p class="text-base text-slate-700">Khi mang code Frontend về GitHub, bạn phải TÌM dòng <code class="bg-slate-100 text-pink-600 px-2 py-1 rounded font-mono text-sm mx-1">const API_URL = "..."</code> và dán đường link này vào giữa 2 dấu ngoặc kép. Nếu thiếu bước này, Web sẽ không bao giờ chạy!</p>
-                    </div>
+                <div class="bg-red-50 p-6 md:p-8 rounded-2xl border border-red-200">
+                    <h3 class="text-xl font-bold text-red-700 mb-2"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Nhắc nhở Quan Trọng: Cập nhật Version</h3>
+                    <p class="text-base text-red-800 leading-relaxed">Những lần sửa code sau, phải chọn <em>Quản lý các tùy chọn triển khai</em> -> Chỗ Phiên bản chọn <strong>Phiên bản mới</strong>. Nếu không làm thế này, code mới sửa sẽ KHÔNG BAO GIỜ có tác dụng!</p>
                 </div>
             </section>
 
@@ -305,36 +360,101 @@ Bạn là Senior Fullstack Developer kiêm QA/Tester (HTML, Tailwind CSS, Vanill
             <section id="lesson-4" class="lesson-content max-w-5xl mx-auto" data-title="Bước 3 / Giao diện (GitHub)">
                 <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 border-b border-slate-200 pb-4">Bước 3: Giao diện (GitHub)</h1>
 
+                <!-- Tạo Repo & Thêm file -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-bold text-slate-800 mb-3"><i class="fa-solid fa-folder-plus text-blue-500 mr-2"></i>Tạo Kho chứa (Repo)</h3>
-                        <p class="text-base text-slate-600 leading-relaxed">Đăng nhập GitHub, bấm nút <kbd>+</kbd> -> <strong>New repository</strong>. Nhập tên dự án (VD: <em>kiotviet-training</em>).</p>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-folder-plus text-blue-500 mr-2"></i>1. Tạo Kho chứa (Repo)</h3>
+                        
+                        <!-- MOCKUP GITHUB MENU -->
+                        <div class="bg-white border border-slate-200 rounded-lg shadow-sm mb-4 overflow-visible font-sans select-none">
+                            <div class="bg-slate-50 p-3 flex justify-end border-b border-slate-200 relative">
+                                <div class="border border-slate-300 rounded-md px-3 py-1.5 text-sm text-slate-600 bg-white flex items-center cursor-pointer group hover:bg-slate-100 transition">
+                                    <i class="fa-solid fa-plus mr-1"></i> <i class="fa-solid fa-caret-down"></i>
+                                    <!-- Dropdown -->
+                                    <div class="absolute top-full right-2 mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-md py-1 z-20 text-sm hidden group-hover:block text-left">
+                                        <div class="px-3 py-2 hover:bg-blue-600 hover:text-white cursor-pointer"><i class="fa-regular fa-dot-circle mr-2 w-3"></i>New issue</div>
+                                        <div class="px-3 py-2 bg-blue-600 text-white cursor-pointer font-bold"><i class="fa-solid fa-book-journal-whills mr-2 w-3"></i>New repository</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6 bg-white text-center text-sm text-slate-400">GitHub Dashboard...</div>
+                        </div>
+                        <p class="text-base text-slate-600 leading-relaxed">Chọn <strong>New repository</strong>. Nhập tên dự án không dấu (VD: <em>kiotviet-training</em>).</p>
                     </div>
+
                     <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="text-xl font-bold text-slate-800 mb-3"><i class="fa-solid fa-file-code text-emerald-500 mr-2"></i>Tạo File Code</h3>
-                        <p class="text-base text-slate-600 leading-relaxed">Bấm <strong>Add file > Create new file</strong>. Tên file <u>BẮT BUỘC</u> kết thúc bằng <code>.html</code> hoặc <code>.js</code> (VD: <code>index.html</code>).</p>
+                        <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-file-code text-emerald-500 mr-2"></i>2. Tạo File HTML</h3>
+                        
+                        <!-- MOCKUP GITHUB ADD FILE -->
+                        <div class="bg-white border border-slate-200 rounded-lg shadow-sm mb-4 overflow-visible font-sans select-none">
+                            <div class="bg-slate-50 p-3 flex justify-between items-center border-b border-slate-200">
+                                <div class="text-blue-600 text-sm font-bold">training-web</div>
+                                <div class="relative group">
+                                    <div class="border border-slate-300 rounded-md px-3 py-1 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 cursor-pointer">
+                                        Add file <i class="fa-solid fa-caret-down ml-1"></i>
+                                    </div>
+                                    <div class="absolute top-full right-0 mt-1 w-40 bg-white border border-slate-200 shadow-xl rounded-md py-1 z-20 text-sm hidden group-hover:block text-left">
+                                        <div class="px-3 py-2 hover:bg-slate-100 cursor-pointer font-bold bg-slate-50"><i class="fa-solid fa-plus mr-2 text-slate-400"></i>Create new file</div>
+                                        <div class="px-3 py-2 hover:bg-slate-100 cursor-pointer"><i class="fa-solid fa-upload mr-2 text-slate-400"></i>Upload files</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-white">
+                                <div class="flex items-center text-sm text-slate-600 mb-3"><i class="fa-regular fa-file-code mr-3 text-slate-400 text-lg"></i> index.html <span class="ml-auto text-xs text-slate-400">9 mins ago</span></div>
+                            </div>
+                        </div>
+                        <p class="text-base text-slate-600 leading-relaxed">Tên file BẮT BUỘC kết thúc bằng đuôi <code>.html</code> hoặc <code>.js</code> thì code mới chạy được.</p>
                     </div>
                 </div>
 
+                <!-- Thao tác Code -->
                 <div class="bg-slate-800 text-white p-6 md:p-8 rounded-2xl shadow-xl mb-8">
-                    <h3 class="text-xl font-bold text-amber-400 mb-6"><i class="fa-solid fa-keyboard mr-2"></i>Thao tác Code (Chỉnh sửa / Lưu)</h3>
+                    <h3 class="text-2xl font-bold text-amber-400 mb-6"><i class="fa-solid fa-keyboard mr-2"></i>3. Kỹ năng Thao tác Code</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        
                         <div class="bg-slate-700/50 p-5 rounded-xl border border-slate-600">
-                            <h4 class="font-bold text-white text-lg mb-2"><i class="fa-solid fa-pen text-blue-400 mr-2"></i>Sửa Code (Edit)</h4>
-                            <p class="text-base text-slate-300">Bấm icon Cây bút hoặc trỏ chuột vào bảng code gõ phím <kbd class="bg-slate-600 px-2 py-1 rounded text-sm text-white mx-1 shadow">E</kbd>.</p>
+                            <h4 class="font-bold text-white text-lg mb-4"><i class="fa-solid fa-pen text-blue-400 mr-2"></i>Sửa Code (Edit)</h4>
+                            <!-- MOCKUP GITHUB EDIT PENCIL -->
+                            <div class="bg-white border border-slate-200 rounded shadow-sm mb-4 p-3 flex justify-end space-x-2 text-sm">
+                                <span class="px-3 py-1.5 border border-slate-200 rounded font-medium text-slate-600">Raw</span>
+                                <span class="px-3 py-1.5 border border-slate-200 rounded bg-slate-100 text-slate-700 relative group cursor-pointer hover:bg-slate-200">
+                                    <i class="fa-solid fa-pen"></i>
+                                    <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-1 rounded whitespace-nowrap hidden group-hover:block">Edit this file</div>
+                                </span>
+                            </div>
+                            <p class="text-base text-slate-300">Bấm icon Cây bút hoặc trỏ chuột vào code gõ phím tắt <kbd class="bg-slate-600 px-2 py-0.5 rounded shadow">E</kbd>.</p>
                         </div>
+
                         <div class="bg-slate-700/50 p-5 rounded-xl border border-slate-600">
-                            <h4 class="font-bold text-white text-lg mb-2"><i class="fa-solid fa-floppy-disk text-emerald-400 mr-2"></i>Lưu Code (Save)</h4>
-                            <p class="text-base text-slate-300">Bấm nút xanh <strong>Commit changes</strong> HOẶC bấm nhanh <kbd class="bg-slate-600 px-2 py-1 rounded text-sm text-white shadow">Ctrl</kbd> + <kbd class="bg-slate-600 px-2 py-1 rounded text-sm text-white shadow">S</kbd> sau đó <kbd class="bg-slate-600 px-2 py-1 rounded text-sm text-white shadow">Enter</kbd>.</p>
+                            <h4 class="font-bold text-white text-lg mb-4"><i class="fa-solid fa-floppy-disk text-emerald-400 mr-2"></i>Lưu Code (Save)</h4>
+                            <!-- MOCKUP GITHUB COMMIT -->
+                            <div class="bg-white border border-slate-200 rounded shadow-sm mb-4 p-4">
+                                <div class="text-sm font-bold text-slate-800 mb-2">Commit changes</div>
+                                <input type="text" value="Update index.html" class="w-full text-sm border border-slate-300 rounded p-2 mb-3 text-slate-600 outline-none focus:border-blue-500">
+                                <div class="flex justify-end">
+                                    <button class="bg-green-600 text-white text-sm font-bold px-4 py-2 rounded hover:bg-green-700 transition">Commit changes</button>
+                                </div>
+                            </div>
+                            <p class="text-base text-slate-300">Bấm nút xanh hoặc phím <kbd class="bg-slate-600 px-2 py-0.5 rounded shadow">Ctrl</kbd> + <kbd class="bg-slate-600 px-2 py-0.5 rounded shadow">S</kbd> sau đó <kbd class="bg-slate-600 px-2 py-0.5 rounded shadow">Enter</kbd>.</p>
                         </div>
+
                     </div>
                 </div>
                 
-                <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4">
-                    <i class="fa-solid fa-rocket text-4xl text-indigo-500 mt-1"></i>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2">Lấy Link Web (Đưa lên mạng)</h3>
-                        <p class="text-base text-slate-600 leading-relaxed">Vào <strong>Settings > Pages</strong>. Chỗ Branch chọn <strong>Main</strong> -> Bấm Save. Chờ 1 phút tải lại trang sẽ thấy một đường Link. Đó chính là website hoàn chỉnh của bạn đem đi gửi cho Học viên!</p>
+                <!-- Github Pages -->
+                <div class="bg-indigo-50 p-6 md:p-8 rounded-2xl border border-indigo-100 shadow-sm">
+                    <h3 class="text-xl font-bold text-indigo-900 mb-4"><i class="fa-solid fa-globe text-indigo-600 mr-2"></i>4. Lấy Link Website (Khởi chạy)</h3>
+                    <p class="text-base text-indigo-800 leading-relaxed mb-6">Vào <strong>Settings > Pages</strong>. Chỗ Branch chọn <strong>Main</strong> -> Bấm Save. Chờ 1 phút để GitHub tạo link Web.</p>
+                    
+                    <!-- MOCKUP GITHUB PAGES SETTINGS -->
+                    <div class="bg-white border border-slate-200 rounded-xl shadow-sm w-full font-sans overflow-hidden">
+                        <div class="border-b border-slate-200 p-5">
+                            <h3 class="font-bold text-xl text-slate-800 mb-3">GitHub Pages</h3>
+                            <div class="bg-green-50 border border-green-200 p-4 rounded-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <span class="text-sm text-slate-700">Your site is live at <a href="#" class="text-blue-600 font-bold hover:underline break-all">https://user.github.io/web-test/</a></span>
+                                <button class="border border-slate-300 text-sm font-bold px-4 py-2 rounded-lg bg-white hover:bg-slate-50 shrink-0 shadow-sm">Visit site</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -346,8 +466,8 @@ Bạn là Senior Fullstack Developer kiêm QA/Tester (HTML, Tailwind CSS, Vanill
                 <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm mb-8">
                     <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-scissors text-blue-500 mr-2"></i>Mẹo: Cắt Ghép Không Tốn Token</h3>
                     <p class="text-base text-slate-600 mb-4 leading-relaxed">Đừng bắt AI viết lại cả file 1000 dòng. Vừa tốn Token vừa dễ sinh thêm lỗi mới. Yêu cầu AI chỉ xuất ra "Hàm bị lỗi". Sau đó làm theo cách sau:</p>
-                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-base text-slate-700">
-                        Trên Github, bấm <kbd class="bg-white border shadow-sm px-2 py-0.5 rounded">Ctrl + F</kbd>. Gõ tên hàm (Ví dụ: <code>function submit()</code>). Bôi đen từ đầu đến cuối hàm đó và dán code mới đè lên.
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-base text-slate-700 shadow-inner">
+                        Trên Github, bấm <kbd class="bg-white border shadow-sm px-2 py-0.5 rounded">Ctrl + F</kbd>. Gõ tên hàm (Ví dụ: <code class="text-pink-600">function submit()</code>). Bôi đen từ đầu đến cuối hàm đó và dán code mới đè lên.
                     </div>
                 </div>
 
@@ -385,9 +505,29 @@ Trả code hoàn chỉnh, dùng try-catch.</div>
                         <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center"><i class="fa-brands fa-html5 text-orange-500 mr-3"></i>Lệnh tạo Frontend (Giao diện Web)</h3>
                         <div class="bg-slate-900 rounded-xl p-5 text-sm md:text-base font-mono text-orange-300 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">
 Bây giờ viết 2 file HTML dùng Tailwind CSS:
-1. student.html: Form nộp bài đẹp (Glassmorphism, font Nunito). Nút bấm gọi Fetch API gửi action='submit'.
+1. student.html: Form nộp bài đẹp (Glassmorphism, font Be Vietnam Pro). Nút bấm gọi Fetch API gửi action='submit'.
 2. teacher.html: Dashboard quản trị tông màu tối. Fetch API action='get_list' để hiển thị Bảng. Có nút "Chấm" gọi action='grade'.
 Code để sẵn 1 biến const API_URL = "" ở đầu script để tôi tự điền link.</div>
+                    </div>
+
+                    <!-- Nối Dây Điện (Quan trọng nhất) -->
+                    <div class="bg-rose-50 border border-rose-200 p-6 md:p-8 rounded-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-40 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                        <h3 class="text-2xl font-bold text-rose-900 mb-4 flex items-center relative z-10"><i class="fa-solid fa-plug-circle-bolt text-rose-600 mr-3 text-3xl"></i>Điểm chạm then chốt: Nối Cầu Dao API</h3>
+                        <p class="text-base text-rose-800 mb-6 relative z-10">Web của bạn phải biết "địa chỉ" Backend của bạn ở đâu để gửi dữ liệu tới. Đừng quên bước này!</p>
+                        
+                        <div class="bg-white rounded-xl shadow-sm border border-rose-100 p-5 relative z-10 font-mono text-sm flex flex-col xl:flex-row items-center gap-6">
+                            <div class="w-full xl:w-auto flex-1 bg-slate-800 text-sky-300 p-4 rounded-lg">
+                                <span class="text-pink-400">const</span> API_URL = <span class="bg-rose-600 text-white px-2 py-0.5 rounded animate-pulse inline-block mt-1 xl:mt-0 font-bold">"DÁN_LINK_APPS_SCRIPT_CỦA_BẠN_VÀO_ĐÂY"</span>;
+                                <br><br><span class="text-slate-500">// Bắt đầu gọi Shipper (Fetch) mang hàng tới địa chỉ trên</span>
+                                <br><span class="text-yellow-200">fetch</span>(API_URL, { ... })
+                            </div>
+                            <div class="text-rose-600 font-bold text-center xl:text-left shrink-0 text-lg">
+                                <i class="fa-solid fa-arrow-left hidden xl:inline-block mr-2 text-2xl"></i>
+                                <i class="fa-solid fa-arrow-up xl:hidden block mb-2 text-2xl mx-auto"></i>
+                                TÌM DÒNG NÀY<br>TRONG CODE WEB
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>

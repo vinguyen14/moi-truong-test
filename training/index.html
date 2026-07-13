@@ -48,27 +48,22 @@
                 <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quy trình Build Web (SOP)</h2>
                 <ul class="space-y-1">
                     <li>
-                        <button onclick="loadLesson('lesson-1')" id="nav-lesson-1" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-map text-blue-500 mr-2 w-4"></i>1. Chuẩn bị & Trạm AI</span>
-                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-1"></i>
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="loadLesson('lesson-2')" id="nav-lesson-2" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-database text-emerald-500 mr-2 w-4"></i>2. Backend (Google Sheet)</span>
-                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-2"></i>
-                        </button>
-                    </li>
-                    <li>
-                        <button onclick="loadLesson('lesson-3')" id="nav-lesson-3" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-brands fa-github text-slate-800 mr-2 w-4"></i>3. Frontend (GitHub)</span>
-                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-3"></i>
-                        </button>
-                    </li>
-                    <li>
                         <button onclick="loadLesson('lesson-4')" id="nav-lesson-4" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
                             <span class="truncate"><i class="fa-solid fa-arrows-rotate text-purple-500 mr-2 w-4"></i>4. Test & Vòng lặp sửa lỗi</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-4"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Phase 3: Thực hành -->
+            <div class="mt-6">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Phase 3: Dự án thực tế</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <button onclick="loadLesson('lesson-5')" id="nav-lesson-5" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-rocket text-rose-500 mr-2 w-4"></i>5. Build Tool Chấm Bài</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-5"></i>
                         </button>
                     </li>
                 </ul>
@@ -421,6 +416,80 @@ BƯỚC 3: Xuất Code & Hướng dẫn.
                     <p class="text-sm text-slate-300">Luôn tạo 2 Repo: <code>du-an-test</code> và <code>du-an-chinh</code>. Dùng AI viết code -> Ném vào Test. Chạy thử chán chê mượt mà -> Copy file đó dán sang Repo Chính. Tuyệt đối không đem User thật ra làm vật thí nghiệm!</p>
                 </div>
             </section>
+            <!-- BÀI 5: THỰC HÀNH (CAPSTONE PROJECT) -->
+            <section id="lesson-5" class="lesson-content max-w-5xl mx-auto" data-title="Phase 3 / Build Tool Chấm Bài">
+                
+                <div class="text-center mb-10 border-b border-slate-200 pb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-100 text-rose-600 mb-4 shadow-sm">
+                        <i class="fa-solid fa-hammer text-3xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">5. Thực chiến: Xây Tool Chấm Bài</h1>
+                    <p class="text-lg text-slate-500">Đây là cuốn "Sổ tay lệnh" (Cheat Sheet). Áp dụng đúng 4 bước SOP vừa học, copy các câu lệnh dưới đây giao cho AI, bạn sẽ có ngay sản phẩm.</p>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <!-- Lệnh Backend -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center"><i class="fa-solid fa-database text-emerald-500 mr-2"></i>1. Lệnh tạo Backend (Mở AI Studio & Dán)</h3>
+                        <p class="text-sm text-slate-600 mb-3">Copy đoạn chữ màu xanh bên dưới đưa cho AI để nó viết mã <code>Code.gs</code> cho bạn. Sau đó mang mã dán vào Apps Script và lấy Link API.</p>
+                        <div class="bg-slate-900 rounded-lg p-4 text-sm font-mono text-emerald-400 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">
+Chào Kỹ sư trưởng, tôi đang làm Bước 2 (Backend) cho Tool chấm bài.
+Vui lòng viết cho tôi mã Google Apps Script (hàm doPost). 
+Bảng Google Sheet của tôi tên là "Submissions", gồm các cột: id, timestamp, student_name, project_link, status, score, feedback.
+
+Luồng xử lý:
+1. Nếu action = 'submit': Lưu student_name và project_link thành 1 dòng mới, status là "Chờ chấm".
+2. Nếu action = 'get_list': Đọc toàn bộ danh sách bỏ qua dòng tiêu đề, trả về JSON.
+Trả code 100% hoàn chỉnh, nhớ dùng try-catch và xuất kết quả dạng JSON.</div>
+                    </div>
+
+                    <!-- Lệnh Frontend -->
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 flex items-center"><i class="fa-brands fa-html5 text-orange-500 mr-2"></i>2. Lệnh tạo Frontend (Giao diện Web)</h3>
+                        <p class="text-sm text-slate-600 mb-3">Tiếp tục chat với AI câu lệnh này để nó sinh ra file <code>student.html</code> (cho Học viên) và <code>teacher.html</code> (cho Giảng viên). Sau đó tạo file trên GitHub và dán vào.</p>
+                        <div class="bg-slate-900 rounded-lg p-4 text-sm font-mono text-orange-300 overflow-x-auto whitespace-pre leading-relaxed shadow-inner">
+Tuyệt vời. Bây giờ chuyển sang Bước 3 (Frontend).
+Viết cho tôi 2 file HTML độc lập dùng Tailwind CSS (gắn qua CDN):
+
+File 1 (student.html): Form nộp bài đẹp mắt. Gồm ô Tên, ô Link và nút "Nộp Bài". Bấm nút thì gọi Fetch API gửi dữ liệu action='submit'. Có nút loading khi chờ.
+
+File 2 (teacher.html): Dashboard quản trị. Vừa mở web tự động Fetch API gọi action='get_list' để hiển thị danh sách bài nộp ra dạng Bảng (Table). 
+
+Lưu ý: Header fetch API phải dùng 'Content-Type': 'text/plain'. Code để sẵn 1 biến const API_URL = "" ở đầu thẻ script để tôi tự điền link sau.</div>
+                    </div>
+
+                    <!-- Nối Dây Điện (Quan trọng nhất) -->
+                    <div class="bg-rose-50 border border-rose-200 p-6 rounded-xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-40 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                        <h3 class="text-xl font-bold text-rose-900 mb-3 flex items-center relative z-10"><i class="fa-solid fa-plug-circle-bolt text-rose-600 mr-2 text-2xl"></i>3. Điểm chạm then chốt: Nối Cầu Dao API</h3>
+                        <p class="text-sm text-rose-800 mb-4 relative z-10">Rất nhiều người lấy code web trên GitHub về chạy không được vì quên bước này. <strong>Web của bạn phải biết "địa chỉ" Backend của bạn ở đâu để gửi dữ liệu tới!</strong></p>
+                        
+                        <div class="bg-white rounded-lg shadow-sm border border-rose-100 p-4 relative z-10 font-mono text-xs md:text-sm flex flex-col md:flex-row items-center gap-4">
+                            <div class="w-full md:w-auto flex-1 bg-slate-800 text-sky-300 p-3 rounded">
+                                <span class="text-pink-400">const</span> API_URL = <span class="bg-rose-600 text-white px-2 py-0.5 rounded animate-pulse">"DÁN_LINK_APPS_SCRIPT_CỦA_BẠN_VÀO_ĐÂY"</span>;
+                                <br><br><span class="text-slate-500">// Bắt đầu gọi Shipper (Fetch) mang hàng tới địa chỉ trên</span>
+                                <br><span class="text-yellow-200">fetch</span>(API_URL, { ... })
+                            </div>
+                            <div class="text-rose-600 font-bold text-center md:text-left shrink-0">
+                                <i class="fa-solid fa-arrow-left hidden md:inline-block mr-2 text-xl"></i>
+                                <i class="fa-solid fa-arrow-up md:hidden block mb-2 text-xl mx-auto"></i>
+                                TÌM DÒNG NÀY<br>TRONG CODE WEB
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Tổng kết -->
+                <div class="text-center mt-12">
+                    <button class="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                        <i class="fa-solid fa-flag-checkered mr-2"></i>Hoàn Tất Khóa Học
+                    </button>
+                    <p class="text-sm text-slate-500 mt-4">Sau khi dán API và bấm Save (Commit) trên GitHub. Mở link GitHub Pages ra và tận hưởng thành quả của chính bạn!</p>
+                </div>
+
+            </section>
 
             <!-- FOOTER CỦA BÀI HỌC (CHỨA NÚT CHUYỂN BÀI) -->
             <div class="max-w-3xl mx-auto mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 pb-12">
@@ -449,7 +518,7 @@ BƯỚC 3: Xuất Code & Hướng dẫn.
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Cấu hình tổng số bài học (dùng mảng id)
-        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4'];
+        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5'];
         let currentLessonId = 'lesson-1';
         let completedLessons = [];
 

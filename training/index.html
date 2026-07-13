@@ -375,88 +375,46 @@ Hãy giải thích mọi thứ thật đơn giản, tuyệt đối không dùng 
                 </div>
             </section>
 
-            <!-- BÀI 4: BACKEND NỘP BÀI TẬP -->
-            <section id="lesson-4" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / Xây Tool Chấm bài">
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">4. Tool Chấm Bài (Phần 1): Kho chứa dữ liệu</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Chúng ta sẽ bắt đầu dự án thực hành. Để lưu trữ bài tập học viên gửi lên, ta cần một "Cái tủ hồ sơ". Và Google Sheet chính là cái tủ đó.</p>
+            <!-- BÀI 4: BACKEND - NỘP BÀI -->
+            <section id="lesson-4" class="lesson-content max-w-4xl mx-auto" data-title="Phase 3 / API Nhận bài (GAS)">
                 
+                <div class="text-center mb-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 mb-4 shadow-sm">
+                        <i class="fa-solid fa-server text-3xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">4. Tủ Hồ Sơ & Chú Bảo Vệ</h1>
+                    <p class="text-lg text-slate-500">Bước đầu tiên của dự án: Tạo một nơi để cất giữ bài tập của học viên.</p>
+                </div>
+
                 <div class="prose prose-slate max-w-none">
-                    <h3 class="text-xl font-bold mt-4 mb-3">Bước 1: Lập bảng Google Sheet</h3>
-                    <p>Hãy tạo một file Google Sheet mới. Ở dòng số 1, hãy gõ tên các cột sau: <strong>id | timestamp | student_name | project_link | status</strong>. Đặt tên Sheet bên dưới góc trái là <code>Submissions</code>.</p>
                     
-                    <h3 class="text-xl font-bold mt-8 mb-4">Bước 2: Thuê "Chú bảo vệ" nhận thư (Viết Backend API)</h3>
-                    <p>Trên menu Google Sheet, chọn <strong>Tiện ích mở rộng > Apps Script</strong>. Nó sẽ mở ra một trang trắng. Trang trắng này là nơi ta viết thư cho "Chú bảo vệ" (hàm tên là <code>doPost</code>), dặn chú ấy: <em>"Hễ ai gửi gói dữ liệu có lệnh 'submit', hãy kiểm tra xem có đủ Tên không, nếu đủ thì cất vào Tủ (Sheet) nhé"</em>.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <!-- Box 1: Tủ Hồ Sơ -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
+                            <div class="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-3xl mb-4">
+                                <i class="fa-solid fa-file-excel"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">1. "Tủ Hồ Sơ" (Google Sheet)</h3>
+                            <p class="text-sm text-slate-600">Mở Google Sheet tạo 1 file mới. Ở dòng đầu tiên gõ các cột: <strong>id, timestamp, student_name, project_link, status</strong>. Đặt tên Sheet là <code>Submissions</code>.</p>
+                        </div>
+
+                        <!-- Box 2: Chú Bảo Vệ -->
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
+                            <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-3xl mb-4">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mb-2">2. "Chú Bảo Vệ" (Apps Script)</h3>
+                            <p class="text-sm text-slate-600">Tủ hồ sơ không thể để ai cũng mở được. Chọn <em>Tiện ích mở rộng > Apps Script</em>. Đây là nơi ta viết luật cho chú bảo vệ.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-8 mb-4">Nhiệm vụ 1: Nhận thư & Cất vào tủ</h3>
+                    <p class="mb-4">Dán đoạn mã (luật) sau vào trang Apps Script. Hàm <code>doPost</code> chính là chú bảo vệ. Nếu có ai gửi gói hàng (submit) có đủ Tên và Link, chú sẽ cất nó thành 1 dòng mới trong Tủ Hồ Sơ.</p>
 
                     <!-- Khối Code Backend -->
-                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
-                            <span>Code.gs (Xóa hết code cũ và dán vào)</span>
-                        </div>
-                        <div class="p-5 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
-<span class="text-slate-500">// Tên hàm bắt buộc của Google: Khi có dữ liệu gửi tới trang web, hàm này sẽ chạy.</span>
-<span class="text-pink-400">function</span> <span class="text-yellow-200">doPost</span>(e) {
-  <span class="text-pink-400">try</span> {
-    <span class="text-slate-500">// Mở gói hàng người ta gửi tới</span>
-    <span class="text-pink-400">var</span> data = JSON.parse(e.postData.contents);
-    
-    <span class="text-slate-500">// Nếu hành động là "submit" (nộp bài)</span>
-    <span class="text-pink-400">if</span> (data.action === <span class="text-green-300">'submit'</span>) {
-      
-      <span class="text-slate-500">// Nếu thiếu tên hoặc link thì đuổi về, báo lỗi</span>
-      <span class="text-pink-400">if</span>(!data.student_name || !data.project_link) {
-        <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Vui lòng điền đủ Tên và Link bài tập!"</span>);
-      }
-
-      <span class="text-slate-500">// Mở cái Tủ (Google Sheet) ra</span>
-      <span class="text-pink-400">var</span> sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(<span class="text-green-300">"Submissions"</span>);
-      
-      <span class="text-slate-500">// Tạo 1 mã ngẫu nhiên cho bài nộp (ví dụ: SUB-12345)</span>
-      <span class="text-pink-400">var</span> newId = <span class="text-green-300">"SUB-"</span> + <span class="text-yellow-200">new Date</span>().getTime();
-      <span class="text-pink-400">var</span> timeNow = <span class="text-yellow-200">new Date</span>();
-      
-      <span class="text-slate-500">// Cất dữ liệu vào Tủ (Thêm 1 dòng mới vào Sheet)</span>
-      sheet.appendRow([newId, timeNow, data.student_name, data.project_link, <span class="text-green-300">"Chờ chấm"</span>]);
-      
-      <span class="text-slate-500">// Báo cáo thành công cho người gửi</span>
-      <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Nộp bài thành công!"</span>);
-    }
-    
-  } <span class="text-pink-400">catch</span> (error) {
-    <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Hệ thống bận: "</span> + error.toString());
-  }
-}
-
-<span class="text-slate-500">// Hàm phụ: Giúp đóng gói câu trả lời trả về cho đẹp (chuẩn JSON)</span>
-<span class="text-pink-400">function</span> <span class="text-yellow-200">responseJSON</span>(status, message) {
-  <span class="text-pink-400">var</span> output = { <span class="text-green-300">"status"</span>: status, <span class="text-green-300">"message"</span>: message };
-  <span class="text-pink-400">return</span> ContentService.createTextOutput(JSON.stringify(output))
-                       .setMimeType(ContentService.MimeType.JSON);
-}</div>
-                    </div>
-                    
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6 rounded-r-lg">
-                        <h4 class="font-bold text-blue-800 mb-2">Bước 3: Xuất bản API (Công khai)</h4>
-                        <p class="text-blue-900 text-sm">Để web có thể gọi được đoạn code này, bạn bấm nút <strong>Triển khai (Deploy) > Triển khai mới</strong>. Chọn loại là <strong>Ứng dụng Web (Web App)</strong>. Phần Quyền truy cập nhớ chọn <strong>Bất kỳ ai (Anyone)</strong>. Bạn sẽ nhận được 1 đường Link (URL), hãy cất kỹ link này, bài sau ta sẽ dùng nó để ráp vào Giao diện web!</p>
-                    </div>
-
-                </div>
-            </section>
-            <!-- BÀI 5: BACKEND (GIẢNG VIÊN) -->
-            <section id="lesson-5" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / API Giảng viên">
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">5. Tool Chấm Bài (Phần 2): Quyền lực của Giảng viên</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Ở Bài 4, học viên đã có thể nộp bài vào Kho (Google Sheet). Bây giờ, chúng ta sẽ mở rộng khả năng của "Chú bảo vệ" (API) để phục vụ Giảng viên: Lấy danh sách bài tập về xem, và Chấm điểm.</p>
-                
-                <div class="prose prose-slate max-w-none">
-                    <h3 class="text-xl font-bold mt-4 mb-3">Nâng cấp "Cái Tủ Hồ Sơ"</h3>
-                    <p>Mở file Google Sheet <code>Submissions</code> của bạn ra. Hãy thêm 2 cột nữa vào cạnh cột <code>status</code>: Đó là cột <strong>score</strong> (Điểm) và cột <strong>feedback</strong> (Lời phê).</p>
-                    
-                    <h3 class="text-xl font-bold mt-8 mb-4">Bổ sung Lệnh cho Chú bảo vệ (Apps Script)</h3>
-                    <p>Quay lại trang viết code ban nãy. Chúng ta sẽ <strong>nối thêm</strong> tính năng vào phía dưới đoạn code của Bài 4. Cụ thể, ta thêm lệnh <code>get_list</code> và <code>grade</code>.</p>
-
-                    <!-- Khối Code Backend Cập nhật -->
-                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
-                            <span>Code.gs (Bản nâng cấp Hoàn chỉnh)</span>
+                    <div class="bg-slate-900 rounded-xl overflow-hidden my-4 shadow-lg border border-slate-700">
+                        <div class="bg-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono">
+                            <span>Mã lệnh cho Chú Bảo Vệ (Code.gs)</span>
                         </div>
                         <div class="p-5 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
 <span class="text-pink-400">function</span> <span class="text-yellow-200">doPost</span>(e) {
@@ -464,208 +422,175 @@ Hãy giải thích mọi thứ thật đơn giản, tuyệt đối không dùng 
     <span class="text-pink-400">var</span> data = JSON.parse(e.postData.contents);
     <span class="text-pink-400">var</span> sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(<span class="text-green-300">"Submissions"</span>);
     
-    <span class="text-slate-500">// 1. TÍNH NĂNG NỘP BÀI (HỌC VIÊN) - Như Bài 4</span>
+    <span class="text-slate-500">// Nếu nhận được lệnh 'submit' (Nộp bài)</span>
     <span class="text-pink-400">if</span> (data.action === <span class="text-green-300">'submit'</span>) {
-      <span class="text-pink-400">if</span>(!data.student_name || !data.project_link) <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Thiếu thông tin!"</span>);
-      
       <span class="text-pink-400">var</span> newId = <span class="text-green-300">"SUB-"</span> + <span class="text-yellow-200">new Date</span>().getTime();
-      <span class="text-slate-500">// Các cột: id | timestamp | student_name | project_link | status | score | feedback</span>
-      sheet.appendRow([newId, <span class="text-yellow-200">new Date</span>(), data.student_name, data.project_link, <span class="text-green-300">"Chờ chấm"</span>, <span class="text-green-300">""</span>, <span class="text-green-300">""</span>]);
+      <span class="text-slate-500">// Cất vào Tủ (Thêm 1 dòng vào Sheet)</span>
+      sheet.appendRow([newId, <span class="text-yellow-200">new Date</span>(), data.student_name, data.project_link, <span class="text-green-300">"Chờ chấm"</span>]);
       
+      <span class="text-slate-500">// Báo cáo thành công!</span>
       <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Nộp bài thành công!"</span>);
     }
-    
-    <span class="text-slate-500">// 2. TÍNH NĂNG LẤY DANH SÁCH (GIẢNG VIÊN)</span>
+  } <span class="text-pink-400">catch</span> (error) { ... }
+}</div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-5 mt-6 rounded-r-xl">
+                        <h4 class="font-bold text-blue-900 mb-1">Cấp địa chỉ cho Bảo Vệ (Deploy API)</h4>
+                        <p class="text-blue-800 text-sm">Bấm <strong>Triển khai (Deploy) > Web App > Quyền: Bất kỳ ai</strong>. Bạn sẽ nhận được 1 đường Link (URL). Đây chính là "địa chỉ bưu điện" để lát nữa ta gọi Shipper mang dữ liệu tới!</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- BÀI 5: BACKEND - CHẤM ĐIỂM -->
+            <section id="lesson-5" class="lesson-content max-w-4xl mx-auto" data-title="Phase 3 / API Chấm điểm (GAS)">
+                
+                <div class="text-center mb-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 mb-4 shadow-sm">
+                        <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">5. Nâng Cấp Quyền Lực API</h1>
+                    <p class="text-lg text-slate-500">Bổ sung cột Điểm số và dạy cho "Chú bảo vệ" 2 kỹ năng mới phục vụ Giảng Viên.</p>
+                </div>
+
+                <div class="prose prose-slate max-w-none">
+                    
+                    <div class="flex flex-col md:flex-row gap-6 mb-8">
+                        <div class="flex-1 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2"><i class="fa-solid fa-print text-indigo-500 mr-2"></i>Kỹ năng: Photocopy</h3>
+                            <p class="text-sm text-slate-600">Khi nghe lệnh <code>get_list</code>, bảo vệ sẽ mở tủ, đọc toàn bộ danh sách bài nộp và gửi về cho Giảng viên xem.</p>
+                        </div>
+                        <div class="flex-1 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="text-lg font-bold text-slate-800 mb-2"><i class="fa-solid fa-pen-nib text-indigo-500 mr-2"></i>Kỹ năng: Ghi Điểm</h3>
+                            <p class="text-sm text-slate-600">Khi nghe lệnh <code>grade</code>, bảo vệ tìm đúng bài tập đó, cập nhật Trạng thái, Điểm số (score) và Lời phê.</p>
+                        </div>
+                    </div>
+
+                    <!-- Khối Code Backend Update -->
+                    <div class="bg-slate-900 rounded-xl overflow-hidden my-4 shadow-lg border border-slate-700">
+                        <div class="bg-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono">
+                            <span>Viết nối tiếp vào code cũ của Bài 4</span>
+                        </div>
+                        <div class="p-5 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
+    <span class="text-slate-500">// KỸ NĂNG: LẤY DANH SÁCH</span>
     <span class="text-pink-400">else if</span> (data.action === <span class="text-green-300">'get_list'</span>) {
-      <span class="text-slate-500">// Lấy toàn bộ dữ liệu trong bảng</span>
       <span class="text-pink-400">var</span> rows = sheet.getDataRange().getValues();
-      <span class="text-pink-400">var</span> result = [];
-      
-      <span class="text-slate-500">// Bỏ qua dòng số 1 (tiêu đề), bắt đầu đọc từ dòng 2 (i=1)</span>
-      <span class="text-pink-400">for</span> (<span class="text-pink-400">var</span> i = 1; i < rows.length; i++) {
-        result.push({
-          id: rows[i][0],
-          timestamp: rows[i][1],
-          student_name: rows[i][2],
-          project_link: rows[i][3],
-          status: rows[i][4],
-          score: rows[i][5],
-          feedback: rows[i][6]
-        });
-      }
-      <span class="text-slate-500">// Gửi danh sách về cho trang web hiển thị</span>
+      <span class="text-slate-500">//... (Đóng gói dữ liệu thành mảng trả về) ...</span>
       <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Lấy dữ liệu thành công"</span>, result);
     }
 
-    <span class="text-slate-500">// 3. TÍNH NĂNG CHẤM ĐIỂM (GIẢNG VIÊN)</span>
+    <span class="text-slate-500">// KỸ NĂNG: CHẤM ĐIỂM</span>
     <span class="text-pink-400">else if</span> (data.action === <span class="text-green-300">'grade'</span>) {
-      <span class="text-pink-400">var</span> rows = sheet.getDataRange().getValues();
-      <span class="text-slate-500">// Tìm xem mã bài tập nằm ở dòng số mấy</span>
-      <span class="text-pink-400">for</span> (<span class="text-pink-400">var</span> i = 1; i < rows.length; i++) {
-        <span class="text-pink-400">if</span> (rows[i][0] === data.id) {
-          <span class="text-slate-500">// Cập nhật cột Trạng thái (cột 5), Điểm (cột 6), Lời phê (cột 7)</span>
-          sheet.getRange(i + 1, 5).setValue(<span class="text-green-300">"Đã chấm"</span>);
-          sheet.getRange(i + 1, 6).setValue(data.score);
-          sheet.getRange(i + 1, 7).setValue(data.feedback);
-          <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Chấm điểm thành công!"</span>);
-        }
-      }
-      <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Không tìm thấy bài tập này!"</span>);
-    }
-    
-  } <span class="text-pink-400">catch</span> (error) {
-    <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"error"</span>, <span class="text-green-300">"Lỗi: "</span> + error.toString());
-  }
-}
-
-<span class="text-slate-500">// Hàm phụ: Cập nhật hàm này để có thể gửi kèm dữ liệu (data) về web</span>
-<span class="text-pink-400">function</span> <span class="text-yellow-200">responseJSON</span>(status, message, data = <span class="text-pink-400">null</span>) {
-  <span class="text-pink-400">var</span> output = { <span class="text-green-300">"status"</span>: status, <span class="text-green-300">"message"</span>: message };
-  <span class="text-pink-400">if</span> (data) output.data = data;
-  <span class="text-pink-400">return</span> ContentService.createTextOutput(JSON.stringify(output))
-                       .setMimeType(ContentService.MimeType.JSON);
-}</div>
+      <span class="text-slate-500">// Cập nhật cột 5 (Trạng thái), 6 (Điểm), 7 (Lời phê)</span>
+      <span class="text-slate-500">//... sheet.getRange(row, 6).setValue(data.score) ...</span>
+      <span class="text-pink-400">return</span> responseJSON(<span class="text-green-300">"success"</span>, <span class="text-green-300">"Chấm điểm thành công!"</span>);
+    }</div>
                     </div>
-                    
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6 rounded-r-lg">
-                        <h4 class="font-bold text-blue-800 mb-2">Cập nhật Phiên bản (Deploy)</h4>
-                        <p class="text-blue-900 text-sm">Mỗi lần sửa code, bạn phải tạo phiên bản mới. Bấm <strong>Deploy > Manage Deployments (Quản lý bản triển khai)</strong>, bấm vào hình cây bút (Edit), ở chỗ Version chọn <strong>New version</strong> và bấm Deploy. Link URL cũ vẫn giữ nguyên không đổi!</p>
-                    </div>
-                </div>
-            </section>
-          <!-- BÀI 6: GIAO DIỆN NỘP BÀI (FRONTEND) -->
-            <section id="lesson-6" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / Web Nộp Bài (Frontend)">
-                <h1 class="text-3xl font-extrabold text-slate-900 mb-4">6. Xây Dựng Giao Diện Nộp Bài</h1>
-                <p class="text-lg text-slate-600 mb-8 leading-relaxed">Chúng ta đã có "Tủ hồ sơ" (Google Sheet) và "Chú bảo vệ" (API). Bây giờ, ta cần làm một cái Bưu điện (Giao diện Web) để học viên đến gửi thư.</p>
-                
-                <div class="prose prose-slate max-w-none">
-                    
-                    <h3 class="text-xl font-bold mt-4 mb-3">Bước 1: Tạo Form nhập liệu (HTML)</h3>
-                    <p>Hãy mở máy tính của bạn, tạo một file tên là <code>student.html</code>. Dùng câu thần chú ở Bài 2, yêu cầu AI viết cho bạn một cái Form nhập Tên và Link bằng Tailwind CSS. Ta sẽ có đoạn mã dạng như sau:</p>
-
-                    <!-- Code HTML -->
-                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
-                            <span>student.html (Phần Giao diện)</span>
-                        </div>
-                        <div class="p-4 text-sm font-mono text-pink-300 overflow-x-auto whitespace-pre leading-relaxed">
-&lt;<span class="text-pink-400">input</span> id="<span class="text-yellow-200">studentName</span>" placeholder="<span class="text-green-300">Nhập tên của bạn</span>" class="<span class="text-yellow-200">border p-2</span>"&gt;
-&lt;<span class="text-pink-400">input</span> id="<span class="text-yellow-200">projectLink</span>" placeholder="<span class="text-green-300">Link bài tập</span>" class="<span class="text-yellow-200">border p-2</span>"&gt;
-
-&lt;<span class="text-pink-400">button</span> onclick="<span class="text-yellow-200">submitData()</span>" class="<span class="text-yellow-200">bg-blue-600 text-white</span>"&gt;
-    Nộp bài
-&lt;/<span class="text-pink-400">button</span>&gt;</div>
-                    </div>
-
-                    <h3 class="text-xl font-bold mt-8 mb-4">Bước 2: Thuê "Anh Shipper" (Lập trình JavaScript)</h3>
-                    <p>Khi học viên bấm nút "Nộp bài", dữ liệu vẫn nằm trên máy tính của họ. Ta cần viết một đoạn mã JavaScript (Anh Shipper) để lấy dữ liệu đó và chạy tới địa chỉ API của ta. Trong lập trình, "Anh Shipper" này tên là <code>fetch()</code>.</p>
-
-                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 my-6 rounded-r-lg">
-                        <h4 class="font-bold text-amber-800 mb-2"><i class="fa-solid fa-key mr-2"></i>Quy tắc Vàng chống Lỗi CORS</h4>
-                        <p class="text-amber-900 text-sm">Rất nhiều bạn mới làm bị lỗi trình duyệt chặn gửi dữ liệu (CORS Error). Bí quyết là luôn phải bọc gói hàng bằng giấy gói <strong>text/plain</strong>. Hãy xem đoạn mã bên dưới.</p>
-                    </div>
-
-                    <!-- Code JS -->
-                    <div class="bg-slate-800 rounded-xl overflow-hidden my-6 shadow-lg">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
-                            <span>Thêm thẻ &lt;script&gt; vào dưới cùng file student.html</span>
-                        </div>
-                        <div class="p-5 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
-<span class="text-slate-500">// 1. Dán đường link API (Web App) lấy từ Bài 4 vào đây</span>
-<span class="text-pink-400">const</span> API_URL = <span class="text-green-300">"https://script.google.com/macros/s/.../exec"</span>;
-
-<span class="text-pink-400">function</span> <span class="text-yellow-200">submitData</span>() {
-  <span class="text-slate-500">// 2. Lấy dữ liệu người dùng gõ vào ô nhập</span>
-  <span class="text-pink-400">const</span> name = document.getElementById(<span class="text-green-300">'studentName'</span>).value;
-  <span class="text-pink-400">const</span> link = document.getElementById(<span class="text-green-300">'projectLink'</span>).value;
-
-  <span class="text-slate-500">// 3. Đóng gói hàng hóa</span>
-  <span class="text-pink-400">const</span> payload = {
-      action: <span class="text-green-300">"submit"</span>,
-      student_name: name,
-      project_link: link
-  };
-
-  <span class="text-slate-500">// 4. Gọi Shipper (fetch) mang đi giao</span>
-  <span class="text-yellow-200">fetch</span>(API_URL, {
-      method: <span class="text-green-300">'POST'</span>,
-      headers: { <span class="text-green-300">'Content-Type'</span>: <span class="text-green-300">'text/plain;charset=utf-8'</span> }, <span class="text-slate-500">// Bí kíp chống CORS</span>
-      body: JSON.stringify(payload)
-  })
-  .then(response => response.json())
-  .then(data => {
-      <span class="text-yellow-200">alert</span>(data.message); <span class="text-slate-500">// Báo thành công!</span>
-  });
-}</div>
-                    </div>
-                    
-                    <p><strong>Chúc mừng!</strong> Bạn đã hoàn thành một chu trình Fullstack hoàn chỉnh. Hãy thử mở file <code>student.html</code> của bạn lên, nhập dữ liệu và xem điều kỳ diệu xảy ra trong Google Sheet nhé!</p>
 
                 </div>
             </section>
-          <!-- BÀI 7: GIAO DIỆN QUẢN TRỊ GIẢNG VIÊN -->
-            <section id="lesson-7" class="lesson-content max-w-3xl mx-auto" data-title="Phase 3 / Web Giảng viên (Frontend)">
-                <div class="text-center mb-8">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white mb-4 shadow-lg shadow-indigo-200">
-                        <i class="fa-solid fa-trophy text-2xl"></i>
-                    </div>
-                    <h1 class="text-3xl font-extrabold text-slate-900 mb-2">7. Trạm Chấm Bài (Teacher Dashboard)</h1>
-                    <p class="text-lg text-slate-500">Mảnh ghép cuối cùng để hoàn thiện một Hệ thống SaaS thực thụ.</p>
-                </div>
+
+            <!-- BÀI 6: FRONTEND - HỌC VIÊN -->
+            <section id="lesson-6" class="lesson-content max-w-4xl mx-auto" data-title="Phase 3 / Web Nộp Bài (Frontend)">
                 
-                <div class="prose prose-slate max-w-none">
-                    <p>Khác với học viên chỉ có chức năng Gửi dữ liệu đi. Ở giao diện Giảng viên, chúng ta cần làm 2 việc: <strong>Lấy danh sách về (Đọc)</strong> và <strong>Chấm điểm (Ghi đè)</strong>.</p>
-                    
-                    <h3 class="text-xl font-bold mt-4 mb-3">1. Lấy dữ liệu về Bảng (Table)</h3>
-                    <p>Ta sẽ tạo một file <code>teacher.html</code>. Dùng AI thiết kế một cái Bảng danh sách. Sau đó, nhờ "Anh Shipper" (hàm fetch) mang theo lời nhắn <code>action: 'get_list'</code> chạy lên Google Sheet gom hết bài tập mang về.</p>
-
-                    <!-- Khối Code JS Fetch Get List -->
-                    <div class="bg-slate-800 rounded-xl overflow-hidden my-4 shadow-lg">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
-                            <span>Lệnh lấy danh sách bài nộp</span>
-                        </div>
-                        <div class="p-4 text-sm font-mono text-sky-300 overflow-x-auto whitespace-pre leading-relaxed">
-<span class="text-yellow-200">fetch</span>(API_URL, {
-  method: <span class="text-green-300">'POST'</span>,
-  headers: { <span class="text-green-300">'Content-Type'</span>: <span class="text-green-300">'text/plain'</span> },
-  body: JSON.stringify({ action: <span class="text-green-300">'get_list'</span> }) <span class="text-slate-500">// Báo API biết là tôi muốn lấy danh sách</span>
-})
-.then(res => res.json())
-.then(response => {
-  <span class="text-slate-500">// Nhận được danh sách, dùng Javascript vẽ nó ra thành các hàng &lt;tr&gt; &lt;td&gt; trên web</span>
-  <span class="text-yellow-200">console.log</span>(<span class="text-green-300">"Đã lấy được: "</span>, response.data);
-});</div>
+                <div class="text-center mb-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-4 shadow-sm">
+                        <i class="fa-solid fa-truck-fast text-3xl"></i>
                     </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">6. Thuê "Anh Shipper" giao hàng</h1>
+                    <p class="text-lg text-slate-500">Tạo trang Web <code>student.html</code> bằng Tailwind. Sau đó dùng Fetch API (Anh Shipper) để gửi bài nộp đi.</p>
+                </div>
 
-                    <h3 class="text-xl font-bold mt-8 mb-3">2. Chấm điểm & Trả kết quả</h3>
-                    <p>Khi giảng viên nhập điểm 10 và bấm Lưu. Ta lại đóng gói một kiện hàng mới, gồm 3 thông tin quan trọng: <strong>Mã Bài Tập (ID), Điểm, và Lời phê</strong>. Bắn thẳng lên API.</p>
+                <div class="prose prose-slate max-w-none">
+                    <p class="mb-6 text-center">Người dùng gõ Tên và Link lên Form. Bấm nút "Nộp bài", JavaScript sẽ gói gọn nó lại thành một kiện hàng (Payload) và gọi Shipper mang lên Địa chỉ API của bạn.</p>
 
-                    <!-- Khối Code JS Fetch Grade -->
-                    <div class="bg-slate-800 rounded-xl overflow-hidden my-4 shadow-lg">
-                        <div class="bg-slate-900 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono border-b border-slate-700">
-                            <span>Lệnh chấm điểm cập nhật Google Sheet</span>
+                    <div class="bg-slate-900 rounded-xl overflow-hidden my-4 shadow-lg border border-slate-700">
+                        <div class="bg-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-400 font-mono">
+                            <span>Mã lệnh JavaScript (Cách gửi hàng)</span>
                         </div>
-                        <div class="p-4 text-sm font-mono text-pink-300 overflow-x-auto whitespace-pre leading-relaxed">
+                        <div class="p-5 text-sm font-mono text-pink-300 overflow-x-auto whitespace-pre leading-relaxed">
+<span class="text-slate-500">// 1. Đóng gói hàng hóa (Payload)</span>
 <span class="text-pink-400">const</span> payload = {
-  action: <span class="text-green-300">"grade"</span>,
-  id: <span class="text-green-300">"SUB-12345"</span>,  <span class="text-slate-500">// Để API biết đang chấm bài của ai</span>
-  score: <span class="text-green-300">"10"</span>,
-  feedback: <span class="text-green-300">"Làm rất tốt!"</span>
+    action: <span class="text-green-300">"submit"</span>,
+    student_name: <span class="text-green-300">"Trần Văn A"</span>,
+    project_link: <span class="text-green-300">"https://..."</span>
 };
 
+<span class="text-slate-500">// 2. Gọi Shipper (Fetch) mang đi</span>
 <span class="text-yellow-200">fetch</span>(API_URL, {
-  method: <span class="text-green-300">'POST'</span>,
-  headers: { <span class="text-green-300">'Content-Type'</span>: <span class="text-green-300">'text/plain'</span> },
-  body: JSON.stringify(payload)
+    method: <span class="text-green-300">'POST'</span>,
+    headers: { <span class="text-green-300">'Content-Type'</span>: <span class="text-green-300">'text/plain;charset=utf-8'</span> }, <span class="text-slate-500">// &lt;-- Giấy thông hành chống chặn</span>
+    body: JSON.stringify(payload)
 })
-.then(res => res.json())
-.then(data => <span class="text-yellow-200">alert</span>(<span class="text-green-300">"Đã lưu điểm thành công!"</span>));</div>
+.then(data => <span class="text-yellow-200">alert</span>(<span class="text-green-300">"Giao hàng thành công!"</span>));</div>
+                    </div>
+
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-5 mt-6 rounded-r-xl flex items-start">
+                        <i class="fa-solid fa-key text-amber-500 text-xl mt-1 mr-4"></i>
+                        <div>
+                            <h4 class="font-bold text-amber-900 mb-1">Thẻ Thông Hành Chống Lỗi (CORS)</h4>
+                            <p class="text-amber-800 text-sm">Trình duyệt rất hay chặn việc gửi dữ liệu lung tung. Bí quyết của Masterclass là luôn dán nhãn <strong>text/plain</strong> lên gói hàng. Google sẽ vui vẻ mở cửa cho đi qua cái vèo!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BÀI 7: FRONTEND - GIẢNG VIÊN & KẾT THÚC -->
+            <section id="lesson-7" class="lesson-content max-w-4xl mx-auto" data-title="Phase 3 / Web Giảng viên (Frontend)">
+                
+                <div class="text-center mb-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-100 text-purple-600 mb-4 shadow-sm">
+                        <i class="fa-solid fa-chalkboard-user text-3xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">7. Trạm Chỉ Huy (Web Giảng Viên)</h1>
+                    <p class="text-lg text-slate-500">Mảnh ghép cuối cùng: Tạo Dashboard <code>teacher.html</code> để hiển thị Bảng danh sách và chấm điểm.</p>
+                </div>
+
+                <div class="prose prose-slate max-w-none">
+                    
+                    <p class="mb-6 text-center">Bảng điều khiển này hoạt động theo 2 luồng liên tục: Vừa mở lên là <strong>Nhận danh sách về (Đọc)</strong>, bấm nút Lưu là <strong>Gửi điểm đi (Ghi)</strong>.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                        <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl">
+                            <h4 class="font-bold text-slate-800 mb-3 flex items-center"><i class="fa-solid fa-download text-emerald-500 mr-2"></i>Lấy Danh Sách</h4>
+                            <div class="text-xs font-mono bg-slate-800 text-sky-300 p-3 rounded-lg overflow-x-auto whitespace-pre">
+body: JSON.stringify({
+  action: <span class="text-green-300">'get_list'</span> 
+})</div>
+                            <p class="text-xs text-slate-500 mt-2">Dùng JavaScript vẽ kết quả trả về thành các hàng ngang <code>&lt;tr&gt;</code> trên Bảng hiển thị.</p>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl">
+                            <h4 class="font-bold text-slate-800 mb-3 flex items-center"><i class="fa-solid fa-upload text-pink-500 mr-2"></i>Gửi Điểm Chấm</h4>
+                            <div class="text-xs font-mono bg-slate-800 text-sky-300 p-3 rounded-lg overflow-x-auto whitespace-pre">
+body: JSON.stringify({
+  action: <span class="text-green-300">"grade"</span>,
+  id: <span class="text-green-300">"SUB-123"</span>,
+  score: <span class="text-green-300">"10"</span>
+})</div>
+                            <p class="text-xs text-slate-500 mt-2">API sẽ dựa vào ID để tìm đúng bài tập trong Google Sheet và cập nhật điểm.</p>
+                        </div>
                     </div>
                     
-                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 my-8 rounded-r-xl">
-                        <h4 class="font-bold text-indigo-900 mb-2 text-xl">🎉 TỔNG KẾT KHÓA HỌC</h4>
-                        <p class="text-indigo-800 mb-3">Chúc mừng bạn! Từ một người chưa rành công nghệ, bạn đã đi qua một hành trình tuyệt vời. Bạn đã biết cách thiết kế Frontend (Tailwind), biết lưu trữ Backend (Google Sheets), và dùng AI làm Kỹ sư viết code (Prompting).</p>
-                        <p class="text-indigo-800 font-medium">Bây giờ, với tư duy này, bạn có thể tự mình xây dựng hệ thống Quản lý nhân sự, Quản lý kho, hay bất cứ phần mềm SaaS nào bạn muốn. Giới hạn duy nhất là trí tưởng tượng của bạn!</p>
+                    <!-- BANNER TỔNG KẾT TUYỆT ĐẸP -->
+                    <div class="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 rounded-3xl p-8 md:p-10 text-white overflow-hidden shadow-2xl mt-12">
+                        <!-- Hiệu ứng trang trí chìm -->
+                        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
+                        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white opacity-10 rounded-full blur-2xl"></div>
+                        
+                        <div class="relative z-10 text-center">
+                            <i class="fa-solid fa-trophy text-5xl text-yellow-300 mb-4 drop-shadow-lg"></i>
+                            <h2 class="text-2xl md:text-3xl font-extrabold mb-3">HÀNH TRÌNH ĐÃ HOÀN TẤT!</h2>
+                            <p class="text-indigo-100 text-sm md:text-base mb-6 max-w-2xl mx-auto leading-relaxed">Từ một người chưa rành công nghệ, bạn đã nắm giữ trong tay tư duy của một Product Builder. Bạn đã biết cách làm Giao diện, thiết kế Database, và dùng AI làm Kỹ sư viết Code.</p>
+                            
+                            <div class="inline-flex bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl p-4 text-left">
+                                <ul class="space-y-2 text-sm">
+                                    <li><i class="fa-solid fa-check text-green-300 mr-2"></i><strong>Tư duy:</strong> Giải quyết vấn đề bằng Micro-SaaS.</li>
+                                    <li><i class="fa-solid fa-check text-green-300 mr-2"></i><strong>Vũ khí:</strong> HTML + Tailwind + Google Apps Script.</li>
+                                    <li><i class="fa-solid fa-check text-green-300 mr-2"></i><strong>Trợ lý:</strong> Google AI Studio (Prompting).</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                 </div>

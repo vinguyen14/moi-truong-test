@@ -43,45 +43,59 @@
 
         <!-- Menu Navigation -->
         <nav class="flex-1 overflow-y-auto p-4 space-y-6" id="nav-menu">
+            
+            <!-- TRẢI NGHIỆM THỰC TẾ -->
+            <div>
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Tầm nhìn Sản phẩm</h2>
+                <ul class="space-y-1">
+                    <li>
+                        <button onclick="loadLesson('lesson-1')" id="nav-lesson-1" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-play text-rose-500 mr-2 w-4"></i>1. Xem Demo Toàn Cảnh</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-1"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
             <!-- QUY TRÌNH CHUẨN (SOP) -->
             <div>
                 <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Quy trình Build Web (SOP)</h2>
                 <ul class="space-y-1">
                     <li>
-                        <button onclick="loadLesson('lesson-1')" id="nav-lesson-1" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-map text-blue-500 mr-2 w-4"></i>1. Chuẩn bị & Trạm AI</span>
-                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-1"></i>
-                        </button>
-                    </li>
-                    <li>
                         <button onclick="loadLesson('lesson-2')" id="nav-lesson-2" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-database text-emerald-500 mr-2 w-4"></i>2. Backend (Google Sheet)</span>
+                            <span class="truncate"><i class="fa-solid fa-map text-blue-500 mr-2 w-4"></i>2. Chuẩn bị & Trạm AI</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-2"></i>
                         </button>
                     </li>
                     <li>
                         <button onclick="loadLesson('lesson-3')" id="nav-lesson-3" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-brands fa-github text-slate-800 mr-2 w-4"></i>3. Frontend (GitHub)</span>
+                            <span class="truncate"><i class="fa-solid fa-database text-emerald-500 mr-2 w-4"></i>3. Backend (Google Sheet)</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-3"></i>
                         </button>
                     </li>
                     <li>
                         <button onclick="loadLesson('lesson-4')" id="nav-lesson-4" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-arrows-rotate text-purple-500 mr-2 w-4"></i>4. Test & Vòng lặp sửa lỗi</span>
+                            <span class="truncate"><i class="fa-brands fa-github text-slate-800 mr-2 w-4"></i>4. Frontend (GitHub)</span>
                             <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-4"></i>
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="loadLesson('lesson-5')" id="nav-lesson-5" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-arrows-rotate text-purple-500 mr-2 w-4"></i>5. Test & Sửa lỗi</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-5"></i>
                         </button>
                     </li>
                 </ul>
             </div>
             
             <!-- Phase 3: Thực hành -->
-            <div class="mt-6">
-                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Phase 3: Dự án thực tế</h2>
+            <div class="mt-2">
+                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Dự án thực tế</h2>
                 <ul class="space-y-1">
                     <li>
-                        <button onclick="loadLesson('lesson-5')" id="nav-lesson-5" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
-                            <span class="truncate"><i class="fa-solid fa-rocket text-rose-500 mr-2 w-4"></i>5. Build Tool Chấm Bài</span>
-                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-5"></i>
+                        <button onclick="loadLesson('lesson-6')" id="nav-lesson-6" class="w-full text-left px-3 py-2 text-sm rounded-lg hover:bg-slate-100 flex items-center justify-between text-slate-600 transition-colors">
+                            <span class="truncate"><i class="fa-solid fa-hammer text-amber-500 mr-2 w-4"></i>6. Tự Build Tool Chấm Bài</span>
+                            <i class="fa-solid fa-circle-check text-green-500 hidden checkmark" id="check-lesson-6"></i>
                         </button>
                     </li>
                 </ul>
@@ -119,8 +133,129 @@
         <!-- Khung chứa nội dung bài học có thể scroll -->
         <div class="flex-1 overflow-y-auto p-6 md:p-12 scroll-smooth" id="lesson-container">
             
-            <!-- BÀI 1: GỐC RỄ & INSIGHT SẢN PHẨM -->
-            <section id="lesson-1" class="lesson-content max-w-5xl mx-auto active" data-title="Bước 1 / Gốc rễ & Bản vẽ">
+            <!-- BÀI 1 (MỚI): DEMO TOÀN CẢNH -->
+            <section id="lesson-1" class="lesson-content max-w-5xl mx-auto active" data-title="Bức tranh toàn cảnh">
+                
+                <div class="text-center mb-10 border-b border-slate-200 pb-8">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-r from-rose-500 to-orange-500 text-white mb-4 shadow-lg shadow-rose-200">
+                        <i class="fa-solid fa-film text-3xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">1. Bức Tranh Toàn Cảnh (Live Demo)</h1>
+                    <p class="text-lg text-slate-500 max-w-3xl mx-auto">Trước khi học cách xây dựng, hãy xem thử "Sản phẩm cuối cùng" trông như thế nào. Dưới đây là mô phỏng luồng chạy của Hệ thống <strong>Đào tạo Kịch bản Direct Sales</strong>.</p>
+                </div>
+
+                <!-- STORYBOARD (VIDEO MÔ PHỎNG) -->
+                <div class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                    
+                    <!-- SCENE 1: Học Viên -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-blue-500 text-white font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">1</div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-md">
+                            <h3 class="font-bold text-blue-700 text-lg mb-2 flex items-center"><i class="fa-solid fa-user-graduate mr-2"></i>Góc nhìn Học Viên</h3>
+                            <p class="text-sm text-slate-600 mb-4">Học viên truy cập Web. Giao diện thiết kế theo phong cách Glassmorphism (Kính mờ) hiện đại. Họ chọn Tình huống và gõ kịch bản nộp bài.</p>
+                            <!-- BẢN VẼ MÔ PHỎNG UI HỌC VIÊN -->
+                            <div class="border border-slate-200 rounded-lg overflow-hidden shadow-inner bg-slate-50 relative">
+                                <div class="bg-white border-b border-slate-200 px-3 py-2 flex items-center gap-2">
+                                    <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs font-bold"><i class="fa-solid fa-k"></i></div>
+                                    <div class="text-xs font-bold text-slate-700 flex-1">Hệ thống Nộp Bài Tập Kỹ Năng</div>
+                                    <div class="text-[10px] bg-slate-100 px-2 py-1 rounded-full text-slate-500 font-bold border border-slate-200">👤 VI - test</div>
+                                </div>
+                                <div class="p-4 bg-gradient-to-br from-blue-50/50 to-indigo-50/50">
+                                    <div class="bg-white/80 backdrop-blur border border-white p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl"><i class="fa-solid fa-keyboard"></i></div>
+                                        <div class="flex-1">
+                                            <div class="text-sm font-bold text-slate-800">Tình huống 1: Mẹ & Bé (Chị Nga)</div>
+                                            <div class="text-[10px] text-slate-500 mt-1">Viết kịch bản tư vấn theo 6 bước...</div>
+                                        </div>
+                                        <div class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full"><i class="fa-solid fa-check"></i> Đã nộp</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SCENE 2: Database -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-green-500 text-white font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">2</div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-md">
+                            <h3 class="font-bold text-green-700 text-lg mb-2 flex items-center"><i class="fa-solid fa-server mr-2"></i>Dữ liệu bay vào Database</h3>
+                            <p class="text-sm text-slate-600 mb-4">Thông qua cầu nối API (Fetch), toàn bộ chữ học viên gõ được tự động đẩy vào Google Sheet theo thời gian thực.</p>
+                            <!-- BẢN VẼ MÔ PHỎNG UI GOOGLE SHEET -->
+                            <div class="border border-slate-200 rounded-lg overflow-hidden shadow-inner">
+                                <div class="bg-green-50 border-b border-green-100 px-3 py-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-excel text-green-600 text-lg"></i>
+                                    <div class="text-xs font-bold text-slate-700">Data Kịch Bản Direct Sales</div>
+                                </div>
+                                <div class="bg-white overflow-x-auto">
+                                    <table class="w-full text-left text-[9px] border-collapse whitespace-nowrap">
+                                        <tr class="bg-slate-100 text-slate-500"><th class="border px-2 py-1">Thời gian</th><th class="border px-2 py-1">Học viên</th><th class="border px-2 py-1">Tình huống</th><th class="border px-2 py-1">Bước 1</th></tr>
+                                        <tr><td class="border px-2 py-1">11:02 13/07/26</td><td class="border px-2 py-1 font-bold text-blue-600">VI (test)</td><td class="border px-2 py-1">TH1: Mẹ & Bé</td><td class="border px-2 py-1 text-slate-500">Chào chị Nga...</td></tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SCENE 3: Giảng Viên -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-amber-500 text-white font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">3</div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-md">
+                            <h3 class="font-bold text-amber-600 text-lg mb-2 flex items-center"><i class="fa-solid fa-chalkboard-user mr-2"></i>Góc nhìn Giảng Viên</h3>
+                            <p class="text-sm text-slate-600 mb-4">Giảng viên mở trang Dashboard (Giao diện tối chuyên nghiệp). Trang tự động kéo danh sách từ Sheet về. GV bấm vào từng bài để thả Nhận xét (Feedback).</p>
+                            <!-- BẢN VẼ MÔ PHỎNG UI TEACHER DASHBOARD -->
+                            <div class="border border-slate-200 rounded-lg overflow-hidden shadow-inner flex h-40">
+                                <div class="w-1/3 bg-slate-900 p-3 flex flex-col gap-3">
+                                    <div class="text-[10px] font-bold text-white mb-2"><i class="fa-solid fa-graduation-cap text-indigo-400 mr-1"></i> KiotViet L&D</div>
+                                    <div class="bg-indigo-600 text-white text-[8px] font-bold py-1.5 px-2 rounded flex items-center justify-center"><i class="fa-solid fa-sync mr-1"></i> Tải dữ liệu</div>
+                                    <div class="text-[8px] text-slate-400 uppercase">Bộ lọc</div>
+                                    <div class="bg-slate-800 border border-slate-700 rounded h-5"></div>
+                                </div>
+                                <div class="w-2/3 bg-slate-50 p-3 overflow-hidden relative">
+                                    <!-- Toast Notification -->
+                                    <div class="absolute top-2 right-2 bg-amber-500 text-white text-[8px] font-bold px-2 py-1 rounded shadow-lg flex items-center"><i class="fa-solid fa-bell mr-1"></i> 8 bài chờ chấm!</div>
+                                    <div class="text-[10px] font-bold text-slate-800 mb-3 mt-1">Danh Sách Kịch Bản</div>
+                                    <div class="bg-white border border-slate-200 rounded p-2 flex items-center justify-between shadow-sm mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-500 text-[10px]"><i class="fa-solid fa-user"></i></div>
+                                            <div>
+                                                <div class="text-[9px] font-bold text-slate-800">Đỗ Huyền Trang <span class="text-indigo-500 bg-indigo-50 px-1 rounded text-[7px]">NỘP LẦN 1</span></div>
+                                                <div class="text-[7px] text-slate-500">TH1: Mẹ & Bé (Chị Nga)</div>
+                                            </div>
+                                        </div>
+                                        <div class="text-[8px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-bold">Chờ chấm</div>
+                                    </div>
+                                    <div class="bg-white border border-slate-200 rounded p-2 flex items-center justify-between shadow-sm">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-6 h-6 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-500 text-[10px]"><i class="fa-solid fa-user"></i></div>
+                                            <div>
+                                                <div class="text-[9px] font-bold text-slate-800">Linh Trang <span class="text-red-500 bg-red-50 px-1 rounded text-[7px]"><i class="fa-solid fa-history"></i> BỔ SUNG</span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SCENE 4: Vòng lặp -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-purple-500 text-white font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10"><i class="fa-solid fa-repeat"></i></div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white p-5 rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-md">
+                            <h3 class="font-bold text-purple-700 text-lg mb-2">Vòng lặp hoàn hảo</h3>
+                            <p class="text-sm text-slate-600 mb-0">Khi Giảng viên bấm "Gửi điểm", hệ thống lại bắn API về Google Sheet. Học viên đang mở web bên kia sẽ lập tức thấy chuông báo đỏ <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse inline-block">Có nhận xét mới</span> và xem được ngay kết quả!</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-12 bg-indigo-50 border border-indigo-100 p-6 rounded-2xl">
+                    <h3 class="font-bold text-indigo-800 text-lg mb-2">Bạn đã thấy đích đến chưa?</h3>
+                    <p class="text-slate-600 text-sm mb-4">Mọi hệ thống lớn đều bắt đầu từ 3 thành phần: <strong>Web nhập liệu, Web Quản trị, và Chỗ lưu data</strong>. Bây giờ, hãy đi vào Bước 2 để học cách ra lệnh cho AI xây dựng hệ thống này nhé!</p>
+                    <button onclick="goNext()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition-transform hover:-translate-y-1">Bắt đầu học cách làm <i class="fa-solid fa-arrow-right ml-2"></i></button>
+                </div>
+            </section>
+            <!-- BÀI 2: GỐC RỄ & INSIGHT SẢN PHẨM -->
+            <section id="lesson-2" class="lesson-content max-w-5xl mx-auto active" data-title="Bước 1 / Gốc rễ & Bản vẽ">
                 
                 <h1 class="text-3xl font-extrabold text-slate-900 mb-6 border-b border-slate-200 pb-4">Bước 1: Hiểu Luật Chơi & Vẽ Bản Đồ</h1>
                 
@@ -205,8 +340,8 @@
                 </div>
             </section>
 
-            <!-- BÀI 2: TUYỆT CHIÊU AI & MỞ RỘNG -->
-            <section id="lesson-2" class="lesson-content max-w-5xl mx-auto" data-title="Bước 2 / Cấu hình AI & Nâng cao">
+            <!-- BÀI 3: TUYỆT CHIÊU AI & MỞ RỘNG -->
+            <section id="lesson-3" class="lesson-content max-w-5xl mx-auto" data-title="Bước 2 / Cấu hình AI & Nâng cao">
                 <h1 class="text-3xl font-extrabold text-slate-900 mb-6 border-b border-slate-200 pb-4">Bước 2: Tuyệt Chiêu Prompt & Chức Năng Nâng Cao</h1>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
@@ -301,8 +436,8 @@ BƯỚC 3: Xuất Code & Hướng dẫn.
                 </div>
             </section>
 
-            <!-- BÀI 3: FRONTEND (GITHUB) -->
-            <section id="lesson-3" class="lesson-content max-w-5xl mx-auto" data-title="Bước 3 / Frontend (GitHub)">
+            <!-- BÀI 4: FRONTEND (GITHUB) -->
+            <section id="lesson-4" class="lesson-content max-w-5xl mx-auto" data-title="Bước 3 / Frontend (GitHub)">
                 <h1 class="text-3xl font-extrabold text-slate-900 mb-6 border-b border-slate-200 pb-4">Bước 3: Giao diện & Quản trị Code (GitHub)</h1>
 
                 <!-- Tạo Repo & Thêm file -->
@@ -432,8 +567,8 @@ BƯỚC 3: Xuất Code & Hướng dẫn.
                 </div>
             </section>
 
-            <!-- BÀI 4: TEST & FIX LỖI -->
-            <section id="lesson-4" class="lesson-content max-w-5xl mx-auto" data-title="Bước 4 / Test & Vòng lặp">
+            <!-- BÀI 5: TEST & FIX LỖI -->
+            <section id="lesson-5" class="lesson-content max-w-5xl mx-auto" data-title="Bước 4 / Test & Vòng lặp">
                 <h1 class="text-3xl font-extrabold text-slate-900 mb-6 border-b border-slate-200 pb-4">Bước 4: Kiểm thử (Test) & Vòng lặp sửa lỗi</h1>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -462,8 +597,8 @@ BƯỚC 3: Xuất Code & Hướng dẫn.
                 </div>
             </section>
             
-            <!-- BÀI 5: THỰC HÀNH (CAPSTONE PROJECT) -->
-            <section id="lesson-5" class="lesson-content max-w-5xl mx-auto" data-title="Phase 3 / Build Tool Chấm Bài">
+            <!-- BÀI 6: THỰC HÀNH (CAPSTONE PROJECT) -->
+            <section id="lesson-6" class="lesson-content max-w-5xl mx-auto" data-title="Phase 3 / Build Tool Chấm Bài">
                 
                 <div class="text-center mb-10 border-b border-slate-200 pb-8">
                     <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-100 text-rose-600 mb-4 shadow-sm">
@@ -564,7 +699,7 @@ Lưu ý: Header fetch API phải dùng 'Content-Type': 'text/plain'. Code để 
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // Cấu hình tổng số bài học (dùng mảng id)
-        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5'];
+        const lessons = ['lesson-1', 'lesson-2', 'lesson-3', 'lesson-4', 'lesson-5', 'lesson-6'];
         let currentLessonId = 'lesson-1';
         let completedLessons = [];
 

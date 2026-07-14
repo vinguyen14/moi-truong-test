@@ -266,6 +266,25 @@
             <!-- BÀI 2: CHUẨN BỊ & AI STUDIO -->
             <section id="lesson-2" class="lesson-content max-w-5xl mx-auto" data-title="Bước 1 / Chuẩn bị & Trạm AI">
                 <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 border-b border-slate-200 pb-4">Bước 1: Chuẩn bị Đầu vào & Cấu hình AI</h1>
+
+<!-- BOX THUẬT NGỮ BỔ SUNG -->
+<div class="bg-indigo-50/50 border border-indigo-100 p-6 md:p-8 rounded-2xl mb-10">
+    <h3 class="text-xl font-bold text-indigo-900 mb-4"><i class="fa-solid fa-spell-check text-indigo-500 mr-2"></i>Làm quen Thuật ngữ hệ thống (Dành cho Non-IT)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm">
+            <span class="font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded text-sm mr-2">Frontend</span> Là "Mặt tiền" của căn nhà. Gồm giao diện, nút bấm, hình ảnh mà học viên nhìn thấy (Viết bằng HTML, Tailwind, JS).
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm">
+            <span class="font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded text-sm mr-2">Backend</span> Là "Nhà kho & Não bộ". Xử lý logic, lưu trữ dữ liệu nộp bài của học viên. Chúng ta sẽ dùng Google Apps Script làm Backend.
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm">
+            <span class="font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded text-sm mr-2">API</span> Là "Anh Shipper" giao tiếp giữa Frontend và Backend. Cầm bài thi của học viên chạy lên gửi cho Google Sheet.
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-indigo-100 shadow-sm">
+            <span class="font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded text-sm mr-2">Deploy</span> Là hành động "Mở cửa đón khách". Đưa code của bạn lên mạng (Github Pages) để mọi người có link truy cập.
+        </div>
+    </div>
+</div>
                 
                 <h3 class="text-xl font-bold text-slate-800 mb-4"><i class="fa-solid fa-box-open text-blue-500 mr-2"></i>1. Chuẩn bị Tài nguyên Kế thừa</h3>
                 <p class="text-base text-slate-600 mb-4 leading-relaxed">Đừng bao giờ bắt AI viết từ số 0. Hãy ném cho nó file dự án cũ (lưu trên Google Docs) để nó hiểu "Gốc rễ" phong cách code của bạn.</p>
@@ -354,16 +373,24 @@
                     </div>
                 </div>
 
-                <div class="bg-indigo-50 border border-indigo-200 p-6 rounded-2xl flex items-start gap-4">
-                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-600 text-3xl mt-1"></i>
-                    <div>
-                        <h4 class="font-bold text-indigo-900 text-lg mb-2">Tuyệt chiêu Prompt Giao diện (UI)</h4>
-                        <p class="text-base text-indigo-800 leading-relaxed">Khi nhờ AI làm web, hãy chèn thêm các câu thần chú sau để web nhìn xịn như hàng chục ngàn đô:</p>
-                        <ul class="list-disc pl-5 mt-2 space-y-1 text-sm text-indigo-800 font-medium">
-                            <li>"Làm giao diện phong cách <strong>Glassmorphism</strong> (Kính mờ, trong suốt)."</li>
-                            <li>"Dùng Google Font <strong>Be Vietnam Pro</strong> hoặc Nunito."</li>
-                            <li>"Chừa sẵn thẻ &lt;img&gt; dạng tròn để tôi tự dán link <strong>Logo</strong> vào sau."</li>
-                        </ul>
+                <!-- BỘ PROMPT ĐẦY ĐỦ -->
+                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-xl mt-8">
+                    <h4 class="font-bold text-amber-400 text-lg mb-4 flex items-center"><i class="fa-solid fa-wand-magic-sparkles mr-3"></i>Bộ Prompt gốc (Copy nguyên văn dán vào AI Studio)</h4>
+                    <p class="text-sm text-slate-400 mb-4">Để AI (Gemini/Claude/ChatGPT) viết code chuẩn 100% nghiệp vụ KiotViet, bạn phải đưa cho nó file Word mô tả quy trình + đoạn Prompt ép luật dưới đây:</p>
+                    
+                    <div class="bg-slate-800 rounded-xl p-4 md:p-5 relative group border border-slate-700">
+                        <div class="text-[13px] md:text-sm text-sky-300 font-mono whitespace-pre-wrap leading-relaxed"># ROLE & CONTEXT
+Bạn là một Senior Fullstack Developer. Tôi muốn thiết kế 1 hệ thống quản trị đào tạo dựa vào file web mẫu tôi cung cấp. Tôi có đính kèm file đặc tả nghiệp vụ quy trình tổng quan (SOP) dành cho Direct Sales.
+
+# NHIỆM VỤ CỦA BẠN
+Đọc kỹ các file đính kèm, lưu trữ vào bộ nhớ. Sau đó tư vấn cho tôi cách thiết kế từng bước. Đi chậm, kiểm tra cẩn thận.
+
+# LUẬT THIẾT KẾ UI/UX (RẤT QUAN TRỌNG)
+1. Dùng Tailwind CSS qua CDN. KHÔNG dùng file CSS rời.
+2. Phong cách: Hiện đại, Glassmorphism (Kính mờ, trong suốt, đổ bóng shadow-sm).
+3. Font chữ mặc định: 'Be Vietnam Pro', sans-serif.
+4. KHÔNG dùng tiếng Anh trong giao diện. 100% nội dung hiển thị cho user phải là tiếng Việt chuẩn.
+5. Màu sắc chủ đạo: Xanh Blue (KiotViet) cho Frontend học viên, Darkmode (Slate-900) cho Backend Admin giảng viên.</div>
                     </div>
                 </div>
             </section>
@@ -394,7 +421,7 @@
                                 <span class="px-2 py-1 hover:bg-slate-200 rounded cursor-pointer">Công cụ</span>
                                 <span class="px-2 py-1 bg-blue-100 text-blue-800 font-medium rounded cursor-pointer group">Tiện ích
                                     <!-- Dropdown Apps Script -->
-                                    <div class="absolute top-full left-40 mt-0 w-56 bg-white border border-slate-200 shadow-2xl rounded py-2 z-50 block">
+                                    <div class="absolute top-full left-40 mt-0 w-56 bg-white border border-slate-200 shadow-2xl rounded py-2 z-50 hidden group-hover:block transition-all duration-300">
                                         <div class="px-4 py-2 hover:bg-slate-100 flex items-center text-slate-700"><i class="fa-solid fa-puzzle-piece mr-3 w-4 text-slate-400"></i> Tiện ích bổ sung <i class="fa-solid fa-caret-right ml-auto text-slate-400"></i></div>
                                         <div class="px-4 py-2 hover:bg-slate-100 flex items-center text-slate-700"><i class="fa-regular fa-circle-play mr-3 w-4 text-slate-400"></i> Macro <i class="fa-solid fa-caret-right ml-auto text-slate-400"></i></div>
                                         <div class="px-4 py-2 bg-slate-100 flex items-center text-slate-800 font-medium"><img src="https://www.gstatic.com/images/branding/product/1x/apps_script_48dp.png" class="w-4 h-4 mr-3"> Apps Script</div>
@@ -436,7 +463,7 @@
                                         <span class="px-4 py-1.5 border-r border-blue-500">Triển khai</span>
                                         <span class="px-2 py-1.5"><i class="fa-solid fa-caret-down"></i></span>
                                     </div>
-                                    <div class="absolute right-0 mt-2 w-64 bg-white border border-slate-200 shadow-2xl rounded py-2 z-50 block">
+                                    <div class="absolute right-0 mt-2 w-64 bg-white border border-slate-200 shadow-2xl rounded py-2 z-50 hidden group-hover:block transition-all duration-300">
                                         <div class="px-4 py-3 text-sm hover:bg-slate-100 cursor-pointer text-slate-800">Tùy chọn triển khai mới</div>
                                         <div class="px-4 py-3 text-sm hover:bg-slate-100 cursor-pointer text-slate-800">Quản lý các tùy chọn triển khai</div>
                                         <div class="px-4 py-3 text-sm hover:bg-slate-100 cursor-pointer text-slate-800">Kiểm tra các tùy chọn triển khai</div>
@@ -497,7 +524,7 @@
                                 <div class="border border-slate-300 rounded-md px-3 py-1.5 text-sm text-slate-700 bg-white flex items-center cursor-pointer group hover:bg-slate-50 transition shadow-sm">
                                     <i class="fa-solid fa-plus mr-1"></i> <i class="fa-solid fa-caret-down text-xs"></i>
                                     <!-- Dropdown -->
-                                    <div class="absolute top-full right-2 mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-md py-2 z-20 text-sm block text-left">
+                                    <div class="absolute top-full right-2 mt-1 w-48 bg-white border border-slate-200 shadow-xl rounded-md py-2 z-20 text-sm hidden group-hover:block text-left transition-all duration-300">
                                         <div class="px-4 py-1.5 hover:bg-[#0969da] hover:text-white cursor-pointer"><i class="fa-regular fa-dot-circle mr-2 w-4 text-slate-400 group-hover:text-white"></i>New issue</div>
                                         <div class="px-4 py-1.5 bg-[#f6f8fa] text-slate-900 cursor-pointer font-medium border-l-2 border-[#0969da]"><i class="fa-solid fa-book-journal-whills mr-2 w-4 text-slate-400"></i>New repository</div>
                                         <div class="px-4 py-1.5 hover:bg-[#0969da] hover:text-white cursor-pointer"><i class="fa-solid fa-upload mr-2 w-4 text-slate-400 group-hover:text-white"></i>Import repository</div>
@@ -520,7 +547,7 @@
                                     <div class="border border-slate-300 rounded-md px-3 py-1.5 text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 cursor-pointer shadow-sm">
                                         Add file <i class="fa-solid fa-caret-down ml-1 text-xs"></i>
                                     </div>
-                                    <div class="absolute top-full right-0 mt-1 w-40 bg-white border border-slate-200 shadow-xl rounded-md py-2 z-20 text-sm block text-left">
+                                    <div class="absolute top-full right-0 mt-1 w-40 bg-white border border-slate-200 shadow-xl rounded-md py-2 z-20 text-sm hidden group-hover:block text-left transition-all duration-300">
                                         <div class="px-4 py-1.5 hover:bg-[#0969da] hover:text-white cursor-pointer font-medium bg-[#f6f8fa] border-l-2 border-[#0969da]"><i class="fa-solid fa-plus mr-2 text-slate-400"></i>Create new file</div>
                                         <div class="px-4 py-1.5 hover:bg-[#0969da] hover:text-white cursor-pointer"><i class="fa-solid fa-upload mr-2 text-slate-400"></i>Upload files</div>
                                     </div>
@@ -534,6 +561,21 @@
                             </div>
                         </div>
                         <p class="text-base text-slate-600 leading-relaxed">Tên file BẮT BUỘC kết thúc bằng đuôi <code>.html</code> hoặc <code>.js</code>.</p>
+                    </div>
+                </div>
+
+                <!-- BỔ SUNG: KỸ NĂNG QUẢN LÝ THƯ MỤC TRÊN GITHUB -->
+                <div class="bg-sky-50 border border-sky-200 p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+                    <h3 class="text-xl font-bold text-sky-900 mb-4"><i class="fa-regular fa-folder-open text-sky-600 mr-2"></i>2.5 Quản lý Thư mục (Folder) trên GitHub</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <div>
+                            <h4 class="font-bold text-sky-800 text-sm mb-2">Cách 1: Tạo Folder mới khi tạo file</h4>
+                            <p class="text-sm text-sky-700 leading-relaxed mb-3">Ở ô điền tên file, bạn chỉ cần gõ <code class="bg-white text-rose-500 px-1 border border-sky-200 rounded font-bold">tên_thư_mục/tên_file.html</code>. Dấu gạch chéo <strong>/</strong> sẽ ra lệnh cho GitHub tự động gom vào Folder.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sky-800 text-sm mb-2">Cách 2: Cách xóa 1 file (Delete)</h4>
+                            <p class="text-sm text-sky-700 leading-relaxed mb-3">Bấm vào file code cần xóa -> Nhìn lên góc phải trên cùng của khung code, bấm vào dấu <i class="fa-solid fa-ellipsis text-sky-500"></i> (3 chấm) -> Chọn <span class="text-red-500 font-bold">Delete file</span> -> Bấm Commit changes.</p>
+                        </div>
                     </div>
                 </div>
 

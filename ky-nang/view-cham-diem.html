@@ -3,202 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KiotViet L&D - Quản Lý Chấm Điểm</title>
+    <title>Chấm Điểm Kịch Bản (GV)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; background-color: #f8fafc; } @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; background: white; } .no-print { display: none !important; } }</style>
+    <style>body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }</style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <script>
-        const CONFIG = {
-            API_URL: "https://script.google.com/macros/s/AKfycbzGViS8Tnc6X_AaYnqfC3Y1GyDW8VtwBgvzNiS5aPUsQJeRxKTnXC8DKCAWo5mNuYy25g/exec", 
-            SHEET_URL: "https://docs.google.com/spreadsheets/d/161DKBTiYh6CXBy7AGRx6qCjIHcdBD7cZQ_CSOrK1CtY/edit?gid=0#gid=0"
-        };
-    </script>
+    <script>const CONFIG = { API_URL: "https://script.google.com/macros/s/AKfycbxpQow0IJ8OYY2tTqvJK-5zcmmS2G4a1f_atwngD0O_c0skmzIeiUu-V_93A-KtRlH3BA/exec" };</script>
 
-    <div id="toastAlert" class="fixed top-6 right-6 bg-amber-500 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 transform transition-all translate-x-full font-black flex items-center gap-3">
-        <i class="fas fa-bell text-2xl"></i> <span id="toastText">Bạn có bài tập chờ chấm!</span>
-        <button onclick="document.getElementById('toastAlert').classList.add('translate-x-full')" class="ml-4 hover:text-amber-200"><i class="fas fa-times"></i></button>
+    <div id="toastAlert" onclick="filterPendingOnly()" class="fixed top-6 right-6 bg-amber-500 text-white px-6 py-4 rounded-2xl shadow-2xl z-50 transform transition-all translate-x-full font-black flex items-center gap-3 cursor-pointer hover:bg-amber-600">
+        <i class="fas fa-bell text-2xl animate-bounce"></i> <span id="toastText"></span>
     </div>
 
     <aside class="w-72 bg-slate-900 text-white flex flex-col shadow-xl z-20 shrink-0">
-        <div class="p-6 border-b border-slate-800 flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-xl shadow-lg"><i class="fas fa-graduation-cap"></i></div>
-            <div><h1 class="font-black text-lg leading-tight tracking-tight">KiotViet L&D</h1><p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Portal Giảng Viên</p></div>
-        </div>
+        <div class="p-6 border-b border-slate-800 flex items-center gap-3"><div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-xl shadow-lg"><i class="fas fa-graduation-cap"></i></div><div><h1 class="font-black text-lg">KiotViet L&D</h1><p class="text-[10px] text-slate-400 font-bold uppercase">Portal Giảng Viên</p></div></div>
         <div class="p-4 flex-1 overflow-y-auto">
-            <button onclick="loadSubmissions()" id="btnRefresh" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition shadow-md mb-4"><i class="fas fa-sync-alt"></i> Tải dữ liệu</button>
-            <a href="#" onclick="window.open(CONFIG.SHEET_URL, '_blank')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition border border-slate-700 mb-8"><i class="fas fa-table text-emerald-400"></i> Mở Database Sheet</a>
-            
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-700 pb-2"><i class="fas fa-filter mr-1"></i> BỘ LỌC TÌM KIẾM</h3>
+            <button onclick="loadSubmissions()" id="btnRefresh" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 mb-6"><i class="fas fa-sync-alt"></i> Tải dữ liệu</button>
             <div class="space-y-4">
-                <div><label class="text-xs font-semibold text-slate-400 mb-1 block">Tên học viên</label><input type="text" id="fltName" oninput="applyFilters()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 text-white" placeholder="Tìm theo tên..."></div>
-                <div><label class="text-xs font-semibold text-slate-400 mb-1 block">Trạng thái chấm</label><select id="fltStatus" onchange="applyFilters()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none text-white"><option value="all">Tất cả bài nộp</option><option value="pending" selected>🟠 Chờ chấm điểm</option><option value="graded">🟢 Đã chấm</option><option value="skipped">⚪ Đã bỏ qua</option></select></div>
-                <div><label class="text-xs font-semibold text-slate-400 mb-1 block">Phòng ban</label><input type="text" id="fltDept" oninput="applyFilters()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none text-white" placeholder="VD: DSSGN..."></div>
-                <div><label class="text-xs font-semibold text-slate-400 mb-1 block">Loại bài nộp</label><select id="fltUpdate" onchange="applyFilters()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none text-white"><option value="all">Tất cả</option><option value="update">🔴 Chỉ bản Bổ sung mới</option></select></div>
+                <div><label class="text-xs font-semibold text-slate-400 mb-1 block">Tên HV / PB</label><input type="text" id="fltText" oninput="applyFilters()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-indigo-500" placeholder="VD: Nguyễn Văn A"></div>
+                <div><label class="text-xs font-semibold text-slate-400 mb-1 block">Trạng thái</label><select id="fltStatus" onchange="applyFilters()" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white outline-none"><option value="all">Tất cả bài nộp</option><option value="pending" selected>🟠 Chờ chấm</option><option value="graded">🟢 Đã chấm</option><option value="skipped">⚪ Đã bỏ qua</option></select></div>
             </div>
-
-            <div class="mt-8 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Thống kê</p>
-                <div class="flex justify-between items-center text-sm font-medium text-slate-300 mb-2"><span>Tổng bài lọc được:</span><span id="statTotal" class="font-black text-white">0</span></div>
-                <div class="flex justify-between items-center text-sm font-medium text-slate-300"><span>Chờ chấm:</span><span id="statPending" class="font-black text-amber-400">0</span></div>
-            </div>
+            <div class="mt-8 bg-slate-800/50 p-4 rounded-xl border border-slate-700"><p class="text-xs font-bold text-slate-400 uppercase mb-3">Thống kê</p><div class="flex justify-between items-center text-sm font-medium text-slate-300 mb-2"><span>Tổng số bài:</span><span id="statTotal" class="font-black text-white">0</span></div><div class="flex justify-between items-center text-sm font-medium text-slate-300"><span>Chờ chấm:</span><span id="statPending" class="font-black text-amber-400">0</span></div></div>
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen relative overflow-hidden bg-slate-50">
-        <header class="bg-white h-16 border-b border-slate-200 px-8 flex items-center justify-between shrink-0 shadow-sm z-10">
-            <h2 class="font-black text-slate-800 text-lg">Danh Sách Kịch Bản</h2>
-            <div class="text-sm font-bold text-slate-500 bg-slate-100 px-4 py-2 rounded-lg"><i class="fas fa-shield-alt text-indigo-500 mr-1"></i> Quản trị viên</div>
-        </header>
-
-        <div id="loading" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center hidden">
-            <i class="fas fa-circle-notch fa-spin text-5xl text-indigo-600 mb-4"></i><p class="font-bold text-slate-600 text-lg">Đang kết nối hệ thống...</p>
-        </div>
-
-        <div class="flex-1 overflow-y-auto p-8 custom-scrollbar">
-            <div id="submissionsList" class="max-w-5xl mx-auto space-y-6 pb-20"><div class="text-center py-20 bg-white rounded-3xl border border-slate-200 border-dashed shadow-sm"><i class="fas fa-inbox text-6xl text-slate-200 mb-4"></i><p class="text-slate-500 font-bold">Hãy bấm "Tải dữ liệu bài làm" ở menu bên trái.</p></div></div>
-        </div>
+    <main class="flex-1 flex flex-col h-screen relative bg-slate-50">
+        <header class="bg-white h-16 border-b border-slate-200 px-8 flex items-center shadow-sm z-10"><h2 class="font-black text-slate-800 text-lg">Danh Sách Kịch Bản</h2></header>
+        <div id="loading" class="absolute inset-0 bg-white/80 backdrop-blur z-50 flex flex-col items-center justify-center hidden"><i class="fas fa-circle-notch fa-spin text-5xl text-indigo-600 mb-4"></i><p class="font-bold text-slate-600">Đang tải...</p></div>
+        <div class="flex-1 overflow-y-auto p-8 custom-scrollbar"><div id="submissionsList" class="max-w-5xl mx-auto space-y-6 pb-20"></div></div>
     </main>
-
-    <div id="printArea" class="hidden"></div>
 
     <script>
         let allData = [];
 
         function loadSubmissions() {
-            if(!CONFIG.API_URL || CONFIG.API_URL === "DÁN_LINK_API_CỦA_BẠN_VÀO_ĐÂY") { alert("Vui lòng gắn Link API vào file HTML trước."); return; }
             document.getElementById('loading').classList.remove('hidden'); document.getElementById('btnRefresh').disabled = true;
-
-            fetch(CONFIG.API_URL + '?action=get_all_submissions')
-            .then(r => r.json()).then(res => {
+            fetch(CONFIG.API_URL + '?action=get_all_submissions').then(r => r.json()).then(res => {
                 if(res.status === 'success') { 
                     allData = res.data; applyFilters(); 
-                    let pendingCount = allData.filter(d => { let fbObj = parseFB(d.feedback); return fbObj.status !== 'graded' && fbObj.status !== 'skipped'; }).length;
-                    if(pendingCount > 0) { document.getElementById('toastText').innerText = `Bạn có ${pendingCount} bài tập chờ chấm!`; document.getElementById('toastAlert').classList.remove('translate-x-full'); setTimeout(() => document.getElementById('toastAlert').classList.add('translate-x-full'), 5000); }
-                } else alert("Lỗi tải dữ liệu!");
-            }).catch(err => alert("Lỗi kết nối!")).finally(() => { document.getElementById('loading').classList.add('hidden'); document.getElementById('btnRefresh').disabled = false; });
+                    let pC = allData.filter(d => { let f = parseFB(d.feedback); return f.status !== 'graded' && f.status !== 'skipped'; }).length;
+                    if(pC > 0) { document.getElementById('toastText').innerText = `CÓ ${pC} BÀI CHỜ CHẤM! BẤM VÀO ĐÂY ĐỂ LỌC`; document.getElementById('toastAlert').classList.remove('translate-x-full'); setTimeout(() => document.getElementById('toastAlert').classList.add('translate-x-full'), 8000); }
+                } 
+            }).finally(() => { document.getElementById('loading').classList.add('hidden'); document.getElementById('btnRefresh').disabled = false; });
         }
 
-        function parseFB(str) { if(!str) return { status: 'pending' }; try { return JSON.parse(str); } catch(e) { return { status: 'graded', general: str }; } }
+        function parseFB(str) { try { return JSON.parse(str||'{"status":"pending"}'); } catch(e) { return { status: 'graded', general: str }; } }
+
+        function filterPendingOnly() {
+            document.getElementById('fltStatus').value = 'pending'; document.getElementById('toastAlert').classList.add('translate-x-full'); applyFilters();
+        }
+
+        function formatTime(str) {
+            // Google Sheet trả về dạng "14/07/2026 10:30:00" nhờ dấu nháy đơn
+            return str.replace(/'/g, ''); 
+        }
 
         function applyFilters() {
-            let nameQuery = document.getElementById('fltName').value.toLowerCase(); let deptQuery = document.getElementById('fltDept').value.toLowerCase();
-            let statusQuery = document.getElementById('fltStatus').value; let updateQuery = document.getElementById('fltUpdate').value;
-            let filtered = allData.filter(item => {
-                let fbObj = parseFB(item.feedback); let currentStatus = fbObj.status || 'pending'; let isUpdate = item.exerciseTitle.includes("[BẢN BỔ SUNG]");
-                let matchName = item.studentName.toLowerCase().includes(nameQuery); let matchDept = item.department.toLowerCase().includes(deptQuery);
-                let matchStatus = statusQuery === 'all' ? true : currentStatus === statusQuery; let matchUpdate = updateQuery === 'all' ? true : (updateQuery === 'update' ? isUpdate : true);
-                return matchName && matchDept && matchStatus && matchUpdate;
+            let tQ = document.getElementById('fltText').value.toLowerCase(); let sQ = document.getElementById('fltStatus').value;
+            let f = allData.filter(item => {
+                let fb = parseFB(item.feedback); let cS = fb.status || 'pending';
+                let m1 = (item.studentName+item.department).toLowerCase().includes(tQ);
+                let m2 = sQ === 'all' ? true : cS === sQ;
+                return m1 && m2;
             });
-            renderList(filtered);
+            renderList(f);
         }
 
         function renderList(data) {
             const container = document.getElementById('submissionsList');
-            if(data.length === 0) { container.innerHTML = `<p class="text-center text-slate-500 font-bold py-10">Không tìm thấy bài làm nào.</p>`; document.getElementById('statTotal').innerText = 0; document.getElementById('statPending').innerText = 0; return; }
-
+            if(data.length === 0) { container.innerHTML = `<div class="text-center py-20 bg-white rounded-3xl border border-dashed"><i class="fas fa-inbox text-5xl text-slate-300 mb-4"></i><p class="font-bold text-slate-500">Trống</p></div>`; return; }
             let pendingCount = 0; container.innerHTML = '';
 
             data.forEach((item, index) => {
-                let fbObj = parseFB(item.feedback); let isUpdate = item.exerciseTitle.includes("[BẢN BỔ SUNG]");
+                let fbObj = parseFB(item.feedback); let isUpd = item.exerciseTitle.includes("[BẢN BỔ SUNG");
+                if(fbObj.status !== 'graded' && fbObj.status !== 'skipped') pendingCount++;
                 
-                let gradeBadge = '';
-                if(fbObj.status === 'graded') gradeBadge = `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-black"><i class="fas fa-check"></i> Đã chấm</span>`;
-                else if(fbObj.status === 'skipped') gradeBadge = `<span class="bg-slate-200 text-slate-500 px-3 py-1 rounded-full text-[11px] font-black"><i class="fas fa-minus-circle"></i> Đã bỏ qua</span>`;
-                else { gradeBadge = `<span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[11px] font-black animate-pulse"><i class="fas fa-exclamation-circle"></i> Chờ chấm</span>`; pendingCount++; }
+                let bSt = fbObj.status === 'graded' ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 text-[11px] font-black rounded-full">Đã chấm</span>` : (fbObj.status === 'skipped' ? `<span class="bg-slate-200 text-slate-600 px-3 py-1 text-[11px] font-black rounded-full">Bỏ qua</span>` : `<span class="bg-amber-100 text-amber-700 px-3 py-1 text-[11px] font-black rounded-full animate-pulse">Chờ chấm</span>`);
+                let bUp = isUpd ? `<span class="bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded text-[10px] font-black">BẢN SỬA LẠI</span>` : `<span class="bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-black">BẢN GỐC</span>`;
+                let bPdf = item.pdfStatus ? `<span class="text-[10px] font-black text-blue-500 bg-blue-50 px-2 py-0.5 rounded"><i class="fas fa-print"></i> ĐÃ TẢI PDF</span>` : '';
 
-                let updateBadge = isUpdate ? `<span class="bg-red-50 text-red-600 border border-red-200 px-2 py-0.5 rounded text-[10px] font-black uppercase"><i class="fas fa-history"></i> Bản bổ sung</span>` : `<span class="bg-slate-100 text-slate-500 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-black uppercase">Nộp lần 1</span>`;
-
-                let stepNames = ["BƯỚC 1: TIẾP CẬN", "BƯỚC 2: XÁC THỰC", "BƯỚC 3: KHAI THÁC", "BƯỚC 4: TƯ VẤN", "BƯỚC 5: CHỐT"];
-                let answers = [item.ans1, item.ans2, item.ans3, item.ans4, item.ans5];
-                let stepsHtml = '';
+                let stepsHtml = ''; let steps = ["TIẾP CẬN", "XÁC THỰC", "KHAI THÁC", "TƯ VẤN", "CHỐT"]; let ans = [item.ans1, item.ans2, item.ans3, item.ans4, item.ans5];
                 for(let i=0; i<5; i++) {
-                    let fbVal = fbObj[`step${i}`] || '';
-                    stepsHtml += `
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="p-4 bg-slate-50 border-b border-slate-200"><p class="text-xs font-black text-indigo-500 mb-2">${stepNames[i]}</p><p class="text-sm text-slate-800 font-medium whitespace-pre-wrap">${answers[i] || '(Chưa nhập)'}</p></div>
-                        <div class="bg-amber-50/50 p-3 border-t border-amber-100 flex gap-3 items-start"><i class="fas fa-reply text-amber-400 mt-2 ml-2"></i><textarea id="fb_step_${index}_${i}" rows="2" class="w-full bg-white border border-amber-200 rounded-lg p-2 text-xs font-medium focus:ring-2 outline-none" placeholder="Nhận xét bước này (Nếu có)...">${fbVal}</textarea></div>
-                    </div>`;
+                    stepsHtml += `<div class="bg-white rounded-xl border border-slate-200 overflow-hidden mb-4"><div class="p-3 bg-slate-50 border-b font-black text-xs text-indigo-500">BƯỚC ${i+1}: ${steps[i]}</div><p class="p-4 text-sm font-medium text-slate-800 whitespace-pre-wrap">${ans[i]||'(Trống)'}</p><div class="bg-amber-50 p-3 flex gap-3"><i class="fas fa-reply text-amber-400 mt-2"></i><textarea id="fb_step_${index}_${i}" rows="2" class="w-full bg-white border border-amber-200 rounded-lg p-2 text-xs font-medium outline-none" placeholder="Nhận xét riêng bước này...">${fbObj[`step${i}`]||''}</textarea></div></div>`;
                 }
 
-                let html = `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
-                    <div class="bg-white p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50" onclick="document.getElementById('body_${index}').classList.toggle('hidden')">
+                container.innerHTML += `
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-5 flex justify-between cursor-pointer hover:bg-slate-50 border-b" onclick="document.getElementById('b_${index}').classList.toggle('hidden')">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center text-xl font-black border border-indigo-100"><i class="fas fa-user-edit"></i></div>
-                            <div>
-                                <div class="flex items-center gap-3 mb-1"><h3 class="text-lg font-black text-slate-800">${item.studentName} <span class="text-sm text-slate-500 font-semibold">(${item.department})</span></h3>${updateBadge}</div>
-                                <p class="text-xs font-bold text-slate-500"><i class="far fa-clock"></i> ${item.timestamp} &nbsp;|&nbsp; <span class="text-indigo-600 font-black">${item.exerciseTitle}</span></p>
-                            </div>
+                            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center font-black"><i class="fas fa-user-edit"></i></div>
+                            <div><h3 class="text-lg font-black text-slate-800">${item.studentName} (${item.department}) ${bUp} ${bPdf}</h3><p class="text-xs font-bold text-slate-500 mt-1">${formatTime(item.timestamp)} | <span class="text-indigo-600">${item.exerciseTitle}</span></p></div>
                         </div>
-                        <div class="flex items-center gap-4">${gradeBadge}</div>
+                        <div class="flex items-center">${bSt}</div>
                     </div>
-                    
-                    <div id="body_${index}" class="hidden border-t border-slate-100 bg-slate-100/50 p-6">
-                        <!-- Nút Chức năng mới: Copy Text + Xuất PDF -->
-                        <div class="flex justify-end gap-3 mb-6">
-                            <button onclick="copyToClipboardGV(${index})" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow-sm transition"><i class="fas fa-copy text-indigo-500"></i> Copy Kịch Bản Gửi Quản Lý</button>
-                            <button onclick="exportToLocalPDF(${index})" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 shadow-md transition"><i class="fas fa-print text-emerald-400"></i> Đóng gói Báo Cáo & In PDF</button>
-                        </div>
-
-                        <div class="space-y-4 mb-6">${stepsHtml}</div>
-
-                        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-sm">
-                            <label class="flex items-center gap-2 text-sm font-black text-amber-400 uppercase mb-3"><i class="fas fa-edit"></i> Nhận xét tổng quan cuối bài:</label>
-                            <textarea id="fb_gen_${index}" rows="3" class="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white outline-none text-sm font-medium mb-4">${fbObj.general || ''}</textarea>
-                            
-                            <div class="flex justify-between items-center border-t border-slate-700 pt-4 mt-2">
-                                <button onclick="sendFeedback(${index}, '${item.studentName}', '${item.exerciseTitle}', 'skipped')" class="text-slate-400 hover:text-white font-bold text-sm px-4 py-2 rounded-lg hover:bg-slate-700 transition flex items-center gap-2"><i class="fas fa-eye-slash"></i> Đánh dấu Bỏ Qua</button>
-                                <button id="btnSend_${index}" onclick="sendFeedback(${index}, '${item.studentName}', '${item.exerciseTitle}', 'graded')" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-black px-8 py-3 rounded-xl shadow-lg transition flex items-center gap-2"><i class="fas fa-paper-plane"></i> GỬI ĐIỂM BÀI NÀY</button>
+                    <div id="b_${index}" class="hidden bg-slate-50/50 p-6">
+                        ${stepsHtml}
+                        ${item.links ? `<div class="mb-6"><p class="text-xs font-black text-slate-500 mb-2">LINK ĐÍNH KÈM CỦA HV:</p><a href="${item.links}" target="_blank" class="text-sm font-bold text-blue-600 underline">${item.links}</a></div>` : ''}
+                        <div class="bg-slate-800 p-6 rounded-2xl">
+                            <label class="text-sm font-black text-amber-400 mb-3 block">NHẬN XÉT TỔNG QUAN:</label>
+                            <textarea id="fb_gen_${index}" rows="3" class="w-full p-4 rounded-xl bg-slate-900 border border-slate-600 text-white font-medium outline-none mb-4">${fbObj.general||''}</textarea>
+                            <div class="flex justify-between">
+                                <button onclick="sendFB(${index}, '${item.studentName}', '${item.exerciseTitle}', 'skipped')" class="text-slate-400 hover:text-white text-sm font-bold"><i class="fas fa-eye-slash"></i> Đánh dấu Bỏ Qua</button>
+                                <button onclick="sendFB(${index}, '${item.studentName}', '${item.exerciseTitle}', 'graded')" class="bg-amber-500 hover:bg-amber-400 text-slate-900 px-6 py-2.5 rounded-xl font-black shadow-lg"><i class="fas fa-paper-plane"></i> GỬI ĐIỂM BÀI NÀY</button>
                             </div>
                         </div>
                     </div>
                 </div>`;
-                container.innerHTML += html;
             });
             document.getElementById('statTotal').innerText = data.length; document.getElementById('statPending').innerText = pendingCount;
         }
 
-        // TÍNH NĂNG COPY CHO GIẢNG VIÊN
-        function copyToClipboardGV(index) {
-            let item = allData[index];
-            let copyText = `KỊCH BẢN TƯ VẤN (HV: ${item.studentName})\nTình huống: ${item.exerciseTitle}\n\n`;
-            let steps = ["BƯỚC 1: TIẾP CẬN", "BƯỚC 2: XÁC THỰC", "BƯỚC 3: KHAI THÁC", "BƯỚC 4: TƯ VẤN", "BƯỚC 5: CHỐT"];
-            let ans = [item.ans1, item.ans2, item.ans3, item.ans4, item.ans5];
-            for(let i=0; i<5; i++) { copyText += `${steps[i]}\n${ans[i] || '(Chưa nhập)'}\n\n`; }
-            
-            navigator.clipboard.writeText(copyText).then(() => { alert("Đã copy kịch bản thành công!"); }).catch(err => { alert("Lỗi trình duyệt không hỗ trợ copy."); });
-        }
-
-        function exportToLocalPDF(index) {
-            const item = allData[index]; const printArea = document.getElementById('printArea');
-            let printHtml = `<div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;"><div style="text-align: center; border-bottom: 2px solid #4f46e5; margin-bottom: 30px; padding-bottom: 20px;"><h1 style="font-size: 26px; font-weight: 900; color: #1e3a8a; margin: 0 0 10px 0;">BÁO CÁO LƯU TRỮ KỊCH BẢN</h1><p style="font-size: 14px; color: #64748b; margin: 0;">Xuất từ Portal Giảng Viên KiotViet</p></div><div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 30px;"><table style="width: 100%; font-size: 14px; line-height: 1.8;"><tr><td style="width: 120px; font-weight: bold; color: #64748b;">Học viên:</td><td style="font-weight: bold; color: #0f172a;">${item.studentName}</td></tr><tr><td style="font-weight: bold; color: #64748b;">Phòng ban:</td><td style="font-weight: bold; color: #0f172a;">${item.department}</td></tr><tr><td style="font-weight: bold; color: #64748b;">Tình huống:</td><td style="font-weight: bold; color: #4f46e5;">${item.exerciseTitle}</td></tr><tr><td style="font-weight: bold; color: #64748b;">Thời gian nộp:</td><td>${item.timestamp}</td></tr></table></div><div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 1: TIẾP CẬN</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans1 || '(Trống)'}</div></div><div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 2: XÁC THỰC</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans2 || '(Trống)'}</div></div><div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 3: KHAI THÁC</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans3 || '(Trống)'}</div></div><div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 4: TƯ VẤN</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans4 || '(Trống)'}</div></div><div style="margin-bottom: 20px;"><div style="background: #eef2ff; padding: 8px 15px; font-size: 13px; font-weight: bold; color: #312e81; margin-bottom: 8px; border-left: 4px solid #4f46e5;">BƯỚC 5: CHỐT</div><div style="padding: 0 15px 15px 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${item.ans5 || '(Trống)'}</div></div></div>`;
-            printArea.innerHTML = printHtml; printArea.classList.remove('hidden'); window.print(); printArea.classList.add('hidden');
-        }
-
-        function sendFeedback(index, stName, exTitle, statusVal) {
-            let fbData = { status: statusVal };
-            for(let i=0; i<5; i++) { fbData[`step${i}`] = document.getElementById(`fb_step_${index}_${i}`).value.trim(); }
-            fbData.general = document.getElementById(`fb_gen_${index}`).value.trim();
-
-            const btn = document.getElementById(`btnSend_${index}`); const oldText = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang xử lý...`; btn.disabled = true;
-
-            const payload = { action: "update_feedback", studentName: stName, exerciseTitle: exTitle, feedback: JSON.stringify(fbData) };
-            if(!CONFIG.API_URL) return alert("Vui lòng gắn Link API!");
-
-            fetch(CONFIG.API_URL, { method: 'POST', headers: {'Content-Type': 'text/plain;charset=utf-8'}, body: JSON.stringify(payload) })
-            .then(r => r.json()).then(res => {
-                if(res.status === 'success') { 
-                    alert(statusVal === 'skipped' ? "Đã đánh dấu bỏ qua!" : "Gửi điểm thành công!"); 
-                    let itemIndex = allData.findIndex(d => d.studentName === stName && d.exerciseTitle === exTitle);
-                    if(itemIndex > -1) allData[itemIndex].feedback = JSON.stringify(fbData);
-                    applyFilters();
-                } else alert("Lỗi: " + res.message);
-            }).catch(err => alert("Lỗi kết nối!")).finally(() => { btn.innerHTML = oldText; btn.disabled = false; });
+        function sendFB(idx, name, title, st) {
+            let fd = { status: st, general: document.getElementById(`fb_gen_${idx}`).value };
+            for(let i=0; i<5; i++) fd[`step${i}`] = document.getElementById(`fb_step_${idx}_${i}`).value;
+            fetch(CONFIG.API_URL, { method: 'POST', body: JSON.stringify({ action:"update_feedback", studentName:name, exerciseTitle:title, feedback:JSON.stringify(fd) }) })
+            .then(r=>r.json()).then(res => { if(res.status==='success') { alert("Đã xử lý!"); loadSubmissions(); } });
         }
     </script>
 </body>

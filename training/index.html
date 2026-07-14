@@ -769,10 +769,164 @@ Bạn là một Senior Fullstack/Frontend Developer kiêm QA/Tester (chuyên HTM
                 <!-- BƯỚC 2: CẤU HÌNH BACKEND -->
                 <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm mb-8">
                     <h3 class="text-2xl font-bold text-slate-800 mb-4 flex items-center"><span class="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mr-3 text-sm border border-amber-300">2</span>Cấu hình Backend (Não bộ hệ thống)</h3>
-                    <p class="text-base text-slate-600 mb-4 leading-relaxed">Chúng ta sẽ không cần nhờ AI viết nữa. Chuyên gia KiotViet đã viết sẵn file <code>code.gs</code> ở trạng thái hoàn hảo nhất cho bạn. Bạn chỉ việc lắp ráp.</p>
+                    <p class="text-base text-slate-600 mb-4 leading-relaxed">Đây là đoạn mã Apps Script (code.gs) đã được cấu hình chuẩn xác nhất để xử lý dữ liệu và tự động tạo thư mục lưu ảnh. Học viên hãy copy toàn bộ đoạn mã này.</p>
                     
-                    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-5 text-sm text-amber-800 rounded-r-lg">
-                        <strong>Thao tác:</strong> Tại màn hình Google Sheet -> Bấm <strong class="mx-1">Tiện ích > Apps Script</strong> -> Xóa mã cũ đi -> Dán file <code>code.gs</code> (Nhận được từ Chuyên gia) vào -> Tìm chữ <strong class="bg-amber-200 px-1 mx-1 rounded text-amber-900">YOUR_FOLDER_ID_HERE</strong> và thay bằng ID bạn đã lấy ở Bước 1 -> Bấm <strong>Triển khai (Deploy)</strong> -> Copy Link API URL.
+                    <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-5 text-sm text-amber-800 rounded-r-lg shadow-sm">
+                        <strong>Thao tác:</strong> Tại màn hình Google Sheet -> Bấm <strong class="mx-1">Tiện ích > Apps Script</strong> -> Xóa mã mặc định đi -> Dán đoạn code bên dưới vào -> Tìm chữ <strong class="bg-amber-200 px-1 mx-1 rounded text-amber-900">YOUR_FOLDER_ID_HERE</strong> và thay bằng ID Thư mục bạn lấy ở Bước 1 -> Bấm <strong>Triển khai (Deploy)</strong> -> Copy Link API URL.
+                    </div>
+
+                    <!-- KHUNG CHỨA CODE BACKEND -->
+                    <div class="bg-[#1e1e1e] rounded-xl p-4 md:p-5 relative group border border-slate-700 h-96 overflow-y-auto custom-scrollbar">
+                        <div class="text-[13px] md:text-sm text-amber-300 font-mono whitespace-pre-wrap leading-relaxed">// ==========================================
+// BACKEND: TRAINER OS - KIOTVIET L&D
+// Cấu hình ID Thư mục gốc trên Google Drive
+// ==========================================
+const PARENT_FOLDER_ID = "YOUR_FOLDER_ID_HERE"; // &lt;-- COPY ID THƯ MỤC CỦA BẠN DÁN VÀO ĐÂY
+const SHEET_NAME = "Submissions";
+
+// Khắc phục lỗi CORS cho API
+function doOptions(e) {
+  return ContentService.createTextOutput("")
+    .setMimeType(ContentService.MimeType.TEXT)
+    .setHeader("Access-Control-Allow-Origin", "*")
+    .setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+    .setHeader("Access-Control-Allow-Headers", "Content-Type");
+}
+
+function doPost(e) {
+  try {
+    // Nếu không có data
+    if (!e || !e.postData || !e.postData.contents) {
+      return responseJSON({ success: false, message: "Không có dữ liệu gửi lên" }, 400);
+    }
+
+    // Phân tích Body JSON từ Frontend gửi lên
+    const data = JSON.parse(e.postData.contents);
+    const action = data.action;
+
+    if (action === "submit") {
+      return handleSubmit(data);
+    } 
+    else if (action === "get_list") {
+      return handleGetList();
+    } 
+    else if (action === "grade") {
+      return handleGrade(data);
+    } 
+    else {
+      return responseJSON({ success: false, message: "Action không hợp lệ" }, 400);
+    }
+  } catch (error) {
+    return responseJSON({ success: false, message: "Lỗi Server: " + error.toString() }, 500);
+  }
+}
+
+// ------------------------------------------
+// 1. NGHIỆP VỤ NỘP BÀI (HỌC VIÊN)
+// ------------------------------------------
+function handleSubmit(data) {
+  const studentName = data.student_name || "Khách Vô Danh";
+  const content = data.content || "";
+  const fileBase64 = data.file_base64 || "";
+  const fileName = data.file_name || "Minh_chung.png";
+  const mimeType = data.mime_type || "image/png";
+  
+  let fileUrl = "";
+
+  // Nếu có file đính kèm, thực hiện lưu vào Drive
+  if (fileBase64) {
+    try {
+      const parentFolder = DriveApp.getFolderById(PARENT_FOLDER_ID);
+      
+      // Kiểm tra xem Thư mục tên Học Viên đã có chưa
+      let studentFolder;
+      const folders = parentFolder.getFoldersByName(studentName);
+      if (folders.hasNext()) {
+        studentFolder = folders.next(); // Dùng thư mục cũ
+      } else {
+        studentFolder = parentFolder.createFolder(studentName); // Tạo thư mục mới
+      }
+
+      // Giải mã Base64 thành File
+      const decodedData = Utilities.base64Decode(fileBase64);
+      const blob = Utilities.newBlob(decodedData, mimeType, fileName);
+      
+      // Tạo file trong thư mục của Học viên và set quyền cho phép ai có link cũng xem được
+      const newFile = studentFolder.createFile(blob);
+      newFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      fileUrl = newFile.getUrl();
+
+    } catch (e) {
+      return responseJSON({ success: false, message: "Lỗi lưu file Drive: " + e.toString() }, 500);
+    }
+  }
+
+  // Ghi dữ liệu vào Google Sheet
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  if (!sheet) return responseJSON({ success: false, message: "Không tìm thấy tab Submissions trong Sheet" }, 500);
+
+  // Cấu trúc mảng [Thời gian, Tên, Nội dung, Link Ảnh, Trạng thái]
+  const rowData = [
+    new Date(), 
+    studentName, 
+    content, 
+    fileUrl, 
+    "Chờ chấm"
+  ];
+  
+  sheet.appendRow(rowData);
+
+  return responseJSON({ success: true, message: "Nộp bài thành công!" }, 200);
+}
+
+// ------------------------------------------
+// 2. NGHIỆP VỤ LẤY DANH SÁCH (GIẢNG VIÊN)
+// ------------------------------------------
+function handleGetList() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  if (!sheet) return responseJSON({ success: false, message: "Chưa cấu hình tab Submissions" }, 500);
+
+  const data = sheet.getDataRange().getValues();
+  const results = [];
+
+  // Bỏ qua dòng Header (dòng 1), lặp từ dòng 2 trở đi
+  for (let i = 1; i &lt; data.length; i++) {
+    results.push({
+      row_index: i + 1, // Vị trí dòng thật trong Sheet
+      timestamp: data[i][0],
+      student_name: data[i][1],
+      content: data[i][2],
+      file_url: data[i][3],
+      status: data[i][4]
+    });
+  }
+
+  // Đảo ngược mảng để bài nộp mới nhất lên đầu
+  results.reverse();
+
+  return responseJSON({ success: true, data: results }, 200);
+}
+
+// ------------------------------------------
+// 3. NGHIỆP VỤ DUYỆT BÀI (GIẢNG VIÊN)
+// ------------------------------------------
+function handleGrade(data) {
+  const rowIndex = data.row_index;
+  if (!rowIndex) return responseJSON({ success: false, message: "Thiếu row_index" }, 400);
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  
+  // Cột E (Cột số 5) là trạng thái
+  sheet.getRange(rowIndex, 5).setValue("Đã chấm");
+
+  return responseJSON({ success: true, message: "Chấm bài thành công!" }, 200);
+}
+
+// Hàm hỗ trợ xuất JSON có chứa Header CORS
+function responseJSON(obj, statusCode) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
                     </div>
                 </div>
 

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Quản lý Tái Ký</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 flex flex-col h-screen font-sans text-gray-800 text-sm">
+
+    <!-- Header -->
+    <header class="bg-white border-b px-6 py-4 flex justify-between items-center shadow-sm shrink-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-gray-500 hover:text-emerald-600 transition-colors" title="Về trang chủ">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </a>
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">Tracking Nhân Sự Mới</h1>
+                <p class="text-xs text-gray-500 mt-1">Quản lý xem kết quả đào tạo & nhận xét từ L&D</p>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="loadData()" class="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-50 font-medium">
+                <i class="fas fa-sync-alt mr-2"></i>Làm mới
+            </button>
+            <button class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 font-medium shadow">
+                <i class="fas fa-file-excel mr-2"></i>Xuất Excel
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-6">
+        <div class="max-w-7xl mx-auto space-y-6">
+            
+            <!-- Thống kê nhanh -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs font-bold uppercase">Tổng nhân sự review</p>
+                        <p class="text-2xl font-bold text-gray-800" id="stat_total">0</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full text-blue-600"><i class="fas fa-users text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs font-bold uppercase">Đạt ứng dụng / Tốt</p>
+                        <p class="text-2xl font-bold text-emerald-600" id="stat_pass">0</p>
+                    </div>
+                    <div class="bg-emerald-100 p-3 rounded-full text-emerald-600"><i class="fas fa-check-circle text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs font-bold uppercase">Cần Coaching thêm</p>
+                        <p class="text-2xl font-bold text-yellow-600" id="stat_coach">0</p>
+                    </div>
+                    <div class="bg-yellow-100 p-3 rounded-full text-yellow-600"><i class="fas fa-exclamation-circle text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs font-bold uppercase">Chưa đạt</p>
+                        <p class="text-2xl font-bold text-red-600" id="stat_fail">0</p>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-full text-red-600"><i class="fas fa-times-circle text-xl"></i></div>
+                </div>
+            </div>
+
+            <!-- Bảng dữ liệu -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                    <h2 class="font-bold text-gray-700"><i class="fas fa-list mr-2"></i>Danh sách Học viên</h2>
+                    <input type="text" id="searchInput" placeholder="Tìm tên nhân sự..." class="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-64" onkeyup="filterTable()">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="dataTable">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
+                                <th class="p-3 border-b font-semibold">Tên Học Viên</th>
+                                <th class="p-3 border-b font-semibold">Ngày Review</th>
+                                <th class="p-3 border-b font-semibold">Điểm Tự Tin</th>
+                                <th class="p-3 border-b font-semibold">Điểm Test Call</th>
+                                <th class="p-3 border-b font-semibold">Xếp Loại L&D</th>
+                                <th class="p-3 border-b font-semibold text-center">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-gray-200">
+                            <!-- JS Render Here -->
+                        </tbody>
+                    </table>
+                    <div id="emptyState" class="hidden p-8 text-center text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+                        <p>Chưa có dữ liệu đánh giá nào từ L&D.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Chi tiết -->
+    <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
+                <h3 class="font-bold text-lg text-gray-800" id="modalTitle">Chi tiết Review: Nguyễn Văn A</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                <!-- Data Rendered by JS -->
+                <div class="bg-blue-50 p-4 rounded border border-blue-100">
+                    <h4 class="font-bold text-blue-800 text-sm mb-2"><i class="fas fa-star mr-1"></i> Điểm mạnh & Tâm lý</h4>
+                    <p id="m_strengths" class="text-gray-700"></p>
+                </div>
+                <div class="bg-red-50 p-4 rounded border border-red-100">
+                    <h4 class="font-bold text-red-800 text-sm mb-2"><i class="fas fa-exclamation-triangle mr-1"></i> Điểm yếu & Không tự tin</h4>
+                    <p id="m_weaknesses" class="text-gray-700"></p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded border border-emerald-100">
+                    <h4 class="font-bold text-emerald-800 text-sm mb-2"><i class="fas fa-lightbulb mr-1"></i> Khuyến nghị từ L&D cho Quản lý</h4>
+                    <p id="m_recommendation" class="text-gray-700 font-medium"></p>
+                </div>
+            </div>
+            <div class="p-4 border-t bg-gray-50 text-right rounded-b-xl">
+                <button onclick="closeModal()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 font-medium">Đóng lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentData = [];
+
+        function getStatusBadge(status) {
+            if(status === 'Tốt') return `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">⭐ Tốt</span>`;
+            if(status === 'Đạt ứng dụng') return `<span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-bold">✅ Đạt ứng dụng</span>`;
+            if(status === 'Đạt thao tác') return `<span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs font-bold">⚠️ Đạt thao tác</span>`;
+            return `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold">❌ Chưa đạt</span>`;
+        }
+
+        function loadData() {
+            const dataStr = localStorage.getItem('trainer_os_reviews');
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+            
+            if(!dataStr || JSON.parse(dataStr).length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            currentData = JSON.parse(dataStr);
+            emptyState.classList.add('hidden');
+            renderTable(currentData);
+            updateStats(currentData);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 border-b font-medium text-gray-800">${row.trainee_name || '-'}</td>
+                    <td class="p-3 border-b text-gray-600">${row.review_date || '-'}</td>
+                    <td class="p-3 border-b text-gray-600">${row.self_confidence_score || '-'}</td>
+                    <td class="p-3 border-b text-gray-600">${row.test_call_score || '-'}</td>
+                    <td class="p-3 border-b">${getStatusBadge(row.final_status)}</td>
+                    <td class="p-3 border-b text-center">
+                        <button onclick="viewDetail('${row.id}')" class="text-emerald-600 hover:text-emerald-900 bg-emerald-50 px-3 py-1 rounded text-xs font-medium border border-emerald-200">
+                            Xem L&D Note
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStats(data) {
+            document.getElementById('stat_total').innerText = data.length;
+            document.getElementById('stat_pass').innerText = data.filter(d => d.final_status === 'Tốt' || d.final_status === 'Đạt ứng dụng').length;
+            document.getElementById('stat_coach').innerText = data.filter(d => d.final_status === 'Đạt thao tác').length;
+            document.getElementById('stat_fail').innerText = data.filter(d => d.final_status === 'Chưa đạt').length;
+        }
+
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = currentData.filter(d => (d.trainee_name || '').toLowerCase().includes(query));
+            renderTable(filtered);
+        }
+
+        function viewDetail(id) {
+            const record = currentData.find(d => d.id === id);
+            if(!record) return;
+
+            document.getElementById('modalTitle').innerText = `Chi tiết Review: ${record.trainee_name}`;
+            document.getElementById('m_strengths').innerText = record.final_strengths || 'Không có ghi chú';
+            document.getElementById('m_weaknesses').innerText = record.final_weaknesses || 'Không có ghi chú';
+            document.getElementById('m_recommendation').innerText = record.final_recommendation || 'Không có ghi chú';
+            
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>

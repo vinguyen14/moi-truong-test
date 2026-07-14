@@ -3,190 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracking Quản lý - Trainer OS</title>
+    <title>Tracking Quản lý | Trainer OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Thư viện xuất PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- SheetJS để xuất Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-        }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.05);
-        }
-        /* Style riêng cho trang in PDF */
-        #printableReport { background: white; color: black; }
-        .pdf-section { page-break-inside: avoid; margin-bottom: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f4f6fa; }
+        .kv-card { background: white; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.03); border: 1px solid #edf2f7; }
+        .kv-input { border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.5rem 0.75rem; font-size: 0.875rem; outline: none; }
+        .kv-input:focus { border-color: #007aff; box-shadow: 0 0 0 3px rgba(0,122,255,0.1); }
     </style>
 </head>
-<body class="flex flex-col h-screen font-sans text-gray-800">
+<body class="flex flex-col h-screen text-gray-800">
 
-    <header class="glass-panel px-8 py-5 flex justify-between items-center shrink-0 sticky top-0 z-10">
+    <header class="bg-white border-b px-6 py-4 flex justify-between items-center z-10 shrink-0 sticky top-0 shadow-sm">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="bg-indigo-100/50 p-2 rounded-full hover:bg-indigo-100 transition-colors" title="Về trang chủ">
-                <i class="fas fa-arrow-left text-xl text-indigo-600"></i>
-            </a>
+            <a href="index.html" class="text-gray-400 hover:text-teal-600 transition-colors"><i class="fas fa-arrow-left text-xl"></i></a>
             <div>
-                <h1 class="text-2xl font-extrabold text-indigo-900">Manager Dashboard</h1>
-                <p class="text-sm font-medium text-gray-600 mt-1">Theo dõi tiến độ & Báo cáo kết quả đào tạo L&D</p>
+                <h1 class="text-xl font-bold text-gray-900">Manager Tracking</h1>
+                <p class="text-xs text-gray-500 mt-1">Báo cáo đánh giá Tái Ký</p>
             </div>
         </div>
-        <button onclick="loadData()" class="bg-white border border-gray-300 font-bold px-5 py-2.5 rounded-xl hover:bg-gray-50 shadow-sm">
-            <i class="fas fa-sync-alt mr-2 text-indigo-600"></i>Làm mới Data
-        </button>
+        <div class="flex gap-2">
+            <button onclick="exportToExcel()" class="bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm flex items-center">
+                <i class="fas fa-file-excel mr-2"></i> Xuất Excel
+            </button>
+        </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto p-6 md:p-10">
-        <div class="max-w-7xl mx-auto space-y-8">
+    <main class="flex-1 overflow-y-auto p-4 md:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
             
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="glass-panel p-6 rounded-2xl flex items-center justify-between">
-                    <div><p class="text-gray-500 text-sm font-bold uppercase">Tổng nhân sự</p><p class="text-3xl font-extrabold text-gray-800 mt-1" id="stat_total">0</p></div>
-                    <div class="bg-blue-100/80 p-4 rounded-full text-blue-600"><i class="fas fa-users text-2xl"></i></div>
+            <!-- Filters -->
+            <div class="kv-card p-4 flex flex-wrap gap-4 items-end bg-white">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Tên nhân viên</label>
+                    <input type="text" id="f_name" class="kv-input w-48" placeholder="Tìm tên..." oninput="filterTable()">
                 </div>
-                <div class="glass-panel p-6 rounded-2xl flex items-center justify-between">
-                    <div><p class="text-emerald-600 text-sm font-bold uppercase">Pass (Tốt/Khá)</p><p class="text-3xl font-extrabold text-emerald-600 mt-1" id="stat_pass">0</p></div>
-                    <div class="bg-emerald-100/80 p-4 rounded-full text-emerald-600"><i class="fas fa-check-circle text-2xl"></i></div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Phòng ban</label>
+                    <select id="f_dept" class="kv-input w-40" onchange="filterTable()">
+                        <option value="">Tất cả</option>
+                        <option value="Hà Nội 1">Hà Nội 1</option>
+                        <option value="Hà Nội 2">Hà Nội 2</option>
+                        <option value="HCM 1">HCM 1</option>
+                        <option value="HCM 2">HCM 2</option>
+                    </select>
                 </div>
-                <div class="glass-panel p-6 rounded-2xl flex items-center justify-between">
-                    <div><p class="text-blue-600 text-sm font-bold uppercase">Đang Đào Tạo</p><p class="text-3xl font-extrabold text-blue-600 mt-1" id="stat_progress">0</p></div>
-                    <div class="bg-blue-100/80 p-4 rounded-full text-blue-500"><i class="fas fa-spinner text-2xl"></i></div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Khóa học</label>
+                    <select id="f_course" class="kv-input w-40" onchange="filterTable()">
+                        <option value="">Tất cả</option>
+                        <option value="Sản Phẩm">Tuần 1 - Sản Phẩm</option>
+                    </select>
                 </div>
-                <div class="glass-panel p-6 rounded-2xl flex items-center justify-between">
-                    <div><p class="text-red-600 text-sm font-bold uppercase">Chưa đạt</p><p class="text-3xl font-extrabold text-red-600 mt-1" id="stat_fail">0</p></div>
-                    <div class="bg-red-100/80 p-4 rounded-full text-red-600"><i class="fas fa-times-circle text-2xl"></i></div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Trạng thái</label>
+                    <select id="f_status" class="kv-input w-40" onchange="filterTable()">
+                        <option value="">Tất cả</option>
+                        <option value="Đang học">Đang học</option>
+                        <option value="Hoàn thành">Hoàn thành</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="glass-panel rounded-2xl overflow-hidden">
-                <div class="p-6 border-b border-gray-200/50 flex justify-between items-center bg-white/40">
-                    <h2 class="font-bold text-lg text-gray-800"><i class="fas fa-list-alt mr-2 text-indigo-600"></i>Danh sách Học viên</h2>
-                    <input type="text" id="searchInput" placeholder="Tìm tên nhân sự..." class="border border-gray-300 rounded-lg px-4 py-2 text-base outline-none focus:ring-2 focus:ring-indigo-500 w-72 bg-white/80" onkeyup="filterTable()">
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse" id="dataTable">
-                        <thead>
-                            <tr class="bg-gray-100/50 text-gray-500 uppercase text-xs font-extrabold tracking-wider">
-                                <th class="p-4 border-b">Tên Học Viên</th>
-                                <th class="p-4 border-b">Ngày Bắt Đầu</th>
-                                <th class="p-4 border-b">Cập Nhật Gần Nhất</th>
-                                <th class="p-4 border-b">Trạng Thái L&D</th>
-                                <th class="p-4 border-b">Xếp Loại Cuối</th>
-                                <th class="p-4 border-b text-center">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody" class="divide-y divide-gray-200/50 bg-white/30 text-base font-medium text-gray-700">
-                        </tbody>
-                    </table>
-                </div>
+            <div class="kv-card overflow-hidden">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-500 font-semibold border-b">
+                            <th class="p-4">Họ & Tên</th>
+                            <th class="p-4">Phòng ban</th>
+                            <th class="p-4">Khóa học</th>
+                            <th class="p-4">Trạng thái</th>
+                            <th class="p-4">Xếp loại</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-gray-100">
+                        <!-- JS Fill -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </main>
 
-    <!-- Modal Chi Tiết Full Toàn Màn Hình -->
-    <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center z-50 p-4 md:p-10">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-full max-h-full flex flex-col overflow-hidden">
-            <!-- Modal Header -->
-            <div class="p-6 border-b flex justify-between items-center bg-gray-50">
-                <h3 class="font-extrabold text-2xl text-indigo-900"><i class="fas fa-file-signature mr-2"></i> Phiếu Kết Quả Review Tuần 1</h3>
-                <div class="flex gap-3">
-                    <button onclick="exportPDF()" class="bg-rose-600 text-white px-5 py-2.5 rounded-xl hover:bg-rose-700 font-bold shadow-md transition-colors">
-                        <i class="fas fa-file-pdf mr-2"></i> Tải PDF Lưu Trữ
-                    </button>
-                    <button onclick="closeModal()" class="bg-gray-200 text-gray-800 w-10 h-10 rounded-full hover:bg-gray-300 flex items-center justify-center font-bold text-xl">&times;</button>
-                </div>
-            </div>
-            
-            <!-- Modal Body (The printable area) -->
-            <div class="p-8 overflow-y-auto flex-1 bg-white" id="printableReport">
-                <div class="text-center mb-10 pb-6 border-b-2 border-gray-100">
-                    <h1 class="text-3xl font-extrabold text-gray-900 mb-2">BÁO CÁO ĐÁNH GIÁ NHÂN SỰ MỚI (TÁI KÝ)</h1>
-                    <h2 class="text-xl text-gray-600 font-bold" id="r_trainee_name">Họ Tên: [Name]</h2>
-                    <p class="text-gray-500 mt-2">Bắt đầu ngày: <span id="r_date"></span> | Trạng thái: <span id="r_status" class="font-bold"></span></p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 pdf-section">
-                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-                        <h3 class="font-extrabold text-indigo-900 mb-4 text-lg border-b border-indigo-200 pb-2">I. TỔNG KẾT TỪ L&D</h3>
-                        <p class="mb-3"><strong>Điểm mạnh:</strong> <span id="r_strong" class="text-gray-700"></span></p>
-                        <p class="mb-3"><strong>Điểm yếu:</strong> <span id="r_weak" class="text-gray-700"></span></p>
-                        <p class="mb-3"><strong>Khuyến nghị Manager:</strong> <span id="r_recom" class="text-gray-700 font-bold text-emerald-700"></span></p>
-                        <p class="mt-4 text-lg"><strong>XẾP LOẠI CUỐI: <span id="r_final" class="text-rose-600 uppercase font-black"></span></strong></p>
-                    </div>
-                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
-                        <h3 class="font-extrabold text-gray-800 mb-4 text-lg border-b border-gray-300 pb-2">II. SELF-CHECK & KỸ NĂNG</h3>
-                        <p class="mb-2 text-sm text-gray-600">Mức độ tự tin: <strong class="text-black text-base" id="r_conf"></strong></p>
-                        <p class="mb-2 text-sm text-gray-600">Hiểu giá trị Tái ký: <strong class="text-black text-base" id="r_reten"></strong></p>
-                        <p class="mt-4 border-t pt-3 text-sm text-gray-600">Đánh giá Test Call: <strong class="text-black text-base" id="r_testcall"></strong></p>
-                        <p class="text-gray-700 mt-1 italic text-sm" id="r_testcall_note"></p>
-                    </div>
-                </div>
-
-                <h3 class="font-extrabold text-2xl text-gray-800 mb-6 border-b-2 border-gray-800 pb-2 pdf-section">III. CHI TIẾT REVIEW TỪNG BUỔI (SẢN PHẨM)</h3>
-                
-                <div class="space-y-6">
-                    <!-- Day 1 -->
-                    <div class="border border-gray-200 rounded-lg p-5 pdf-section break-inside-avoid">
-                        <h4 class="font-bold text-xl text-blue-800 mb-3 bg-blue-50 py-2 px-3 rounded">Ngày 1: Hàng hóa & Đầu vào (Retail)</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="font-bold text-gray-700">Sáng (Hàng hóa) - Điểm: <span class="text-rose-600" id="r_d1m_score"></span></p>
-                                <p class="text-gray-600 text-sm mt-1" id="r_d1m_note"></p>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-700">Chiều (Kiểm kho/Giá) - Điểm: <span class="text-rose-600" id="r_d1a_score"></span></p>
-                                <p class="text-gray-600 text-sm mt-1" id="r_d1a_note"></p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Day 2 -->
-                    <div class="border border-gray-200 rounded-lg p-5 pdf-section break-inside-avoid">
-                        <h4 class="font-bold text-xl text-teal-800 mb-3 bg-teal-50 py-2 px-3 rounded">Ngày 2: Bán hàng & Quản trị (Retail)</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <p class="font-bold text-gray-700">Sáng (Bán/Khách) - Điểm: <span class="text-rose-600" id="r_d2m_score"></span></p>
-                                <p class="text-gray-600 text-sm mt-1" id="r_d2m_note"></p>
-                            </div>
-                            <div>
-                                <p class="font-bold text-gray-700">Chiều (Báo cáo/TMĐT) - Điểm: <span class="text-rose-600" id="r_d2a_score"></span></p>
-                                <p class="text-gray-600 text-sm mt-1" id="r_d2a_note"></p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Day 3 -->
-                    <div class="border border-gray-200 rounded-lg p-5 pdf-section break-inside-avoid">
-                        <h4 class="font-bold text-xl text-purple-800 mb-3 bg-purple-50 py-2 px-3 rounded">Ngày 3: Tài chính Kế toán 01</h4>
-                        <div>
-                            <p class="font-bold text-gray-700">Nghiệp vụ Kế toán - Điểm: <span class="text-rose-600" id="r_d3_score"></span></p>
-                            <p class="text-gray-600 text-sm mt-1" id="r_d3_note"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         let currentData = [];
 
-        function getStatusBadge(status) {
-            if(status === 'Đang học') return `<span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">⏳ Đang đánh giá</span>`;
-            return `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold shadow-sm">✅ Hoàn thành</span>`;
-        }
-
         function loadData() {
             const dataStr = localStorage.getItem('trainer_os_reviews');
-            if(!dataStr) return;
-            currentData = JSON.parse(dataStr);
-            renderTable(currentData);
-            updateStats(currentData);
+            if(dataStr) {
+                currentData = JSON.parse(dataStr);
+                renderTable(currentData);
+            }
+        }
+
+        function filterTable() {
+            const name = document.getElementById('f_name').value.toLowerCase();
+            const dept = document.getElementById('f_dept').value;
+            const course = document.getElementById('f_course').value;
+            const status = document.getElementById('f_status').value;
+
+            const filtered = currentData.filter(d => {
+                const matchName = (d.trainee_name || '').toLowerCase().includes(name);
+                const matchDept = dept === "" || d.department === dept;
+                const matchCourse = course === "" || (d.course_type && d.course_type.includes(course));
+                const matchStatus = status === "" || d.status === status;
+                return matchName && matchDept && matchCourse && matchStatus;
+            });
+            renderTable(filtered);
         }
 
         function renderTable(data) {
@@ -194,81 +120,44 @@
             tbody.innerHTML = '';
             
             data.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-white/60 transition-colors cursor-pointer";
-                tr.onclick = () => viewDetail(row.id);
-                tr.innerHTML = `
-                    <td class="p-4 border-b font-bold text-gray-800">${row.trainee_name || 'N/A'}</td>
-                    <td class="p-4 border-b text-gray-600">${row.review_date || '-'}</td>
-                    <td class="p-4 border-b text-gray-500 text-sm italic">${row.last_updated || '-'}</td>
-                    <td class="p-4 border-b">${getStatusBadge(row.status)}</td>
-                    <td class="p-4 border-b font-bold text-indigo-700">${row.final_status || '<span class="text-gray-400 font-normal">Chưa có kết quả</span>'}</td>
-                    <td class="p-4 border-b text-center">
-                        <button class="bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold shadow hover:bg-indigo-700">
-                            View Data
-                        </button>
-                    </td>
+                let statusHtml = row.status === 'Đang học' 
+                    ? `<span class="bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded text-xs">Đang Đánh Giá</span>`
+                    : `<span class="bg-green-50 text-green-600 border border-green-200 px-2 py-1 rounded text-xs">Hoàn thành</span>`;
+                
+                let resultHtml = row.final_status ? `<span class="font-semibold text-gray-800">${row.final_status}</span>` : `<span class="text-gray-400">-</span>`;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="p-4 font-semibold text-blue-700">${row.trainee_name || 'N/A'}</td>
+                        <td class="p-4 text-gray-600">${row.department || '-'}</td>
+                        <td class="p-4 text-gray-600">${row.course_type || 'Tuần 1'}</td>
+                        <td class="p-4">${statusHtml}</td>
+                        <td class="p-4">${resultHtml}</td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
             });
         }
 
-        function updateStats(data) {
-            document.getElementById('stat_total').innerText = data.length;
-            document.getElementById('stat_progress').innerText = data.filter(d => d.status === 'Đang học').length;
-            document.getElementById('stat_pass').innerText = data.filter(d => d.final_status === 'Tốt' || d.final_status === 'Đạt ứng dụng').length;
-            document.getElementById('stat_fail').innerText = data.filter(d => d.final_status === 'Chưa đạt').length;
-        }
-
-        function filterTable() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            renderTable(currentData.filter(d => (d.trainee_name||'').toLowerCase().includes(q)));
-        }
-
-        function viewDetail(id) {
-            const d = currentData.find(x => x.id === id);
-            if(!d) return;
-
-            // Fill Data to HTML Report
-            const map = {
-                'r_trainee_name': d.trainee_name, 'r_date': d.review_date, 'r_status': d.status,
-                'r_strong': d.final_strengths, 'r_weak': d.final_weaknesses, 'r_recom': d.final_recommendation,
-                'r_final': d.final_status, 'r_conf': d.self_confidence_score, 'r_reten': d.self_retention_value,
-                'r_testcall': d.test_call_score, 'r_testcall_note': d.test_call_note,
-                'r_d1m_score': d.day1_morning_score, 'r_d1m_note': d.day1_morning_note,
-                'r_d1a_score': d.day1_afternoon_score, 'r_d1a_note': d.day1_afternoon_note,
-                'r_d2m_score': d.day2_morning_score, 'r_d2m_note': d.day2_morning_note,
-                'r_d2a_score': d.day2_afternoon_score, 'r_d2a_note': d.day2_afternoon_note,
-                'r_d3_score': d.day3_accounting_score, 'r_d3_note': d.day3_accounting_note
-            };
-
-            for (const [key, val] of Object.entries(map)) {
-                const el = document.getElementById(key);
-                if(el) el.innerText = val || '(Chưa cập nhật)';
-            }
+        function exportToExcel() {
+            if(currentData.length === 0) { alert("Không có dữ liệu để xuất!"); return; }
             
-            document.getElementById('detailModal').classList.remove('hidden');
-        }
+            // Format data for Excel
+            const excelData = currentData.map(d => ({
+                "Họ Tên": d.trainee_name,
+                "Phòng Ban": d.department,
+                "Khóa Đánh Giá": d.course_type,
+                "Ngày Bắt Đầu": d.review_date,
+                "Trạng Thái": d.status,
+                "Điểm Tự Tin": d.self_confidence_score,
+                "Điểm Mạnh": d.final_strengths,
+                "Điểm Yếu": d.final_weaknesses,
+                "Xếp Loại L&D": d.final_status
+            }));
 
-        function closeModal() { document.getElementById('detailModal').classList.add('hidden'); }
-
-        function exportPDF() {
-            const element = document.getElementById('printableReport');
-            const opt = {
-                margin:       10,
-                filename:     `Review_${document.getElementById('r_trainee_name').innerText}_Week1.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            // Thêm hiệu ứng loading
-            const btn = event.currentTarget;
-            const originText = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Đang tạo PDF...';
-            
-            html2pdf().set(opt).from(element).save().then(() => {
-                btn.innerHTML = originText;
-            });
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "BaoCao_LND");
+            XLSX.writeFile(wb, "Bao_Cao_Nhan_Su_Tai_Ky.xlsx");
         }
 
         document.addEventListener('DOMContentLoaded', loadData);

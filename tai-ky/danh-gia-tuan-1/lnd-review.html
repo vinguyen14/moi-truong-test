@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đánh giá nhân sự mới Tái Ký - Trainer OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f3f4f6; }
+        .saas-card { background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); padding: 1.5rem; }
+        .btn-primary { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: background-color 0.2s; cursor: pointer; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-secondary { background-color: #e5e7eb; color: #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: background-color 0.2s; cursor: pointer; }
+        .btn-secondary:hover { background-color: #d1d5db; }
+        
+        .tab-active { border-bottom-width: 2px; border-color: #2563eb; color: #2563eb; font-weight: 600; }
+        .tab-inactive { border-bottom-width: 2px; border-color: transparent; color: #6b7280; font-weight: 500; cursor: pointer; }
+        .tab-inactive:hover { color: #374151; border-color: #d1d5db; }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar { width: 6px; }
+        textarea::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-gray-800 text-sm">
+
+    <!-- Giả lập Sidebar (Chỉ để xem form, khi gắn vào dự án chính thức có thể bỏ phần này nếu đã có layout chung) -->
+    <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex">
+        <div class="p-4 text-xl font-bold border-b border-slate-800">Trainer OS</div>
+        <nav class="p-4 flex-1 space-y-2">
+            <a href="index.html" class="block py-2 px-3 rounded hover:bg-slate-800 text-gray-300">Trang chủ</a>
+            <a href="lnd-review.html" class="block py-2 px-3 rounded bg-blue-600 text-white font-medium">Đánh giá Tái ký <i class="fas fa-star text-xs ml-1"></i></a>
+            <a href="manager-tracking.html" class="block py-2 px-3 rounded hover:bg-slate-800 text-gray-300">Báo cáo Quản lý</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white border-b px-6 py-4 flex justify-between items-center z-10 shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold text-gray-800">Review 1:1 Nhân Sự Mới (Khối Tái Ký)</h1>
+                <p class="text-xs text-gray-500 mt-1">L&D phỏng vấn và đánh giá năng lực hiểu bản chất tính năng - ứng dụng tư vấn</p>
+            </div>
+            <button onclick="submitReviewForm()" class="btn-primary" id="btnSubmitTop">
+                <i class="fas fa-save mr-2"></i>Lưu Đánh Giá
+            </button>
+        </header>
+
+        <!-- Main Form Area -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <form id="reviewForm" class="saas-card max-w-5xl mx-auto mb-10">
+                
+                <!-- Tab Navigation -->
+                <div class="flex border-b mb-6 overflow-x-auto">
+                    <button type="button" class="tab-btn tab-active py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab1">
+                        1. Thông tin & Self-Check
+                    </button>
+                    <button type="button" class="tab-btn tab-inactive py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab2">
+                        2. Review Ngày 1 (Nhập/Hàng hóa)
+                    </button>
+                    <button type="button" class="tab-btn tab-inactive py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab3">
+                        3. Review Ngày 2 (Bán/Mở rộng)
+                    </button>
+                    <button type="button" class="tab-btn tab-inactive py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab4">
+                        4. Test Call & Kết Luận
+                    </button>
+                </div>
+
+                <!-- ================= TAB 1: THÔNG TIN & SELF-CHECK ================= -->
+                <div id="tab1" class="tab-content active space-y-6">
+                    <!-- I. Thông tin chung -->
+                    <div>
+                        <h2 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2">I. Thông tin chung</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Họ tên học viên <span class="text-red-500">*</span></label>
+                                <input type="text" name="trainee_name" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">Ngày review / Buổi review <span class="text-red-500">*</span></label>
+                                <input type="date" name="review_date" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-700 font-medium mb-1">Bài thực hành đã hoàn thành (Đã đủ / Thiếu / Cần làm lại)</label>
+                                <input type="text" name="practice_status" placeholder="Ví dụ: Đã đủ bài 1, thiếu bài 2..." class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- II. Self Check -->
+                    <div>
+                        <h2 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2 mt-8">II. Self-check (5 Phút)</h2>
+                        <div class="space-y-4 bg-blue-50/50 p-4 rounded-lg border border-blue-100">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">1. Tính năng nào em thấy dễ hiểu nhất? Vì sao?</label>
+                                <textarea name="self_easy_feature" rows="2" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">2. Tính năng nào em thấy khó giải thích cho khách nhất?</label>
+                                <textarea name="self_hard_feature" rows="2" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">3. Gặp khách đã dùng KiotViet, em nghĩ nội dung đã học giúp tư vấn tái ký ở điểm nào?</label>
+                                <textarea name="self_retention_value" rows="2" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-1">4. Thang điểm tự tin khi giới thiệu tính năng (1-10)</label>
+                                <select name="self_confidence_score" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none md:w-1/3">
+                                    <option value="">Chọn mức độ...</option>
+                                    <option value="1-3">1-3 Điểm (Rất yếu)</option>
+                                    <option value="4-6">4-6 Điểm (Trung bình)</option>
+                                    <option value="7-8">7-8 Điểm (Khá tự tin)</option>
+                                    <option value="9-10">9-10 Điểm (Rất tự tin)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end pt-4">
+                        <button type="button" class="btn-primary" onclick="switchTab('tab2')">Tiếp tục: Review Ngày 1 <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 2: NGÀY 1 ================= -->
+                <div id="tab2" class="tab-content space-y-6">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                        <p class="font-bold text-yellow-800 text-sm"><i class="fas fa-lightbulb mr-1"></i> Mục tiêu L&D cần Test:</p>
+                        <p class="text-xs text-yellow-700 mt-1">Sale không chỉ nhớ thao tác, mà phải trình bày theo cấu trúc: <strong>Vấn đề Khách -> Giải pháp -> Lợi ích mang lại.</strong></p>
+                    </div>
+
+                    <!-- Sáng Ngày 1 -->
+                    <div>
+                        <h2 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2">Sáng Ngày 1: Các loại hàng hóa</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Cột tham khảo (Read-only) -->
+                            <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-96 overflow-y-auto">
+                                <h3 class="font-bold mb-2">Gợi ý Tình huống (Dành cho L&D)</h3>
+                                <ul class="space-y-3">
+                                    <li><strong>Mỹ phẩm (Nhiều date):</strong> Gợi ý Lô-HSD. Lợi ích: ưu tiên bán trước, giảm tồn cận date.</li>
+                                    <li><strong>Điện thoại:</strong> Serial/IMEI. Lợi ích: bán đúng mã, tra lịch sử bảo hành nhanh.</li>
+                                    <li><strong>Giỏ quà Tết:</strong> Combo. Lợi ích: bán nhanh 1 bộ, tự trừ tồn thành phần.</li>
+                                    <li><strong>Bàn ghế lắp ráp:</strong> Hàng sản xuất. Lợi ích: quản lý định mức, ghi nhận thành phẩm/hao hụt.</li>
+                                    <li><strong>Câu hỏi đào sâu:</strong> "Nếu khách nói dùng Excel được, em trả lời sao?"</li>
+                                </ul>
+                            </div>
+                            <!-- Cột nhập liệu -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Sáng Ngày 1)</label>
+                                    <textarea name="day1_morning_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ghi chú về cách học viên trả lời..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Sáng Ngày 1)</label>
+                                    <div class="flex flex-wrap gap-4">
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_morning_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_morning_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_morning_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_morning_score" value="Tốt"> <span class="text-blue-600 font-medium">Tốt</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chiều Ngày 1 -->
+                    <div class="mt-8">
+                        <h2 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2">Chiều Ngày 1: Nhập hàng, NCC, Thiết lập giá, Kiểm kho</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Cột tham khảo (Read-only) -->
+                            <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-96 overflow-y-auto">
+                                <h3 class="font-bold mb-2">Gợi ý Tình huống (Dành cho L&D)</h3>
+                                <ul class="space-y-3">
+                                    <li><strong>Không rõ nợ NCC:</strong> Nhập hàng/Công nợ NCC.</li>
+                                    <li><strong>Lệch tồn:</strong> Kiểm kho định kỳ. Lợi ích: giảm thất thoát.</li>
+                                    <li><strong>Nhiều nhóm khách (Sỉ/Lẻ):</strong> Thiết lập giá/Bảng giá. Lợi ích: nhân viên không cần nhớ thủ công.</li>
+                                    <li><strong>Câu hỏi đào sâu:</strong> "BI cho thấy khách ít dùng nhập hàng, rủi ro vận hành là gì?"</li>
+                                </ul>
+                            </div>
+                            <!-- Cột nhập liệu -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Chiều Ngày 1)</label>
+                                    <textarea name="day1_afternoon_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Học viên có tư vấn được việc kiểm soát đầu vào, giá vốn không?"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Chiều Ngày 1)</label>
+                                    <div class="flex flex-wrap gap-4">
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_afternoon_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_afternoon_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_afternoon_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day1_afternoon_score" value="Tốt"> <span class="text-blue-600 font-medium">Tốt</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" class="btn-secondary" onclick="switchTab('tab1')"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
+                        <button type="button" class="btn-primary" onclick="switchTab('tab3')">Tiếp tục: Review Ngày 2 <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 3: NGÀY 2 ================= -->
+                <div id="tab3" class="tab-content space-y-6">
+                    
+                    <!-- Sáng Ngày 2 -->
+                    <div>
+                        <h2 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2">Sáng Ngày 2: Đặt hàng, Bán hàng, Thanh toán, Khách hàng</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Cột tham khảo -->
+                            <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-96 overflow-y-auto">
+                                <h3 class="font-bold mb-2">Gợi ý Tình huống (Dành cho L&D)</h3>
+                                <ul class="space-y-3">
+                                    <li><strong>Khách đặt trước qua FB, hay quên giữ hàng:</strong> Đặt hàng → Hóa đơn. Lợi ích: tránh quên đơn.</li>
+                                    <li><strong>Khách quen nhưng không biết lịch sử mua:</strong> Quản lý khách hàng. Lợi ích: tư vấn đúng nhu cầu.</li>
+                                    <li><strong>Khách nói chỉ cần bán được hàng, ko cần nhập Data KH:</strong> Gợi mở lợi ích data để phân nhóm, chăm sóc lại, tăng doanh thu.</li>
+                                </ul>
+                            </div>
+                            <!-- Cột nhập liệu -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Sáng Ngày 2)</label>
+                                    <textarea name="day2_morning_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Học viên hiểu quy trình tạo doanh thu & dữ liệu KH không?"></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Sáng Ngày 2)</label>
+                                    <div class="flex flex-wrap gap-4">
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_morning_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_morning_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_morning_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_morning_score" value="Tốt"> <span class="text-blue-600 font-medium">Tốt</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chiều Ngày 2 -->
+                    <div class="mt-8">
+                        <h2 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2">Chiều Ngày 2: Trả hàng, Báo cáo, Phân quyền, TMĐT</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Cột tham khảo -->
+                            <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-96 overflow-y-auto">
+                                <h3 class="font-bold mb-2">Gợi ý Tình huống (Dành cho L&D)</h3>
+                                <ul class="space-y-3">
+                                    <li><strong>Chủ shop ít mặt, 4 NV, sợ gian lận:</strong> Quản lý người dùng/Phân quyền. Lợi ích: giảm rủi ro.</li>
+                                    <li><strong>Bán sàn + Offline lệch tồn:</strong> Kết nối sàn TMĐT. Lợi ích: đồng bộ.</li>
+                                    <li><strong>Doanh thu giảm không biết vì sao:</strong> Báo cáo phân tích. Lợi ích: báo cáo là công cụ ra quyết định, ko chỉ xem số.</li>
+                                </ul>
+                            </div>
+                            <!-- Cột nhập liệu -->
+                            <div class="lg:col-span-2 space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Chiều Ngày 2)</label>
+                                    <textarea name="day2_afternoon_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Khả năng tư vấn tính năng mở rộng quản trị..."></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Chiều Ngày 2)</label>
+                                    <div class="flex flex-wrap gap-4">
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_afternoon_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_afternoon_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_afternoon_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
+                                        <label class="flex items-center gap-2"><input type="radio" name="day2_afternoon_score" value="Tốt"> <span class="text-blue-600 font-medium">Tốt</span></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" class="btn-secondary" onclick="switchTab('tab2')"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
+                        <button type="button" class="btn-primary" onclick="switchTab('tab4')">Tiếp tục: Test Call & Kết luận <i class="fas fa-arrow-right ml-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- ================= TAB 4: TEST CALL & TỔNG KẾT ================= -->
+                <div id="tab4" class="tab-content space-y-6">
+                    
+                    <div>
+                        <h2 class="text-lg font-bold text-blue-800 mb-4 border-b pb-2">Test Call Tái Ký</h2>
+                        <div class="bg-gray-100 p-4 rounded mb-4">
+                            <p class="text-sm"><strong>Tiêu chí:</strong> Ưu tiên giải quyết tình huống để khách hàng lắng nghe. Test kịch bản nguyên nhân & xử lý.</p>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-1">Nhận xét kỹ năng xử lý tình huống cuộc gọi (45 phút trao đổi)</label>
+                            <textarea name="test_call_note" rows="4" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Học viên giải quyết tình huống thế nào? Giọng điệu, cách tạo lòng tin..."></textarea>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-gray-700 font-medium mb-1">Mức độ đạt Test Call</label>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="flex items-center gap-2"><input type="radio" name="test_call_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
+                                <label class="flex items-center gap-2"><input type="radio" name="test_call_score" value="Đạt"> <span class="text-green-600 font-medium">Đạt</span></label>
+                                <label class="flex items-center gap-2"><input type="radio" name="test_call_score" value="Tốt"> <span class="text-blue-600 font-medium">Tốt</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-blue-50/50 p-6 rounded-lg border border-blue-200">
+                        <h2 class="text-xl font-bold text-blue-900 mb-4">Kết Luận Chung Của L&D</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-gray-700 font-bold mb-1">Tâm lý & Điểm mạnh</label>
+                                <textarea name="final_strengths" rows="3" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ví dụ: Tự tin, giao tiếp tốt, tư duy logic..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold mb-1">Điểm yếu & Không tự tin ở đâu</label>
+                                <textarea name="final_weaknesses" rows="3" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Ví dụ: Lúng túng phần Báo cáo, chưa biết cách gài lợi ích..."></textarea>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-1">Định hướng & Khuyến nghị cho Quản lý Tái ký</label>
+                            <textarea name="final_recommendation" rows="4" class="w-full border rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Đề xuất hành động tiếp theo: VD 'Cần coaching thêm cách liên kết tính năng', 'Đủ nền tảng sang tuần 2' ..."></textarea>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <label class="block text-gray-700 font-bold mb-2">Đánh giá Xếp loại Tổng thể <span class="text-red-500">*</span></label>
+                            <select name="final_status" class="w-full md:w-1/2 border rounded p-3 text-base font-medium focus:ring-2 focus:ring-blue-500 outline-none" required>
+                                <option value="">--- Chọn xếp loại ---</option>
+                                <option value="Chưa đạt">❌ Chưa đạt (Cần học lại bản chất)</option>
+                                <option value="Đạt thao tác">⚠️ Đạt thao tác (Cần Manager coaching thêm tình huống)</option>
+                                <option value="Đạt ứng dụng">✅ Đạt ứng dụng (Đủ nền tảng sang thực chiến)</option>
+                                <option value="Tốt">⭐ Tốt (Có thể giao tình huống khó/giữ gói lớn)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4 border-t mt-6">
+                        <button type="button" class="btn-secondary" onclick="switchTab('tab3')"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
+                        <button type="button" class="btn-primary py-3 px-8 text-lg shadow-lg" onclick="submitReviewForm()">
+                            <i class="fas fa-paper-plane mr-2"></i> Hoàn Thành Đánh Giá
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Tab switching logic
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        function switchTab(targetId) {
+            // Update buttons
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-target') === targetId) {
+                    tab.classList.remove('tab-inactive');
+                    tab.classList.add('tab-active');
+                } else {
+                    tab.classList.remove('tab-active');
+                    tab.classList.add('tab-inactive');
+                }
+            });
+
+            // Update content
+            contents.forEach(content => {
+                if (content.id === targetId) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Scroll to top of form
+            document.querySelector('.overflow-y-auto').scrollTop = 0;
+        }
+
+        // Add event listeners to tabs manually
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.getAttribute('data-target'));
+            });
+        });
+
+        // Submit form standard logic Trainer OS
+        function submitReviewForm() {
+            const form = document.getElementById('reviewForm');
+            
+            // Basic validation
+            if (!form.trainee_name.value || !form.review_date.value || !form.final_status.value) {
+                alert('Vui lòng điền đầy đủ Họ Tên, Ngày Review và Xếp Loại Tổng Thể ở Tab 4!');
+                if(!form.trainee_name.value || !form.review_date.value) switchTab('tab1');
+                else if(!form.final_status.value) switchTab('tab4');
+                return;
+            }
+
+            // Gather Data
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+            
+            // Log for QA
+            console.log('--- Payload Review Form ---', payload);
+
+            // Change button UI to loading
+            const btnTop = document.getElementById('btnSubmitTop');
+            const originalText = btnTop.innerHTML;
+            btnTop.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...';
+            btnTop.disabled = true;
+
+            // GAS API CALL Standard (Placeholder since we use kv_api_url usually)
+            const apiUrl = localStorage.getItem('kv_api_url') || 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'; // Replace logic when Backend is ready
+
+            /*
+            // TODO: Uncomment when Option 3 (Backend) is implemented
+            fetch(apiUrl + '?action=save_lnd_review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if(res.status === 'success') {
+                    alert('Đã lưu đánh giá thành công! Dữ liệu đã được đẩy về bảng Tracking của Quản lý Tái Ký.');
+                    form.reset();
+                    switchTab('tab1');
+                } else {
+                    alert('Có lỗi xảy ra: ' + res.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Không thể kết nối với máy chủ. Vui lòng kiểm tra lại mạng hoặc kv_api_url.');
+            })
+            .finally(() => {
+                btnTop.innerHTML = originalText;
+                btnTop.disabled = false;
+            });
+            */
+
+            // Temporary mock success for Frontend Testing
+            setTimeout(() => {
+                alert('Đã lưu đánh giá thành công! (Mock Frontend)');
+                btnTop.innerHTML = originalText;
+                btnTop.disabled = false;
+            }, 800);
+        }
+    </script>
+</body>
+</html>

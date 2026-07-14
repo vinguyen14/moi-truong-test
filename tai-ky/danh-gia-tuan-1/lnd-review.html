@@ -6,7 +6,7 @@
     <title>Chấm điểm L&D | Trainer OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="data.js"></script> <!-- Load JSON Data -->
+    <script src="data.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f4f6fa; }
@@ -31,44 +31,44 @@
         </div>
         <div>
             <button onclick="saveDraft()" class="bg-white border border-blue-200 text-blue-600 font-semibold px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors shadow-sm">
-                Lưu tạm tiến độ
+                <i class="fas fa-pause-circle mr-2"></i> Lưu tạm tiến độ
             </button>
         </div>
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 md:p-8">
-        
-        <!-- Chọn học viên đang học -->
-        <div class="max-w-5xl mx-auto mb-6 kv-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Khu vực quản lý Draft -->
+        <div class="max-w-6xl mx-auto mb-6 kv-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-sm">
-                <span class="font-semibold text-gray-700">Đang thực hiện:</span> Chọn học viên cũ để tiếp tục hoặc tạo mới.
+                <span class="font-semibold text-gray-700">Đang thực hiện:</span> Chọn học viên cũ để tiếp tục đánh giá hoặc tạo mới.
             </div>
             <div class="flex gap-2 w-full md:w-auto">
                 <select id="draftSelector" class="kv-input py-2 text-sm md:w-64" onchange="loadDraft(this.value)">
                     <option value="">-- Chọn hồ sơ đang đánh giá --</option>
                 </select>
-                <button onclick="createNewRecord()" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 whitespace-nowrap text-sm">
-                    <i class="fas fa-plus mr-1"></i> Form Mới
+                <button onclick="createNewRecord()" class="bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-700 whitespace-nowrap text-sm shadow">
+                    <i class="fas fa-plus mr-1"></i> Tạo Mới
                 </button>
             </div>
         </div>
 
-        <form id="reviewForm" class="kv-card max-w-5xl mx-auto mb-10 overflow-hidden">
+        <form id="reviewForm" class="kv-card max-w-6xl mx-auto mb-10 overflow-hidden">
             <input type="hidden" name="id" id="record_id">
             <input type="hidden" name="status" id="record_status" value="Đang học">
-            <!-- Thêm thông tin Phòng ban & Khóa để cho Quản lý lọc -->
-            <input type="hidden" name="course_type" id="course_type" value="Sản phẩm"> 
+            <input type="hidden" name="course_type" id="course_type" value="Sản phẩm">
             
             <div class="flex border-b bg-gray-50/50 overflow-x-auto">
-                <button type="button" class="tab-btn tab-active py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab1">1. Thông tin chung</button>
-                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab2">2. Retail Ngày 1</button>
-                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab3">3. Retail Ngày 2</button>
-                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab4">4. Kết Luận</button>
+                <button type="button" class="tab-btn tab-active py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab1">1. Self-Check</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab2">2. Retail N1</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab3">3. Retail N2</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab4">4. Kế Toán 01</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none" data-target="tab5">5. Tổng Kết</button>
             </div>
 
             <div class="p-6 md:p-8">
-                <!-- TAB 1 -->
-                <div id="tab1" class="tab-content active space-y-8">
+                <!-- TAB 1: Thông tin & Self-check -->
+                <div id="tab1" class="tab-content active space-y-6">
+                    <h2 class="text-lg font-bold text-gray-900 border-b pb-2">I. Thông tin chung</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-gray-700 font-semibold mb-2 text-sm">Họ tên nhân sự <span class="text-red-500">*</span></label>
@@ -89,8 +89,19 @@
                             <input type="date" name="review_date" class="kv-input" required>
                         </div>
                         <div>
-                            <label class="block text-gray-700 font-semibold mb-2 text-sm">Điểm tự tin (1-10)</label>
-                            <select name="self_confidence_score" class="kv-input">
+                            <label class="block text-gray-700 font-semibold mb-2 text-sm">Tình trạng Bài thực hành</label>
+                            <input type="text" name="practice_status" placeholder="Ví dụ: Đã đủ bài 1, thiếu bài 2..." class="kv-input">
+                        </div>
+                    </div>
+
+                    <h2 class="text-lg font-bold text-gray-900 border-b pb-2 mt-8">II. Self-check (5 Phút)</h2>
+                    <div class="space-y-4 bg-blue-50/50 p-6 rounded-lg border border-blue-100">
+                        <div><label class="block text-gray-700 font-semibold mb-2 text-sm">1. Tính năng nào dễ hiểu nhất? Vì sao?</label><textarea name="self_easy_feature" rows="2" class="kv-input"></textarea></div>
+                        <div><label class="block text-gray-700 font-semibold mb-2 text-sm">2. Khó giải thích cho khách nhất?</label><textarea name="self_hard_feature" rows="2" class="kv-input"></textarea></div>
+                        <div><label class="block text-gray-700 font-semibold mb-2 text-sm">3. Giúp gì cho tư vấn tái ký (Khách đã dùng KV)?</label><textarea name="self_retention_value" rows="2" class="kv-input"></textarea></div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2 text-sm">4. Điểm tự tin (1-10)</label>
+                            <select name="self_confidence_score" class="kv-input md:w-1/3 text-blue-700 font-semibold">
                                 <option value="">Chọn mức độ...</option>
                                 <option value="1-3">1-3 Điểm (Rất yếu)</option>
                                 <option value="4-6">4-6 Điểm (Trung bình)</option>
@@ -101,22 +112,20 @@
                     </div>
                 </div>
 
-                <!-- TAB 2: Ngày 1 -->
+                <!-- TAB 2: Retail Ngày 1 -->
                 <div id="tab2" class="tab-content space-y-6">
                     <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg">
                         <h4 class="font-bold text-blue-800 mb-2">Gợi ý tình huống Sáng Ngày 1 (Hàng hóa)</h4>
-                        <ul class="text-sm text-blue-900 space-y-1 pl-4 list-disc" id="hint_day1_morning">
-                            <!-- Đổ từ JS -->
-                        </ul>
+                        <ul class="text-sm text-blue-900 space-y-1 pl-4 list-disc" id="hint_day1_morning"></ul>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2 text-sm">Ghi chú & Đánh giá (Sáng Ngày 1)</label>
                         <textarea name="day1_morning_note" rows="3" class="kv-input mb-3" placeholder="Ghi nhận xét..."></textarea>
-                        <div class="flex gap-4 text-sm">
-                            <label><input type="radio" name="day1_morning_score" value="Chưa đạt"> Chưa đạt</label>
-                            <label><input type="radio" name="day1_morning_score" value="Đạt thao tác"> Đạt thao tác</label>
-                            <label><input type="radio" name="day1_morning_score" value="Đạt ứng dụng"> Đạt ứng dụng</label>
-                            <label><input type="radio" name="day1_morning_score" value="Tốt"> Tốt</label>
+                        <div class="flex flex-wrap gap-4 text-sm font-medium">
+                            <label><input type="radio" name="day1_morning_score" value="Chưa đạt"> <span class="text-red-600">Chưa đạt</span></label>
+                            <label><input type="radio" name="day1_morning_score" value="Đạt thao tác"> <span class="text-yellow-600">Đạt thao tác</span></label>
+                            <label><input type="radio" name="day1_morning_score" value="Đạt ứng dụng"> <span class="text-green-600">Đạt ứng dụng</span></label>
+                            <label><input type="radio" name="day1_morning_score" value="Tốt"> <span class="text-blue-600">Tốt</span></label>
                         </div>
                     </div>
 
@@ -127,16 +136,16 @@
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2 text-sm">Ghi chú & Đánh giá (Chiều Ngày 1)</label>
                         <textarea name="day1_afternoon_note" rows="3" class="kv-input mb-3"></textarea>
-                        <div class="flex gap-4 text-sm">
-                            <label><input type="radio" name="day1_afternoon_score" value="Chưa đạt"> Chưa đạt</label>
-                            <label><input type="radio" name="day1_afternoon_score" value="Đạt thao tác"> Đạt thao tác</label>
-                            <label><input type="radio" name="day1_afternoon_score" value="Đạt ứng dụng"> Đạt ứng dụng</label>
-                            <label><input type="radio" name="day1_afternoon_score" value="Tốt"> Tốt</label>
+                        <div class="flex flex-wrap gap-4 text-sm font-medium">
+                            <label><input type="radio" name="day1_afternoon_score" value="Chưa đạt"> <span class="text-red-600">Chưa đạt</span></label>
+                            <label><input type="radio" name="day1_afternoon_score" value="Đạt thao tác"> <span class="text-yellow-600">Đạt thao tác</span></label>
+                            <label><input type="radio" name="day1_afternoon_score" value="Đạt ứng dụng"> <span class="text-green-600">Đạt ứng dụng</span></label>
+                            <label><input type="radio" name="day1_afternoon_score" value="Tốt"> <span class="text-blue-600">Tốt</span></label>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 3: Ngày 2 -->
+                <!-- TAB 3: Retail Ngày 2 -->
                 <div id="tab3" class="tab-content space-y-6">
                      <div class="bg-teal-50 border border-teal-100 p-4 rounded-lg">
                         <h4 class="font-bold text-teal-800 mb-2">Gợi ý tình huống Sáng Ngày 2 (Bán hàng, KH)</h4>
@@ -145,11 +154,11 @@
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2 text-sm">Ghi chú & Đánh giá (Sáng Ngày 2)</label>
                         <textarea name="day2_morning_note" rows="3" class="kv-input mb-3"></textarea>
-                        <div class="flex gap-4 text-sm">
-                            <label><input type="radio" name="day2_morning_score" value="Chưa đạt"> Chưa đạt</label>
-                            <label><input type="radio" name="day2_morning_score" value="Đạt thao tác"> Đạt thao tác</label>
-                            <label><input type="radio" name="day2_morning_score" value="Đạt ứng dụng"> Đạt ứng dụng</label>
-                            <label><input type="radio" name="day2_morning_score" value="Tốt"> Tốt</label>
+                        <div class="flex flex-wrap gap-4 text-sm font-medium">
+                            <label><input type="radio" name="day2_morning_score" value="Chưa đạt"> <span class="text-red-600">Chưa đạt</span></label>
+                            <label><input type="radio" name="day2_morning_score" value="Đạt thao tác"> <span class="text-yellow-600">Đạt thao tác</span></label>
+                            <label><input type="radio" name="day2_morning_score" value="Đạt ứng dụng"> <span class="text-green-600">Đạt ứng dụng</span></label>
+                            <label><input type="radio" name="day2_morning_score" value="Tốt"> <span class="text-blue-600">Tốt</span></label>
                         </div>
                     </div>
 
@@ -160,30 +169,56 @@
                     <div>
                         <label class="block text-gray-700 font-semibold mb-2 text-sm">Ghi chú & Đánh giá (Chiều Ngày 2)</label>
                         <textarea name="day2_afternoon_note" rows="3" class="kv-input mb-3"></textarea>
-                        <div class="flex gap-4 text-sm">
-                            <label><input type="radio" name="day2_afternoon_score" value="Chưa đạt"> Chưa đạt</label>
-                            <label><input type="radio" name="day2_afternoon_score" value="Đạt thao tác"> Đạt thao tác</label>
-                            <label><input type="radio" name="day2_afternoon_score" value="Đạt ứng dụng"> Đạt ứng dụng</label>
-                            <label><input type="radio" name="day2_afternoon_score" value="Tốt"> Tốt</label>
+                        <div class="flex flex-wrap gap-4 text-sm font-medium">
+                            <label><input type="radio" name="day2_afternoon_score" value="Chưa đạt"> <span class="text-red-600">Chưa đạt</span></label>
+                            <label><input type="radio" name="day2_afternoon_score" value="Đạt thao tác"> <span class="text-yellow-600">Đạt thao tác</span></label>
+                            <label><input type="radio" name="day2_afternoon_score" value="Đạt ứng dụng"> <span class="text-green-600">Đạt ứng dụng</span></label>
+                            <label><input type="radio" name="day2_afternoon_score" value="Tốt"> <span class="text-blue-600">Tốt</span></label>
                         </div>
                     </div>
                 </div>
 
-                <!-- TAB 4: Kết luận -->
+                <!-- TAB 4: Kế toán 01 -->
                 <div id="tab4" class="tab-content space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-gray-700 font-semibold mb-2 text-sm">Điểm mạnh / Tâm lý</label>
-                            <textarea name="final_strengths" rows="3" class="kv-input"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-semibold mb-2 text-sm">Điểm yếu cần khắc phục</label>
-                            <textarea name="final_weaknesses" rows="3" class="kv-input"></textarea>
+                    <h2 class="text-lg font-bold text-gray-900 border-b pb-2">Ngày 3: Khóa Kế Toán 01</h2>
+                    <p class="text-sm text-gray-600 mb-4">Đánh giá khả năng hiểu luồng nghiệp vụ tài chính, thu chi, công nợ kế toán cơ bản.</p>
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2 text-sm">Ghi chú & Đánh giá (Kế Toán 01)</label>
+                        <textarea name="day3_accounting_note" rows="4" class="kv-input mb-3" placeholder="Học viên hiểu sổ quỹ, thu chi thế nào?"></textarea>
+                        <div class="flex flex-wrap gap-4 text-sm font-medium">
+                            <label><input type="radio" name="day3_accounting_score" value="Chưa đạt"> <span class="text-red-600">Chưa đạt</span></label>
+                            <label><input type="radio" name="day3_accounting_score" value="Đạt thao tác"> <span class="text-yellow-600">Đạt thao tác</span></label>
+                            <label><input type="radio" name="day3_accounting_score" value="Đạt ứng dụng"> <span class="text-green-600">Đạt ứng dụng</span></label>
+                            <label><input type="radio" name="day3_accounting_score" value="Tốt"> <span class="text-blue-600">Tốt</span></label>
                         </div>
                     </div>
+                </div>
+
+                <!-- TAB 5: Kết luận & Test Call -->
+                <div id="tab5" class="tab-content space-y-6">
+                    <div class="bg-gray-50 border border-gray-200 p-6 rounded-lg mb-6">
+                        <h2 class="text-lg font-bold text-gray-900 border-b pb-2 mb-4">Test Call Tái Ký (45 Phút)</h2>
+                        <label class="block text-gray-700 font-semibold mb-2 text-sm">Nhận xét kỹ năng xử lý cuộc gọi</label>
+                        <textarea name="test_call_note" rows="3" class="kv-input mb-3" placeholder="Cách tạo lòng tin, giọng điệu..."></textarea>
+                        <div class="flex gap-4 text-sm font-medium">
+                            <label><input type="radio" name="test_call_score" value="Chưa đạt"> <span class="text-red-600">Chưa đạt</span></label>
+                            <label><input type="radio" name="test_call_score" value="Đạt"> <span class="text-green-600">Đạt</span></label>
+                            <label><input type="radio" name="test_call_score" value="Tốt"> <span class="text-blue-600">Tốt</span></label>
+                        </div>
+                    </div>
+
+                    <h2 class="text-lg font-bold text-gray-900 border-b pb-2">Kết Luận Tổng Thể</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div><label class="block text-gray-700 font-semibold mb-2 text-sm">Điểm mạnh / Tâm lý</label><textarea name="final_strengths" rows="3" class="kv-input"></textarea></div>
+                        <div><label class="block text-gray-700 font-semibold mb-2 text-sm">Điểm yếu cần khắc phục</label><textarea name="final_weaknesses" rows="3" class="kv-input"></textarea></div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-gray-700 font-semibold mb-2 text-sm">Khuyến nghị cho Quản lý Tái ký</label>
+                        <textarea name="final_recommendation" rows="2" class="kv-input" placeholder="Ví dụ: Đủ nền tảng sang tuần 2..."></textarea>
+                    </div>
                     
-                    <div class="bg-gray-50 border border-gray-200 p-6 rounded-xl mt-6 text-center">
-                        <label class="block text-gray-900 font-bold mb-3 text-lg">Xếp Loại Chung Của L&D <span class="text-red-500">*</span></label>
+                    <div class="bg-blue-50 border border-blue-200 p-6 rounded-xl mt-6 text-center">
+                        <label class="block text-blue-900 font-bold mb-3 text-lg">Xếp Loại Chung Của L&D <span class="text-red-500">*</span></label>
                         <select name="final_status" id="final_status_select" class="kv-input max-w-sm mx-auto text-center font-bold text-blue-700">
                             <option value="">-- CHỌN KẾT QUẢ --</option>
                             <option value="Chưa đạt">Chưa đạt (Học lại)</option>
@@ -191,48 +226,49 @@
                             <option value="Đạt ứng dụng">Đạt ứng dụng (Pass)</option>
                             <option value="Tốt">Tốt (Pass xuất sắc)</option>
                         </select>
-                        <button type="button" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full mt-6 hover:bg-blue-700 transition-colors w-full md:w-auto" onclick="submitFinal()">
+                        <button type="button" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full mt-6 hover:bg-blue-700 transition-colors w-full md:w-auto shadow" onclick="submitFinal()">
                             Hoàn Thành Đánh Giá
                         </button>
                     </div>
                 </div>
             </div>
             
+            <!-- Điều hướng Tab Next/Prev -->
+            <div class="bg-gray-50 border-t p-4 flex justify-between items-center">
+                <button type="button" onclick="prevTab()" class="text-gray-600 font-medium hover:text-blue-600"><i class="fas fa-arrow-left mr-1"></i> Lùi lại</button>
+                <button type="button" onclick="nextTab()" class="bg-gray-200 text-gray-800 px-6 py-2 rounded font-medium hover:bg-gray-300">Tiếp theo <i class="fas fa-arrow-right ml-1"></i></button>
+            </div>
         </form>
     </main>
 
     <script>
-        // Init Load from URL params & Data.js
+        let currentTabIndex = 0;
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const type = urlParams.get('type') || 'product';
-            
-            if(type === 'product' && reviewCriteria.product_w1) {
+            if(urlParams.get('type') === 'product' && reviewCriteria.product_w1) {
                 const data = reviewCriteria.product_w1;
                 document.getElementById('pageTitle').innerText = data.title;
-                document.getElementById('course_type').value = "Tuần 1 - Sản Phẩm";
-                
-                // Đổ text tình huống vào HTML
-                document.getElementById('hint_day1_morning').innerHTML = data.day1_morning.scenarios.map(s => `<li>${s}</li>`).join('');
-                document.getElementById('hint_day1_afternoon').innerHTML = data.day1_afternoon.scenarios.map(s => `<li>${s}</li>`).join('');
-                document.getElementById('hint_day2_morning').innerHTML = data.day2_morning.scenarios.map(s => `<li>${s}</li>`).join('');
-                document.getElementById('hint_day2_afternoon').innerHTML = data.day2_afternoon.scenarios.map(s => `<li>${s}</li>`).join('');
+                document.getElementById('hint_day1_morning').innerHTML = data.day1_morning.map(s => `<li>${s}</li>`).join('');
+                document.getElementById('hint_day1_afternoon').innerHTML = data.day1_afternoon.map(s => `<li>${s}</li>`).join('');
+                document.getElementById('hint_day2_morning').innerHTML = data.day2_morning.map(s => `<li>${s}</li>`).join('');
+                document.getElementById('hint_day2_afternoon').innerHTML = data.day2_afternoon.map(s => `<li>${s}</li>`).join('');
             }
-            
             loadDraftList();
             if(!document.getElementById('record_id').value) createNewRecord();
         });
 
-        // Tab Logic
         const tabs = Array.from(document.querySelectorAll('.tab-btn'));
         const contents = document.querySelectorAll('.tab-content');
         function switchTab(index) {
             tabs.forEach((tab, i) => tab.className = i === index ? "tab-btn tab-active py-4 px-6 text-sm whitespace-nowrap outline-none" : "tab-btn tab-inactive py-4 px-6 text-sm whitespace-nowrap outline-none");
             contents.forEach((c, i) => c.classList.toggle('active', i === index));
+            currentTabIndex = index;
+            document.querySelector('main').scrollTop = 0;
         }
         tabs.forEach((tab, i) => tab.addEventListener('click', () => switchTab(i)));
+        function nextTab() { if(currentTabIndex < tabs.length - 1) switchTab(currentTabIndex + 1); }
+        function prevTab() { if(currentTabIndex > 0) switchTab(currentTabIndex - 1); }
 
-        // Data Logic
         const DB_KEY = 'trainer_os_reviews';
 
         function loadDraftList() {
@@ -272,7 +308,7 @@
 
         function saveDraft() {
             const form = document.getElementById('reviewForm');
-            if(!form.trainee_name.value) { alert("Nhập Tên học viên ở Tab 1 trước!"); return; }
+            if(!form.trainee_name.value) { alert("Nhập Tên học viên ở Tab 1 trước!"); switchTab(0); return; }
             if(!document.getElementById('record_id').value) document.getElementById('record_id').value = 'TR_' + Date.now();
             document.getElementById('record_status').value = 'Đang học';
             saveToDB();

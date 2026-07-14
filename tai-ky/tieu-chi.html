@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Công cụ Đánh giá Sản phẩm - Trainer OS</title>
+    <title>Công cụ Quản lý Data Kịch Bản - Trainer OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,17 +11,20 @@
         .saas-card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid #f1f5f9; padding: 1.25rem; }
         .btn-primary { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; border: none; }
         .btn-primary:hover { background-color: #1d4ed8; }
-        .btn-secondary { background-color: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; border: none; }
-        .btn-secondary:hover { background-color: #059669; }
         .btn-outline { border: 1px solid #d1d5db; color: #4b5563; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; background: white; }
         .btn-outline:hover { background-color: #f3f4f6; }
-        
+        .btn-danger { background-color: #ef4444; color: white; padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; font-size: 0.875rem; }
+        .btn-danger:hover { background-color: #dc2626; }
         .table-header { background-color: #f1f5f9; color: #334155; font-weight: 600; font-size: 0.85rem; }
         .editable-cell { transition: background-color 0.2s; white-space: pre-line; }
         .editable-cell:focus { background-color: #eff6ff; outline: 1px solid #93c5fd; border-radius: 0.25rem; }
         .sidebar { width: 250px; height: 100vh; position: fixed; top: 0; left: 0; z-index: 40; }
         .main-content { margin-left: 250px; min-height: 100vh; }
         .step-badge { background-color: #dbeafe; color: #1e40af; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; margin-right: 0.5rem; }
+        
+        /* Nav Menu Active State */
+        .nav-item { cursor: pointer; }
+        .nav-item.active { background-color: #2563eb; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
 <body>
@@ -36,208 +39,237 @@
             <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
                 <i class="fa-solid fa-chart-pie w-5"></i> Tổng quan
             </a>
-            <a href="product-assessment.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md bg-blue-600 text-white shadow-md">
-                <i class="fa-solid fa-clipboard-check w-5"></i> Bộ đánh giá SP
-            </a>
+            <div onclick="switchView('builder')" id="navBuilder" class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                <i class="fa-solid fa-pen-ruler w-5"></i> Tạo Kịch Bản Data
+            </div>
+            <div onclick="switchView('library')" id="navLibrary" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+                <i class="fa-solid fa-book-bookmark w-5"></i> Thư Viện Dữ Liệu
+            </div>
         </nav>
     </aside>
 
     <main class="main-content flex flex-col relative">
-        <!-- HEADER -->
         <header class="bg-white h-16 border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-30">
-            <h1 class="text-xl font-semibold text-gray-800">Công cụ Tạo Kịch Bản Đào Tạo (Hệ Thống Nội Bộ)</h1>
+            <h1 class="text-xl font-semibold text-gray-800" id="headerTitle">Công cụ Tạo Kịch Bản (Data Generator)</h1>
             <div class="flex items-center gap-3">
                 <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-bolt"></i> Database Siêu Tốc
+                    <i class="fa-solid fa-hard-drive"></i> Offline Local Storage
                 </span>
             </div>
         </header>
 
-        <!-- WORKSPACE -->
-        <div class="p-6 flex-1 bg-slate-50 overflow-auto">
-            
+        <!-- ============================================== -->
+        <!-- VIEW 1: MÀN HÌNH TẠO KỊCH BẢN (BUILDER)        -->
+        <!-- ============================================== -->
+        <div id="viewBuilder" class="p-6 flex-1 bg-slate-50 overflow-auto block">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-                
-                <!-- BƯỚC 1: INPUT TÌM KIẾM (BÊN TRÁI) -->
-                <div class="lg:col-span-4 saas-card flex flex-col h-fit">
+                <!-- CỘT TRÁI: TÌM KIẾM -->
+                <div class="lg:col-span-3 saas-card flex flex-col h-fit">
                     <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center">
                         <span class="step-badge">1</span> CSDL Tính Năng
                     </h2>
-                    <p class="text-sm text-gray-500 mb-4">Nhập tên tính năng hoặc dán bài viết để hệ thống quét từ khóa và lấy kịch bản chuẩn.</p>
+                    <p class="text-xs text-gray-500 mb-3">Nhập từ khóa (VD: Lô, Combo, Phân quyền, Shopee...) để lấy kịch bản.</p>
+                    <input type="text" id="searchInput" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-3 text-sm focus:ring-2 focus:ring-blue-500 font-medium" placeholder="Gõ từ khóa tính năng...">
                     
-                    <input type="text" id="searchInput" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-3 text-sm focus:ring-2 focus:ring-blue-500 font-medium" placeholder="VD: Lô, IMEI, Combo, Sản xuất, Bảng giá...">
-                    
-                    <textarea id="wpContent" class="w-full h-32 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm resize-none mb-4" placeholder="(Tùy chọn) Dán nội dung tài liệu chi tiết vào đây..."></textarea>
-                    
-                    <button id="btnScanKB" class="btn-primary w-full py-2.5 text-base shadow-sm">
-                        <i class="fa-solid fa-radar"></i> Quét Dữ Liệu & Phân Tích
+                    <button id="btnScanKB" class="btn-primary w-full py-2 shadow-sm text-sm">
+                        <i class="fa-solid fa-radar"></i> Quét Kịch Bản
                     </button>
-
-                    <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-                        <i class="fa-solid fa-circle-info text-blue-500"></i> Tool hoạt động dựa trên bộ từ khóa kịch bản nội bộ do L&D biên soạn, không cần Internet.
+                    
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 flex flex-col gap-2">
+                        <span><i class="fa-solid fa-lightbulb text-yellow-500"></i> Gợi ý test từ khóa:</span>
+                        <span class="bg-gray-100 p-1 rounded font-mono cursor-pointer hover:bg-gray-200" onclick="document.getElementById('searchInput').value='phân quyền'">phân quyền</span>
+                        <span class="bg-gray-100 p-1 rounded font-mono cursor-pointer hover:bg-gray-200" onclick="document.getElementById('searchInput').value='shopee'">shopee</span>
+                        <span class="bg-gray-100 p-1 rounded font-mono cursor-pointer hover:bg-gray-200" onclick="document.getElementById('searchInput').value='combo'">combo</span>
                     </div>
                 </div>
 
-                <!-- BƯỚC 2: RENDER TABLE (BÊN PHẢI) -->
-                <div class="lg:col-span-8 saas-card flex flex-col">
+                <!-- CỘT PHẢI: BẢNG DATA -->
+                <div class="lg:col-span-9 saas-card flex flex-col">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-base font-bold text-gray-800 flex items-center">
-                            <span class="step-badge bg-green-600 text-white">2</span> Kết Quả Đánh Giá & Kịch Bản
+                            <span class="step-badge bg-blue-600 text-white">2</span> Hiệu đính Bảng Data
                         </h2>
                         <button class="btn-outline !text-sm !py-1.5" onclick="addEmptyRow()">
                             <i class="fa-solid fa-plus"></i> Thêm Dòng Trống
                         </button>
                     </div>
 
-                    <!-- KHUNG THAM CHIẾU ĐÁNH GIÁ -->
-                    <div class="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4 text-xs lg:text-sm flex flex-wrap gap-x-6 gap-y-2">
-                        <div><strong class="text-amber-800">Chưa đạt:</strong> Nhớ tên tính năng rời rạc, không biết dùng cho khách nào.</div>
-                        <div><strong class="text-amber-800">Đạt thao tác:</strong> Biết làm nhưng giải thích lợi ích còn chung chung.</div>
-                        <div><strong class="text-amber-800">Đạt ứng dụng:</strong> Chọn đúng tính năng trong tình huống và nói được lợi ích.</div>
-                        <div><strong class="text-amber-800">Tốt:</strong> Hỏi thêm, phân tích đúng vấn đề, diễn đạt lợi ích theo ngôn ngữ khách.</div>
-                    </div>
-
-                    <!-- BẢNG KẾT QUẢ -->
-                    <div class="overflow-x-auto rounded-lg border border-gray-200 flex-1" id="tableContainer">
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 flex-1 mb-4" id="tableContainer">
                         <table class="w-full text-left text-sm" id="rubricTable">
                             <thead class="table-header">
                                 <tr>
-                                    <th class="px-4 py-3 w-12 text-center">STT</th>
-                                    <th class="px-4 py-3 w-1/4">Tình huống (Vấn đề Khách)</th>
-                                    <th class="px-4 py-3 w-1/5">Câu hỏi cho Sale</th>
-                                    <th class="px-4 py-3 w-1/4">Kỳ vọng trả lời</th>
-                                    <th class="px-4 py-3">Câu hỏi Đào sâu</th>
-                                    <th class="px-4 py-3 w-12 text-center">Xóa</th>
+                                    <th class="px-3 py-2 w-10 text-center">STT</th>
+                                    <th class="px-3 py-2 w-1/5">Tình huống (Vấn đề)</th>
+                                    <th class="px-3 py-2 w-1/6">Câu hỏi Sale</th>
+                                    <th class="px-3 py-2 w-1/5">Kỳ vọng (Giải pháp)</th>
+                                    <th class="px-3 py-2 w-1/6">Câu hỏi Đào sâu</th>
+                                    <th class="px-3 py-2 w-1/5 bg-amber-50">Kỳ vọng Đào sâu</th>
+                                    <th class="px-2 py-2 w-10 text-center">Xóa</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 bg-white" id="rubricBody">
                                 <tr>
-                                    <td colspan="6" class="px-4 py-8 text-center text-gray-400 italic" id="emptyStateText">
-                                        Hãy nhập từ khóa tính năng và bấm "Quét Dữ Liệu".
+                                    <td colspan="7" class="px-4 py-8 text-center text-gray-400 italic" id="emptyStateText">
+                                        Hãy nhập từ khóa tính năng bên trái và bấm "Quét Kịch Bản".
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                     
-                    <div class="mt-4 flex justify-end gap-3">
-                        <button class="btn-primary" onclick="saveData()">
-                            <i class="fa-solid fa-floppy-disk"></i> Lưu Vào Khóa Học
+                    <!-- NÚT LƯU VÀO THƯ VIỆN -->
+                    <div class="flex justify-end gap-3 border-t pt-4">
+                        <button class="btn-primary !bg-indigo-600 hover:!bg-indigo-700" onclick="saveToLibrary()">
+                            <i class="fa-solid fa-floppy-disk"></i> Lưu Vào Thư Viện Data
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- ============================================== -->
+        <!-- VIEW 2: MÀN HÌNH THƯ VIỆN (LIBRARY)            -->
+        <!-- ============================================== -->
+        <div id="viewLibrary" class="p-6 flex-1 bg-slate-50 overflow-auto hidden">
+            <div class="saas-card mb-6">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">Thư viện Data thô của bạn</h2>
+                <p class="text-sm text-gray-500 mb-6">Đây là nơi lưu trữ các bộ câu hỏi/tình huống bạn đã tạo. Bạn có thể xuất các bộ này ra file JSON hoặc CSV (Excel) để đẩy vào Tool/Hệ thống khác.</p>
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full text-left text-sm">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-4 py-3 w-16">ID</th>
+                                <th class="px-4 py-3">Tên Bộ Dữ Liệu (Dataset)</th>
+                                <th class="px-4 py-3">Ngày tạo</th>
+                                <th class="px-4 py-3 text-center">Số lượng câu</th>
+                                <th class="px-4 py-3 text-right">Thao tác Tải xuống</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white" id="libraryBody">
+                            <!-- Dữ liệu thư viện sẽ được render ở đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </main>
 
+    <!-- KỊCH BẢN LOGIC JS -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // 1. DATABASE KỊCH BẢN CHUẨN DO BẠN CUNG CẤP (KHÔNG CẦN AI)
-            const defaultKnowledgeBase = [
-                {
-                    keywords: ["lô", "date", "hạn sử dụng", "mỹ phẩm", "thực phẩm", "lo", "han su dung"],
-                    tinhHuong: "Khách là shop mỹ phẩm, thường nhập nhiều đợt hàng, mỗi đợt có hạn sử dụng khác nhau. Gần đây khách than hay quên hàng cận date.",
-                    cauHoiSale: "Em sẽ gợi ý tính năng nào? Nói lợi ích thế nào?",
-                    kyVong: "Gợi ý quản lý lô-HSD.\nLợi ích: kiểm soát từng lô, biết lô nào gần hết hạn, ưu tiên bán trước, giảm tồn cận date.",
-                    daoSau: "Nếu khách nói: “Chị vẫn quản lý Excel được, cần gì dùng phần này”, em trả lời sao?\nLợi ích nào là quan trọng nhất với khách này: tiết kiệm thời gian hay giảm thất thoát?"
-                },
-                {
-                    keywords: ["imei", "serial", "điện thoại", "máy móc", "bảo hành", "dien thoai", "bao hanh"],
-                    tinhHuong: "Khách bán điện thoại, mỗi máy có mã IMEI riêng, khách hay cần tra lại máy đã bán để hỗ trợ bảo hành.",
-                    cauHoiSale: "Tính năng nào phù hợp? Vì sao không chỉ tạo hàng hóa thường?",
-                    kyVong: "Gợi ý Serial/IMEI.\nLợi ích: kiểm soát từng máy, bán đúng mã, tra lịch sử khi bảo hành/khiếu nại nhanh chóng.",
-                    daoSau: "Tình huống: Nhân viên mất rất lâu để tra lại máy đó bán ngày nào, ai bán. Em sẽ dùng ngôn từ bán hàng nào để thuyết phục chủ shop dùng tính năng này?"
-                },
-                {
-                    keywords: ["combo", "giỏ quà", "đóng gói", "dong goi", "gio qua", "thành phần"],
-                    tinhHuong: "Khách bán giỏ quà Tết gồm nhiều sản phẩm thành phần. Khi bán 1 giỏ quà, khách muốn tự động trừ tồn từng món bên trong.",
-                    cauHoiSale: "Em chọn Combo hay Hàng sản xuất? Vì sao?",
-                    kyVong: "Gợi ý Combo - đóng gói (vì chỉ gộp nhiều sản phẩm để bán thành 1 bộ).\nLợi ích: bán nhanh theo combo, vẫn tự động trừ tồn thành phần chính xác.",
-                    daoSau: "Khi nào dùng Combo, khi nào dùng Hàng sản xuất? Điểm khác biệt lớn nhất là gì?"
-                },
-                {
-                    keywords: ["sản xuất", "bàn ghế", "lắp ráp", "nguyên vật liệu", "hao hụt", "san xuat"],
-                    tinhHuong: "Khách bán bàn ghế, cần lắp ráp từ mặt bàn, chân bàn, linh kiện. Khi xưởng hoàn thiện 5 bàn thì muốn ghi nhận thành phẩm và trừ nguyên liệu.",
-                    cauHoiSale: "Nên dùng tính năng nào? Lợi ích là gì?",
-                    kyVong: "Gợi ý Hàng sản xuất.\nLợi ích: quản lý định mức nguyên liệu, tự động ghi nhận thành phẩm, kiểm soát hao hụt nguyên vật liệu kho xưởng.",
-                    daoSau: "Nếu khách hàng muốn tính cả chi phí nhân công vào giá vốn của cái bàn thì làm trên hệ thống thế nào?"
-                },
-                {
-                    keywords: ["đơn vị tính", "thùng", "chai", "quy đổi", "don vi", "lon"],
-                    tinhHuong: "Khách bán nước giải khát, nhập theo thùng nhưng bán lẻ theo chai.",
-                    cauHoiSale: "Nên gợi ý tính năng nào để giải quyết?",
-                    kyVong: "Gợi ý Quản lý đơn vị tính.\nLợi ích: nhập/bán linh hoạt theo thùng/chai, hạn chế nhầm lẫn quy đổi kho, tự động tính giá vốn.",
-                    daoSau: "Nếu khách thiết lập quy đổi sai (1 thùng = 10 chai thay vì 24), hậu quả lúc kiểm kho là gì?"
-                },
-                {
-                    keywords: ["bảng giá", "giá", "khách sỉ", "khách vip", "khách quen", "bang gia", "gia ban"],
-                    tinhHuong: "Khách có nhiều nhóm khách: khách lẻ, khách sỉ, khách VIP với mức giá khác nhau nhưng nhân viên hay nhớ nhầm và thu sai tiền.",
-                    cauHoiSale: "Em sẽ setup hệ thống như thế nào để xử lý triệt để lỗi này?",
-                    kyVong: "Gợi ý Thiết lập Bảng giá.\nLợi ích: Giúp mỗi nhóm có mức giá tự động, thu ngân chỉ cần chọn đúng tên khách là hiện giá chính xác, chống thất thoát doanh thu.",
-                    daoSau: "Khách hỏi: Lỡ anh muốn đổi giá 1 loạt 100 sản phẩm cho dịp lễ thì phần mềm làm nhanh được không?"
-                }
-            ];
+        // === KHỞI TẠO DỮ LIỆU GỐC (KNOWLEDGE BASE) ===
+        const defaultKnowledgeBase = [
+            {
+                keywords: ["lô", "date", "hạn sử dụng", "mỹ phẩm"],
+                tinhHuong: "Khách là shop mỹ phẩm, thường nhập nhiều đợt hàng, mỗi đợt có HSD khác nhau. Khách than hay quên hàng cận date.",
+                cauHoiSale: "Em sẽ gợi ý tính năng nào? Nói lợi ích thế nào?",
+                kyVong: "Gợi ý quản lý lô-HSD. Lợi ích: kiểm soát từng lô, biết lô nào gần hết hạn, ưu tiên bán trước, giảm tồn cận date.",
+                daoSau: "Nếu khách nói: “Chị vẫn quản lý Excel được, cần gì dùng phần này”, em trả lời sao?",
+                kyVongDaoSau: "Nhấn mạnh vào lợi ích tiết kiệm thời gian, phần mềm tự động cảnh báo màu đỏ khi cận date thay vì ngày nào cũng phải mở Excel ra dò tay."
+            },
+            {
+                keywords: ["combo", "giỏ quà", "đóng gói", "thành phần"],
+                tinhHuong: "Khách bán giỏ quà Tết gồm nhiều SP thành phần. Bán 1 giỏ quà tự động trừ tồn món bên trong.",
+                cauHoiSale: "Em chọn Combo hay Hàng sản xuất? Vì sao?",
+                kyVong: "Gợi ý Combo - đóng gói. Lợi ích: bán nhanh 1 bộ, vẫn trừ tồn thành phần.",
+                daoSau: "Khi nào dùng Combo, khi nào dùng Hàng sản xuất?",
+                kyVongDaoSau: "Combo dùng khi chỉ gộp lại bán chung (tồn ảo). Hàng sản xuất dùng khi xưởng gia công thật sự tạo ra 1 thành phẩm mới cất vào kho (tồn thật)."
+            },
+            {
+                keywords: ["phân quyền", "nhân viên", "giá vốn", "thao tác phân quyền", "kỹ thuật"],
+                tinhHuong: "[KỸ THUẬT] Chủ shop muốn nhân viên thu ngân chỉ được tạo hóa đơn, KHÔNG được xem giá vốn để tránh lộ thông tin nhập hàng.",
+                cauHoiSale: "Trình bày các bước thao tác trên hệ thống để setup quyền này?",
+                kyVong: "Vào Thiết lập -> Quản lý người dùng -> Vai trò -> Chọn vai trò 'Thu ngân' -> Bỏ tích quyền 'Xem giá vốn'.",
+                daoSau: "Sau khi bỏ quyền 'Xem giá vốn', nhân viên đó vào màn hình Báo Cáo Cuối Ngày có xem được Tiền Lãi (Lợi nhuận) không?",
+                kyVongDaoSau: "Không. Hệ thống tự động ẩn cột Lợi Nhuận/Giá vốn ở tất cả các báo cáo đối với tài khoản không có quyền này."
+            },
+            {
+                keywords: ["shopee", "tiktok", "sàn tmđt", "kết nối", "thao tác", "map mã"],
+                tinhHuong: "[KỸ THUẬT] Khách vừa bán tại cửa hàng vừa bán trên Shopee. Khách phàn nàn là đơn Shopee kéo về nhưng tồn kho ở cửa hàng không bị trừ.",
+                cauHoiSale: "Nguyên nhân lỗi kỹ thuật này là gì và thao tác xử lý thế nào?",
+                kyVong: "Nguyên nhân do chưa 'Liên kết hàng hóa' (Map mã SKU). Thao tác: Vào Kênh bán -> Shopee -> Liên kết hàng hóa -> Khớp mã hàng trên Shopee với mã hàng trên phần mềm.",
+                daoSau: "Nếu 1 sản phẩm A trên phần mềm mà trên Shopee khách đăng thành 3 link sản phẩm khác nhau thì có map được không?",
+                kyVongDaoSau: "Được. Chọn 3 hàng hóa trên Shopee và liên kết (map) chung về 1 mã hàng hóa A duy nhất trên phần mềm."
+            }
+        ];
 
-            // Lưu Database vào Local Storage nếu chưa có (Để L&D có thể mở rộng sau này)
-            if (!localStorage.getItem('kv_product_kb')) {
-                localStorage.setItem('kv_product_kb', JSON.stringify(defaultKnowledgeBase));
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('kv_product_kb_v2')) {
+                localStorage.setItem('kv_product_kb_v2', JSON.stringify(defaultKnowledgeBase));
+            }
+            if (!localStorage.getItem('kv_product_library')) {
+                localStorage.setItem('kv_product_library', JSON.stringify([]));
             }
 
-            const btnScanKB = document.getElementById('btnScanKB');
-            const rubricBody = document.getElementById('rubricBody');
-
-            // 2. LOGIC QUÉT TỪ KHÓA
-            btnScanKB.addEventListener('click', () => {
-                const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
-                const wpContent = document.getElementById('wpContent').value.trim().toLowerCase();
-                const fullTextToScan = searchInput + " " + wpContent;
-
-                if (!fullTextToScan.trim()) {
-                    alert('Vui lòng nhập tên tính năng hoặc từ khóa!');
-                    document.getElementById('searchInput').focus();
-                    return;
-                }
-
-                // Lấy Data từ hệ thống
-                const kbData = JSON.parse(localStorage.getItem('kv_product_kb'));
-                let matchedScenarios = [];
-
-                // Thuật toán: Chạy qua từng kịch bản, nếu fullTextToScan chứa bất kỳ keyword nào -> lấy kịch bản đó
-                kbData.forEach(scenario => {
-                    const isMatch = scenario.keywords.some(keyword => fullTextToScan.includes(keyword.toLowerCase()));
-                    if (isMatch) {
-                        matchedScenarios.push(scenario);
-                    }
-                });
-
-                // 3. HIỂN THỊ KẾT QUẢ
-                rubricBody.innerHTML = ''; // Xóa bảng cũ
-
-                if (matchedScenarios.length > 0) {
-                    matchedScenarios.forEach((item, index) => {
-                        appendRow(index + 1, item.tinhHuong, item.cauHoiSale, item.kyVong, item.daoSau);
-                    });
-                } else {
-                    // Xử lý Edge Case: Nếu không match được keyword nào
-                    alert('Hệ thống chưa có sẵn kịch bản mẫu cho từ khóa này. Đã tạo một dòng trống để bạn tự biên soạn!');
-                    addEmptyRow();
-                }
-            });
+            // Gắn sự kiện nút Quét
+            document.getElementById('btnScanKB').addEventListener('click', scanKeyword);
+            
+            // Render sẵn thư viện
+            renderLibrary();
         });
 
-        // Hàm hỗ trợ: Vẽ 1 dòng dữ liệu vào bảng
-        function appendRow(stt, tinhHuong, cauHoi, kyVong, daoSau) {
+        // === LOGIC CHUYỂN TAB (ĐỒNG BỘ UI) ===
+        function switchView(viewName) {
+            const builder = document.getElementById('viewBuilder');
+            const library = document.getElementById('viewLibrary');
+            const navB = document.getElementById('navBuilder');
+            const navL = document.getElementById('navLibrary');
+            const headerTitle = document.getElementById('headerTitle');
+
+            if (viewName === 'builder') {
+                builder.classList.replace('hidden', 'block');
+                library.classList.replace('block', 'hidden');
+                navB.classList.add('active'); navB.classList.replace('text-slate-300', 'text-white');
+                navL.classList.remove('active'); navL.classList.replace('text-white', 'text-slate-300');
+                headerTitle.textContent = "Công cụ Tạo Kịch Bản (Data Generator)";
+            } else {
+                library.classList.replace('hidden', 'block');
+                builder.classList.replace('block', 'hidden');
+                navL.classList.add('active'); navL.classList.replace('text-slate-300', 'text-white');
+                navB.classList.remove('active'); navB.classList.replace('text-white', 'text-slate-300');
+                headerTitle.textContent = "Thư Viện Dữ Liệu & Export";
+                renderLibrary(); // Load lại data mới nhất
+            }
+        }
+
+        // === LOGIC TẠO BẢNG ===
+        function scanKeyword() {
+            const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
+            if (!searchInput) { alert('Vui lòng gõ từ khóa!'); return; }
+
+            const kbData = JSON.parse(localStorage.getItem('kv_product_kb_v2'));
+            let matchedScenarios = [];
+            kbData.forEach(scenario => {
+                if (scenario.keywords.some(keyword => searchInput.includes(keyword.toLowerCase()))) {
+                    matchedScenarios.push(scenario);
+                }
+            });
+
+            const rubricBody = document.getElementById('rubricBody');
+            rubricBody.innerHTML = ''; 
+
+            if (matchedScenarios.length > 0) {
+                matchedScenarios.forEach((item, index) => {
+                    appendRow(item.tinhHuong, item.cauHoiSale, item.kyVong, item.daoSau, item.kyVongDaoSau);
+                });
+            } else {
+                alert('Chưa có kịch bản cho từ khóa này. Đã tạo dòng trống để bạn tự thiết kế.');
+                addEmptyRow();
+            }
+        }
+
+        function appendRow(tinhHuong, cauHoi, kyVong, daoSau, kyVongDaoSau) {
             const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50 transition-colors group border-b border-gray-100';
+            tr.className = 'hover:bg-slate-50 transition-colors group border-b border-gray-100 data-row';
             tr.innerHTML = `
-                <td class="px-4 py-3 text-center text-gray-500 font-medium align-top row-stt">${stt}</td>
-                <td class="px-4 py-3 text-gray-800 align-top editable-cell" contenteditable="true">${tinhHuong || ''}</td>
-                <td class="px-4 py-3 text-blue-700 align-top font-medium editable-cell" contenteditable="true">${cauHoi || ''}</td>
-                <td class="px-4 py-3 text-emerald-700 align-top editable-cell" contenteditable="true">${kyVong || ''}</td>
-                <td class="px-4 py-3 text-amber-700 align-top editable-cell" contenteditable="true">${daoSau || ''}</td>
-                <td class="px-4 py-3 text-center align-top">
-                    <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" onclick="deleteRow(this)" title="Xóa dòng này">
+                <td class="px-3 py-2 text-center text-gray-500 font-medium align-top row-stt"></td>
+                <td class="px-3 py-2 text-gray-800 align-top editable-cell" contenteditable="true" data-key="tinhHuong">${tinhHuong || ''}</td>
+                <td class="px-3 py-2 text-blue-700 align-top font-medium editable-cell" contenteditable="true" data-key="cauHoiSale">${cauHoi || ''}</td>
+                <td class="px-3 py-2 text-emerald-700 align-top editable-cell" contenteditable="true" data-key="kyVong">${kyVong || ''}</td>
+                <td class="px-3 py-2 text-amber-700 align-top editable-cell" contenteditable="true" data-key="daoSau">${daoSau || ''}</td>
+                <td class="px-3 py-2 text-amber-900 bg-amber-50/50 align-top editable-cell font-medium" contenteditable="true" data-key="kyVongDaoSau">${kyVongDaoSau || ''}</td>
+                <td class="px-2 py-2 text-center align-top">
+                    <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" onclick="deleteRow(this)" title="Xóa">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </td>
@@ -246,44 +278,154 @@
             updateSTT();
         }
 
-        // Hàm hỗ trợ: Thêm dòng trống cho Trainer tự gõ tay
-        window.addEmptyRow = function() {
-            const tbody = document.getElementById('rubricBody');
-            // Nếu đang là text báo trống, xóa đi
-            if (document.getElementById('emptyStateText')) {
-                tbody.innerHTML = '';
-            }
-            appendRow('-', '[Gõ tình huống khách hàng...]', '[Hỏi sale cần gợi ý tính năng nào...]', '[Tính năng + Lợi ích xử lý nỗi đau...]', '[Khách từ chối thì sao...]');
-        };
+        function addEmptyRow() {
+            if (document.getElementById('emptyStateText')) document.getElementById('rubricBody').innerHTML = '';
+            appendRow('[Gõ tình huống...]', '[Câu hỏi Sale...]', '[Lợi ích giải quyết...]', '[Hỏi sâu thêm...]', '[Đáp án sâu...]');
+        }
 
-        // Hàm hỗ trợ: Xóa dòng và cập nhật lại STT
-        window.deleteRow = function(btn) {
-            btn.closest('tr').remove();
-            updateSTT();
-            // Nếu xóa hết, hiển thị lại dòng trống
-            const tbody = document.getElementById('rubricBody');
-            if (tbody.children.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 italic" id="emptyStateText">Dữ liệu trống. Hãy tìm kiếm từ khóa mới hoặc thêm dòng trống.</td></tr>`;
+        function deleteRow(btn) {
+            btn.closest('tr').remove(); updateSTT();
+            if (document.getElementById('rubricBody').children.length === 0) {
+                document.getElementById('rubricBody').innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-gray-400 italic" id="emptyStateText">Dữ liệu trống.</td></tr>`;
             }
-        };
+        }
 
-        // Hàm hỗ trợ: Cập nhật STT tự động
         function updateSTT() {
-            const sttCells = document.querySelectorAll('.row-stt');
-            sttCells.forEach((cell, index) => {
-                cell.textContent = index + 1;
+            document.querySelectorAll('.row-stt').forEach((cell, index) => cell.textContent = index + 1);
+        }
+
+        // === LOGIC LƯU VÀO THƯ VIỆN ===
+        function saveToLibrary() {
+            const rows = document.querySelectorAll('.data-row');
+            if (rows.length === 0) { alert('Bảng đang trống, không có dữ liệu để lưu!'); return; }
+
+            const title = prompt("Vui lòng nhập tên cho Bộ dữ liệu này:\n(Ví dụ: Data Kịch Bản Lô Date)");
+            if (!title) return; // Hủy lưu nếu không nhập tên
+
+            let scenarios = [];
+            rows.forEach(row => {
+                const getVal = (key) => row.querySelector(`[data-key="${key}"]`).innerText.trim();
+                scenarios.push({
+                    tinhHuong: getVal('tinhHuong'),
+                    cauHoiSale: getVal('cauHoiSale'),
+                    kyVong: getVal('kyVong'),
+                    daoSau: getVal('daoSau'),
+                    kyVongDaoSau: getVal('kyVongDaoSau')
+                });
+            });
+
+            const newDataset = {
+                id: 'DATA_' + Date.now(),
+                title: title,
+                date: new Date().toLocaleDateString('vi-VN'),
+                scenarios: scenarios
+            };
+
+            const library = JSON.parse(localStorage.getItem('kv_product_library')) || [];
+            library.unshift(newDataset); // Thêm lên đầu mảng
+            localStorage.setItem('kv_product_library', JSON.stringify(library));
+
+            alert('Đã lưu thành công vào Thư viện Dữ liệu!');
+            // Chuyển view sang thư viện
+            switchView('library');
+        }
+
+        // === LOGIC RENDER & XUẤT FILE THƯ VIỆN ===
+        function renderLibrary() {
+            const library = JSON.parse(localStorage.getItem('kv_product_library')) || [];
+            const tbody = document.getElementById('libraryBody');
+            tbody.innerHTML = '';
+
+            if (library.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 italic">Thư viện chưa có bộ dữ liệu nào. Hãy sang Tab Tạo Kịch Bản để lưu dữ liệu!</td></tr>`;
+                return;
+            }
+
+            library.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition-colors border-b border-gray-100';
+                tr.innerHTML = `
+                    <td class="px-4 py-3 text-xs text-gray-400 font-mono">${item.id.substring(item.id.length - 6)}</td>
+                    <td class="px-4 py-3 font-semibold text-gray-800">${item.title}</td>
+                    <td class="px-4 py-3 text-gray-500 text-sm">${item.date}</td>
+                    <td class="px-4 py-3 text-center text-blue-600 font-bold">${item.scenarios.length}</td>
+                    <td class="px-4 py-3 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button onclick="exportJSON('${item.id}')" class="btn-outline !py-1 !px-2 !text-xs !text-indigo-600 hover:!bg-indigo-50" title="Tải file JSON">
+                                <i class="fa-solid fa-code"></i> JSON
+                            </button>
+                            <button onclick="exportCSV('${item.id}')" class="btn-outline !py-1 !px-2 !text-xs !text-emerald-600 hover:!bg-emerald-50" title="Tải file Excel (CSV)">
+                                <i class="fa-solid fa-file-csv"></i> CSV/Excel
+                            </button>
+                            <button onclick="deleteFromLibrary('${item.id}')" class="btn-danger !py-1 !px-2" title="Xóa bộ này">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
             });
         }
 
-        // Hàm lưu dữ liệu (Giả lập chức năng của hệ thống)
-        window.saveData = function() {
-            const tbody = document.getElementById('rubricBody');
-            if (tbody.children.length === 0 || document.getElementById('emptyStateText')) {
-                alert('Không có dữ liệu để lưu!');
-                return;
+        function deleteFromLibrary(id) {
+            if(confirm("Bạn có chắc chắn muốn xóa bộ Data này khỏi thư viện?")) {
+                let library = JSON.parse(localStorage.getItem('kv_product_library')) || [];
+                library = library.filter(item => item.id !== id);
+                localStorage.setItem('kv_product_library', JSON.stringify(library));
+                renderLibrary();
             }
-            alert('Đã lưu dữ liệu Kịch Bản Roleplay thành công vào Local Storage của Trainer OS. Bạn có thể mang bảng này đi review đội Sale!');
-        };
+        }
+
+        // TẢI FILE JSON
+        function exportJSON(id) {
+            const library = JSON.parse(localStorage.getItem('kv_product_library')) || [];
+            const dataset = library.find(item => item.id === id);
+            if (!dataset) return;
+
+            const dataStr = JSON.stringify(dataset.scenarios, null, 4);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${dataset.title.replace(/ /g, '_').toLowerCase()}_data.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // TẢI FILE CSV (Hỗ trợ mở bằng Excel không lỗi font)
+        function exportCSV(id) {
+            const library = JSON.parse(localStorage.getItem('kv_product_library')) || [];
+            const dataset = library.find(item => item.id === id);
+            if (!dataset) return;
+
+            const headers = ['Tinh Huong', 'Cau Hoi Sale', 'Ky Vong (Giai phap)', 'Cau Hoi Dao Sau', 'Ky Vong Dao Sau'];
+            let csvContent = headers.join(',') + '\n';
+
+            dataset.scenarios.forEach(row => {
+                // Thoát (escape) các dấu ngoặc kép và dấu phẩy để Excel đọc đúng cột
+                const escapeCsv = (text) => `"${(text || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`;
+                
+                let rowArray = [
+                    escapeCsv(row.tinhHuong),
+                    escapeCsv(row.cauHoiSale),
+                    escapeCsv(row.kyVong),
+                    escapeCsv(row.daoSau),
+                    escapeCsv(row.kyVongDaoSau)
+                ];
+                csvContent += rowArray.join(',') + '\n';
+            });
+
+            // \uFEFF là BOM code giúp Excel nhận diện font UTF-8 tiếng Việt
+            const blob = new Blob(['\uFEFF' + csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${dataset.title.replace(/ /g, '_').toLowerCase()}_data.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>

@@ -6,44 +6,65 @@
     <title>Hệ thống Đánh giá Nhân sự Tái Ký</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Font Plus Jakarta Sans: Tròn trịa, hiện đại, dễ đọc -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .hover-lift { transition: transform 0.2s, box-shadow 0.2s; }
-        .hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            /* Nền Gradient mượt mà */
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            min-height: 100vh;
+        }
+        /* Hiệu ứng Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+        .hover-glass:hover {
+            background: rgba(255, 255, 255, 0.85);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px 0 rgba(31, 38, 135, 0.15);
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center font-sans text-gray-800 p-4">
+<body class="flex items-center justify-center p-4">
 
-    <div class="max-w-4xl w-full">
-        <div class="text-center mb-10">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4">
-                <i class="fas fa-graduation-cap text-3xl"></i>
+    <div class="max-w-4xl w-full z-10">
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full glass-panel text-indigo-600 mb-6 shadow-lg">
+                <i class="fas fa-graduation-cap text-4xl"></i>
             </div>
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Hệ thống Đánh giá Nhân sự Tái Ký</h1>
-            <p class="text-slate-500 text-lg">Vui lòng chọn phân hệ làm việc của bạn</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-4 drop-shadow-sm">Review Nhân Sự Tái Ký</h1>
+            <p class="text-slate-700 text-lg md:text-xl font-medium">Hệ thống L&D Training OS - Tuần 1 (Sản phẩm)</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <!-- Cổng L&D -->
-            <a href="lnd-review.html" class="block bg-white rounded-xl p-8 border border-gray-200 hover-lift text-center group cursor-pointer">
-                <div class="w-20 h-20 mx-auto bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-indigo-100 transition-colors">
-                    <i class="fas fa-clipboard-check text-4xl text-indigo-600"></i>
+            <a href="lnd-review.html" class="block rounded-2xl p-8 glass-panel hover-glass text-center group cursor-pointer transition-all duration-300">
+                <div class="w-24 h-24 mx-auto bg-white/60 rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                    <i class="fas fa-clipboard-list text-5xl text-indigo-600"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">L&D Coach</h2>
-                <p class="text-gray-500 mb-6 text-sm">Vào form đánh giá 1:1, kiểm tra năng lực, hiểu bản chất và phản xạ tư vấn của nhân sự mới.</p>
-                <span class="inline-block bg-indigo-600 text-white font-medium py-2 px-6 rounded-lg group-hover:bg-indigo-700 transition-colors w-full">
-                    Bắt đầu Đánh giá
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">L&D Coach</h2>
+                <p class="text-gray-600 mb-8 text-base">Đánh giá 1:1, chấm điểm phản xạ tình huống, ghi nhận tiến độ từng ngày của học viên.</p>
+                <span class="inline-block bg-indigo-600 text-white font-semibold text-lg py-3 px-8 rounded-xl hover:bg-indigo-700 shadow-md w-full">
+                    Bắt đầu Chấm Điểm
                 </span>
             </a>
 
             <!-- Cổng Manager -->
-            <a href="manager-tracking.html" class="block bg-white rounded-xl p-8 border border-gray-200 hover-lift text-center group cursor-pointer">
-                <div class="w-20 h-20 mx-auto bg-emerald-50 rounded-full flex items-center justify-center mb-6 group-hover:bg-emerald-100 transition-colors">
-                    <i class="fas fa-chart-pie text-4xl text-emerald-600"></i>
+            <a href="manager-tracking.html" class="block rounded-2xl p-8 glass-panel hover-glass text-center group cursor-pointer transition-all duration-300">
+                <div class="w-24 h-24 mx-auto bg-white/60 rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chart-line text-5xl text-emerald-600"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Quản lý Tái Ký</h2>
-                <p class="text-gray-500 mb-6 text-sm">Xem báo cáo điểm, theo dõi tiến độ nhân sự, đọc nhận xét từ L&D để phân công khách hàng.</p>
-                <span class="inline-block bg-emerald-600 text-white font-medium py-2 px-6 rounded-lg group-hover:bg-emerald-700 transition-colors w-full">
-                    Xem Báo Cáo Tracking
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">Quản lý Tái Ký</h2>
+                <p class="text-gray-600 mb-8 text-base">Theo dõi tiến độ, đọc full review từng buổi, tải PDF phiếu kết quả để phân bổ khách hàng.</p>
+                <span class="inline-block bg-emerald-600 text-white font-semibold text-lg py-3 px-8 rounded-xl hover:bg-emerald-700 shadow-md w-full">
+                    Xem Báo Cáo Tracker
                 </span>
             </a>
         </div>

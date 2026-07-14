@@ -52,8 +52,19 @@
         });
 
         function saveProfile() {
-            let n = document.getElementById('inpName').value.trim(); let d = document.getElementById('inpDept').value.trim();
-            if(!n || !d) return alert("Điền đủ TT"); localStorage.setItem('kv_trainer_profile', JSON.stringify({name:n, dept:d})); location.reload();
+            let n = document.getElementById('inpName').value.trim(); 
+            let d = document.getElementById('inpDept').value.trim();
+            if(!n || !d) return alert("Vui lòng điền đủ Họ Tên và Phòng Ban!"); 
+            
+            // Lưu vào LocalStorage
+            localStorage.setItem('kv_trainer_profile', JSON.stringify({name:n, dept:d})); 
+            
+            // Ẩn Modal và Cập nhật UI ngay lập tức (Không dùng reload nữa)
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('studentLabel').innerText = `👤 ${n} - ${d}`;
+            
+            // Gọi load dữ liệu
+            loadSessionData();
         }
 
         function renderDashboard() {

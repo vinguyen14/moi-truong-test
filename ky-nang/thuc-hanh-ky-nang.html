@@ -15,10 +15,16 @@
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
         .clickable-card { cursor: pointer; transition: all 0.3s ease; }
         .clickable-card:hover { transform: translateY(-4px); border-color: rgba(79, 70, 229, 0.4); }
+        @media print {
+            body * { visibility: hidden; }
+            #pdf-content, #pdf-content * { visibility: visible; }
+            #pdf-content { position: absolute; left: 0; top: 0; width: 100%; padding: 0 !important; background: white; }
+            .print-page-break { page-break-inside: avoid; margin-bottom: 40px; }
+            #certificateModal, #previewFullModal, header, aside, .fixed { display: none !important; }
+        }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden relative selection:bg-indigo-200">
-
     <div class="tech-bg"></div>
 
     <header class="bg-white/90 backdrop-blur border-b border-slate-200 h-16 flex items-center justify-between px-4 md:px-6 z-20 shrink-0 sticky top-0 shadow-sm">
@@ -29,7 +35,7 @@
         </div>
         <div class="flex items-center gap-3 shrink-0">
             <button onclick="fetchFeedback(true)" class="relative flex items-center gap-2 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-3 py-2 rounded-lg transition">
-                <i class="fas fa-sync-alt text-amber-600"></i><span id="btnFeedbackText">Kiểm tra Nhận Xét</span>
+                <i class="fas fa-sync-alt text-amber-600"></i><span id="btnFeedbackText" class="hidden sm:inline">Kiểm tra Nhận Xét</span>
                 <span id="globalNotificationDot" class="hidden absolute -top-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative rounded-full h-3 w-3 bg-red-500 border-2 border-white"></span></span>
             </button>
             <div class="flex items-center text-xs font-bold text-slate-600 bg-slate-100 px-3 py-2 rounded-lg"><span id="studentLabel" class="text-indigo-600 font-black">👤 Chưa định danh</span></div>
@@ -42,15 +48,19 @@
                 <h2 class="text-xl md:text-2xl font-black text-indigo-800 mb-4">II. HƯỚNG DẪN LÀM VÀ NỘP BÀI TẬP</h2>
                 <div class="space-y-2 text-indigo-900/80 text-sm font-medium">
                     <p>Chọn và viết kịch bản hoàn chỉnh <b class="text-red-600">ít nhất 1 trong 3 tình huống</b> bên dưới.</p>
-                    <p>Trong quá trình làm, <b class="text-indigo-700">Bấm LƯU sau mỗi bước</b> để thanh tiến độ tăng lên.</p>
-                    <p>Bản nộp bổ sung sẽ được hệ thống gắn nhãn <b class="text-red-600">[BẢN BỔ SUNG]</b> để báo cho GV biết.</p>
+                    <p><b class="text-indigo-700">LƯU Ý:</b> Hãy tham khảo Kịch Bản Mẫu trước khi làm. Bấm <b>LƯU</b> sau mỗi bước để thanh tiến độ tăng lên.</p>
                 </div>
             </div>
 
             <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4"><i class="fas fa-tasks text-indigo-500"></i> Chọn tình huống thực hành</h3>
             <div id="gridScenarios" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"></div>
-            <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4"><i class="fas fa-book-open text-amber-500"></i> Kịch bản tham khảo</h3>
+            <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4"><i class="fas fa-book-open text-amber-500"></i> Kịch bản tham khảo (Bấm xem trước)</h3>
             <div id="gridReferences" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+        <div class="fixed bottom-0 right-0 w-full bg-white/95 backdrop-blur border-t border-slate-200 p-4 z-40 shadow-lg flex justify-end">
+            <button id="btnCert" onclick="showCert()" class="hidden flex items-center gap-2 px-8 py-3 text-emerald-700 bg-emerald-100 hover:bg-emerald-200 rounded-xl transition font-black text-sm border border-emerald-300">
+                <i class="fas fa-search"></i> Xem lại kịch bản / Copy gửi quản lý
+            </button>
         </div>
     </main>
 
@@ -68,27 +78,47 @@
 
         <div class="flex-1 p-4 md:p-8"><div id="wsContent" class="max-w-4xl mx-auto space-y-6 pb-24"></div></div>
 
+        <!-- BOTTOM BAR ĐÃ ĐỔI: Thêm nút Preview Tổng thể -->
         <div id="wsBottomBar" class="fixed bottom-0 right-0 w-full bg-white/95 backdrop-blur border-t border-slate-200 p-4 z-40 shadow-lg flex justify-between items-center px-4 md:px-8 gap-4">
-            <div class="flex items-center gap-3 w-full max-w-lg">
-                <i class="fas fa-link text-slate-400"></i>
-                <input type="text" id="inpLink" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-medium outline-none focus:border-indigo-400" placeholder="Dán link tài liệu bổ sung vào đây (Nếu có)...">
-            </div>
-            <button id="btnSubmitEx" onclick="submitCurrentExercise()" disabled class="px-8 py-3.5 text-white bg-indigo-600 rounded-xl font-black text-sm shadow-lg opacity-50 cursor-not-allowed">Nộp Kịch Bản Này</button>
+            <button onclick="openPreviewFull()" class="flex items-center gap-2 px-6 py-3.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-xl font-black text-sm transition">
+                <i class="fas fa-eye"></i> Xem tổng thể Kịch bản
+            </button>
+            <button id="btnSubmitEx" onclick="submitCurrentExercise()" disabled class="px-8 py-3.5 text-white bg-indigo-600 rounded-xl font-black text-sm shadow-lg opacity-50 cursor-not-allowed transition">
+                Nộp Kịch Bản Này
+            </button>
         </div>
     </main>
 
+    <!-- MODAL XEM TỔNG THỂ KỊCH BẢN TRONG LÚC LÀM -->
+    <div id="previewFullModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[150] hidden flex-col transition-all p-4 md:p-10">
+        <div class="bg-white rounded-3xl shadow-2xl flex flex-col max-w-4xl w-full mx-auto h-full overflow-hidden">
+            <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                <h2 class="text-xl font-black text-indigo-800"><i class="fas fa-file-alt mr-2"></i>Tổng thể Kịch bản</h2>
+                <div class="flex gap-2">
+                    <button onclick="copyFullScript()" class="bg-slate-800 text-white hover:bg-slate-700 px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2"><i class="fas fa-copy"></i> Copy gửi Quản lý</button>
+                    <button onclick="document.getElementById('previewFullModal').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-red-100 hover:text-red-600 flex items-center justify-center transition"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div id="previewFullContent" class="p-6 md:p-8 flex-1 overflow-y-auto custom-scrollbar bg-white"></div>
+        </div>
+    </div>
+
+    <!-- MODAL ĐĂNG NHẬP -->
     <div id="authModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 max-w-md w-full">
             <h2 class="text-2xl font-black text-slate-800 mb-6 flex items-center gap-2"><i class="fas fa-user-shield text-indigo-600"></i> Định danh</h2>
             <div class="space-y-4">
-                <div><label class="block text-xs font-black text-slate-400 uppercase mb-2">Họ và tên *</label><input type="text" id="inpName" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-400" placeholder="VD: Nguyễn Văn A"></div>
-                <div><label class="block text-xs font-black text-slate-400 uppercase mb-2">Phòng ban (Team) *</label><input type="text" id="inpDept" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-400" placeholder="VD: DSSGN3"></div>
+                <div><label class="block text-xs font-black text-slate-400 uppercase mb-2">Họ và tên *</label><input type="text" id="inpName" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-400"></div>
+                <div><label class="block text-xs font-black text-slate-400 uppercase mb-2">Phòng ban (Team) *</label><input type="text" id="inpDept" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-400"></div>
                 <button onclick="saveProfile()" class="w-full bg-indigo-600 text-white text-sm font-black py-3.5 rounded-xl mt-4">Bắt đầu làm bài</button>
             </div>
         </div>
     </div>
 
-    <script src="codelab-data.js?v=5"></script>
+    <!-- Vùng ẩn xuất PDF -->
+    <div id="pdf-content" class="absolute -left-[9999px] top-0 bg-white p-10 text-gray-800" style="width: 210mm;"></div>
+
+    <script src="codelab-data.js?v=7"></script>
     <script>
         const SESSION_ID = 'session_kynang'; const STORAGE_KEY = 'kv_codelab_progress_kynang'; const DATA_KEY = 'kv_codelab_data_kynang'; 
         let currentExercises = []; let stepDataStore = {}; let activeScenarioIndex = -1;
@@ -123,26 +153,28 @@
 
         function renderDashboard() {
             const gridScenarios = document.getElementById('gridScenarios'); const gridReferences = document.getElementById('gridReferences');
-            gridScenarios.innerHTML = ''; gridReferences.innerHTML = '';
+            gridScenarios.innerHTML = ''; gridReferences.innerHTML = ''; let hasSubmittedAny = false;
 
             currentExercises.forEach((ex, index) => {
                 if (ex.isGroupHeader) return;
                 const myData = stepDataStore[index] || {}; let isRef = ex.title.toLowerCase().includes('tham khảo');
 
                 if (isRef) {
-                    gridReferences.innerHTML += `<div onclick="openReference(${index})" class="glass-panel p-6 rounded-3xl clickable-card flex flex-col h-full bg-amber-50/30 border-amber-200/50"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-black text-lg shadow-sm"><i class="fas fa-book-reader"></i></div><h4 class="font-black text-slate-800 text-lg flex-1">${ex.title}</h4></div><div class="text-amber-600 font-bold text-xs mt-auto pt-3 border-t border-slate-100/50">Xem chi tiết <i class="fas fa-arrow-right"></i></div></div>`;
+                    gridReferences.innerHTML += `<div onclick="openReference(${index})" class="glass-panel p-6 rounded-3xl clickable-card flex flex-col h-full bg-amber-50/30 border-amber-200/50"><div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-black text-lg"><i class="fas fa-book-reader"></i></div><h4 class="font-black text-slate-800 text-lg flex-1">${ex.title}</h4></div><div class="text-amber-600 font-bold text-xs mt-auto pt-3 border-t border-slate-100">Xem kịch bản mẫu <i class="fas fa-arrow-right"></i></div></div>`;
                 } else {
                     let theoryLen = ex.theory ? ex.theory.length : 0; let filledCount = 0;
                     if(myData.textAnswers) { for(let i=0; i<theoryLen; i++) { if(myData.textAnswers[i] && myData.textAnswers[i].trim() !== "") filledCount++; } }
                     let pct = theoryLen === 0 ? 0 : Math.round((filledCount / theoryLen) * 100);
+                    if(myData.isSubmitted) hasSubmittedAny = true;
                     
-                    let statusHtml = myData.isSubmitted ? `<div class="absolute top-4 right-4 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-200 flex items-center gap-1 shadow-sm"><i class="fas fa-check-double"></i> ĐÃ NỘP BÀI</div>` : (pct > 0 ? `<div class="absolute top-4 right-4 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black border border-indigo-200 flex items-center gap-1 shadow-sm"><i class="fas fa-spinner fa-spin"></i> ĐANG LÀM (${pct}%)</div>` : '');
-                    let feedbackHtml = myData.isUnread ? `<div class="absolute -top-3 -right-3 bg-red-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full border-2 border-white shadow-md animate-bounce"><i class="fas fa-bell"></i> Có Nhận Xét</div>` : '';
+                    let statusHtml = myData.isSubmitted ? `<div class="absolute top-4 right-4 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black border border-emerald-200"><i class="fas fa-check-double"></i> ĐÃ NỘP BÀI</div>` : (pct > 0 ? `<div class="absolute top-4 right-4 bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black border border-indigo-200"><i class="fas fa-spinner fa-spin"></i> ĐANG LÀM (${pct}%)</div>` : '');
+                    let feedbackHtml = myData.isUnread ? `<div class="absolute -top-3 -right-3 bg-red-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-md animate-bounce"><i class="fas fa-bell"></i> Có Nhận Xét</div>` : '';
                     let cardStyle = myData.isSubmitted ? 'bg-white border-emerald-200 shadow-md' : 'glass-panel';
 
-                    gridScenarios.innerHTML += `<div onclick="openScenario(${index})" class="group relative ${cardStyle} p-6 rounded-3xl clickable-card flex flex-col h-full">${statusHtml} ${feedbackHtml}<div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-xl mb-4 transition-transform group-hover:scale-110"><i class="fas fa-keyboard"></i></div><h4 class="font-black text-slate-800 text-lg mb-2">${ex.title}</h4><p class="text-slate-500 text-xs leading-relaxed mb-6 flex-1">${ex.hints ? ex.hints[0] : ''}</p><div class="w-full bg-slate-100 h-1.5 rounded-full mb-3 overflow-hidden"><div class="bg-indigo-500 h-full rounded-full transition-all" style="width: ${pct}%"></div></div><div class="text-indigo-600 font-bold text-xs mt-auto group-hover:gap-2 transition-all flex items-center gap-1">Vào làm bài <i class="fas fa-arrow-right"></i></div></div>`;
+                    gridScenarios.innerHTML += `<div onclick="openScenario(${index})" class="group relative ${cardStyle} p-6 rounded-3xl clickable-card flex flex-col h-full">${statusHtml} ${feedbackHtml}<div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-xl mb-4 transition-transform group-hover:scale-110"><i class="fas fa-keyboard"></i></div><h4 class="font-black text-slate-800 text-lg mb-2">${ex.title}</h4><p class="text-slate-500 text-xs leading-relaxed mb-6 flex-1">${ex.hints ? ex.hints[0] : ''}</p><div class="w-full bg-slate-100 h-1.5 rounded-full mb-3 overflow-hidden"><div class="bg-indigo-500 h-full rounded-full transition-all" style="width: ${pct}%"></div></div><div class="text-indigo-600 font-bold text-xs mt-auto flex items-center gap-1">Vào viết kịch bản <i class="fas fa-arrow-right"></i></div></div>`;
                 }
             });
+            if(hasSubmittedAny) document.getElementById('btnCert').classList.remove('hidden'); else document.getElementById('btnCert').classList.add('hidden');
         }
 
         function backToDashboard() { document.getElementById('workspaceView').classList.add('hidden'); document.getElementById('dashboardView').classList.remove('hidden'); renderDashboard(); }
@@ -150,8 +182,8 @@
         function openReference(index) {
             const ex = currentExercises[index]; activeScenarioIndex = index;
             document.getElementById('dashboardView').classList.add('hidden'); document.getElementById('workspaceView').classList.remove('hidden'); document.getElementById('wsTitle').innerText = ex.title; document.getElementById('wsBottomBar').classList.add('hidden'); 
-            let html = `<div class="bg-amber-50 border border-amber-200 p-6 md:p-8 rounded-3xl"><h3 class="font-black text-amber-800 text-lg mb-6"><i class="fas fa-book-open"></i> CHI TIẾT KỊCH BẢN MẪU</h3><div class="space-y-6">`;
-            if(ex.hints) { ex.hints.forEach(hint => { html += `<div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm text-slate-700 text-sm leading-relaxed">${hint.replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-900 text-sm">$1</strong>').replace(/\n/g, '<br>')}</div>`; }); }
+            let html = `<div class="bg-amber-50 p-6 md:p-8 rounded-3xl"><h3 class="font-black text-amber-800 text-lg mb-6"><i class="fas fa-book-open"></i> KỊCH BẢN MẪU</h3><div class="space-y-4">`;
+            if(ex.hints) { ex.hints.forEach(hint => { html += `<div class="bg-white p-5 rounded-2xl border border-amber-100 text-slate-700 text-sm leading-relaxed">${hint.replace(/\*\*(.*?)\*\*/g, '<strong class="text-amber-900">$1</strong>').replace(/\n/g, '<br>')}</div>`; }); }
             html += `</div></div>`; document.getElementById('wsContent').innerHTML = html; document.getElementById('wsProgressBar').style.width = '100%'; document.getElementById('wsProgressText').innerText = '100%';
         }
 
@@ -164,12 +196,9 @@
             let fbObj = parseFB(myData.feedback);
             let html = ``;
 
-            if(fbObj.general) {
-                html += `<div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-2xl mb-6 shadow-sm"><h3 class="text-sm font-black text-amber-800 uppercase tracking-widest mb-2"><i class="fas fa-chalkboard-teacher"></i> Giảng viên nhận xét tổng quan:</h3><p class="text-amber-900 text-sm whitespace-pre-wrap font-medium leading-relaxed">${fbObj.general}</p></div>`;
-            }
-            if(myData.isSubmitted) {
-                html += `<div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl mb-6 flex items-center gap-3"><i class="fas fa-check-circle text-emerald-600 text-2xl"></i><div><p class="font-black text-emerald-800 text-sm">HỆ THỐNG ĐÃ GHI NHẬN BÀI LÀM CỦA BẠN</p><p class="text-xs text-emerald-600 font-medium">Bạn có thể sửa lại kịch bản và bấm Nộp bổ sung nếu muốn.</p></div></div>`;
-            }
+            if(fbObj.general) html += `<div class="bg-amber-50 border-l-4 border-amber-500 p-5 rounded-r-2xl mb-6 shadow-sm"><h3 class="text-sm font-black text-amber-800 uppercase mb-2"><i class="fas fa-chalkboard-teacher"></i> Giảng viên nhận xét tổng quan:</h3><p class="text-amber-900 text-sm whitespace-pre-wrap font-medium">${fbObj.general}</p></div>`;
+            if(ex.hints && ex.hints.length > 0) html += `<div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-8 text-indigo-900 text-sm font-medium leading-relaxed">${ex.hints.map(h => `<p>${h.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</p>`).join('')}</div>`;
+            if(myData.isSubmitted) html += `<div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl mb-6 flex items-center gap-3"><i class="fas fa-check-circle text-emerald-600 text-2xl"></i><div><p class="font-black text-emerald-800 text-sm">HỆ THỐNG ĐÃ GHI NHẬN BÀI LÀM CỦA BẠN</p><p class="text-xs text-emerald-600 font-medium">Bạn có thể sửa lại kịch bản và bấm Nộp bổ sung.</p></div></div>`;
 
             let answersArr = myData.textAnswers || [];
             if(ex.theory) {
@@ -178,48 +207,29 @@
                     let btnStateClass = isFilled ? "bg-emerald-100 text-emerald-700" : "bg-white text-slate-600 border border-slate-300";
                     let btnText = isFilled ? `<i class="fas fa-check"></i> Đã Lưu` : `<i class="fas fa-save"></i> Lưu bước này`;
                     
-                    // NẾU BƯỚC NÀY CÓ NHẬN XÉT CỦA GIẢNG VIÊN (NÚT BẬT TẮT)
-                    let fbStepHtml = '';
-                    let fbStepVal = fbObj[`step${qIndex}`];
+                    let fbStepHtml = ''; let fbStepVal = fbObj[`step${qIndex}`];
                     if(fbStepVal && fbStepVal.trim() !== "") {
-                        fbStepHtml = `
-                        <div class="relative">
-                            <button onclick="document.getElementById('fb_box_${qIndex}').classList.toggle('hidden')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 transition border border-amber-300 animate-pulse">
-                                <i class="fas fa-comment-dots text-sm"></i> Xem nhận xét bước này
-                            </button>
-                            <div id="fb_box_${qIndex}" class="hidden absolute top-10 right-0 w-80 bg-white border border-amber-200 shadow-2xl rounded-2xl p-4 z-40 origin-top-right">
-                                <div class="flex justify-between items-center mb-2 pb-2 border-b border-amber-100"><span class="text-[10px] font-black text-amber-600 uppercase"><i class="fas fa-pen"></i> GV Sửa bài:</span><i class="fas fa-times text-slate-400 cursor-pointer" onclick="document.getElementById('fb_box_${qIndex}').classList.add('hidden')"></i></div>
-                                <p class="text-sm text-slate-700 font-medium">${fbStepVal}</p>
-                            </div>
-                        </div>`;
+                        fbStepHtml = `<div class="relative"><button onclick="document.getElementById('fb_box_${qIndex}').classList.toggle('hidden')" class="bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 border border-amber-300 animate-pulse"><i class="fas fa-comment-dots text-sm"></i> Xem nhận xét</button><div id="fb_box_${qIndex}" class="hidden absolute top-10 right-0 w-80 bg-white border border-amber-200 shadow-xl rounded-2xl p-4 z-40 origin-top-right"><div class="flex justify-between items-center mb-2 pb-2 border-b border-amber-100"><span class="text-[10px] font-black text-amber-600 uppercase"><i class="fas fa-pen"></i> GV Sửa bài:</span><i class="fas fa-times text-slate-400 cursor-pointer" onclick="document.getElementById('fb_box_${qIndex}').classList.add('hidden')"></i></div><p class="text-sm text-slate-700 font-medium">${fbStepVal}</p></div></div>`;
                     }
 
                     html += `
                     <div class="mb-6 bg-white border border-slate-200 rounded-2xl overflow-visible shadow-sm">
-                        <div class="bg-slate-50 p-3 px-5 border-b border-slate-200 flex justify-between items-center relative">
-                            <p class="text-slate-800 font-black text-sm uppercase tracking-tight">${q}</p>
-                            ${fbStepHtml}
-                        </div>
+                        <div class="bg-slate-50 p-3 px-5 border-b border-slate-200 flex justify-between items-center relative"><p class="text-slate-800 font-black text-sm uppercase">${q}</p>${fbStepHtml}</div>
                         <textarea id="inpStep_${qIndex}" rows="4" class="w-full p-5 outline-none font-medium text-slate-700 text-sm resize-y" placeholder="Gõ lời thoại kịch bản của bạn...">${ansVal}</textarea>
-                        <div class="bg-slate-50 px-5 py-3 border-t border-slate-100 flex justify-end">
-                            <button id="btnSave_${qIndex}" onclick="saveSingleStep(${qIndex})" class="px-5 py-2 text-xs font-bold rounded-lg transition-all ${btnStateClass}">${btnText}</button>
-                        </div>
+                        <div class="bg-slate-50 px-5 py-3 border-t border-slate-100 flex justify-end"><button id="btnSave_${qIndex}" onclick="saveSingleStep(${qIndex})" class="px-5 py-2 text-xs font-bold rounded-lg transition-all ${btnStateClass}">${btnText}</button></div>
                     </div>`;
                 });
             }
-
-            document.getElementById('wsContent').innerHTML = html;
-            if(myData.linkAttachment) document.getElementById('inpLink').value = myData.linkAttachment; else document.getElementById('inpLink').value = "";
-            updateWorkspaceProgress();
+            document.getElementById('wsContent').innerHTML = html; updateWorkspaceProgress();
         }
 
         function saveSingleStep(stepIndex) {
             let val = document.getElementById(`inpStep_${stepIndex}`).value.trim();
-            if(!val) { alert("Vui lòng nhập nội dung!"); document.getElementById(`inpStep_${stepIndex}`).focus(); return; }
+            if(!val) { alert("Vui lòng nhập nội dung kịch bản trước khi lưu!"); document.getElementById(`inpStep_${stepIndex}`).focus(); return; }
             if(!stepDataStore[activeScenarioIndex]) stepDataStore[activeScenarioIndex] = { textAnswers: [] };
             if(!stepDataStore[activeScenarioIndex].textAnswers) stepDataStore[activeScenarioIndex].textAnswers = [];
             stepDataStore[activeScenarioIndex].textAnswers[stepIndex] = val; localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore));
-            let btn = document.getElementById(`btnSave_${stepIndex}`); btn.innerHTML = `<i class="fas fa-check"></i> Đã Lưu`; btn.className = "px-5 py-2 text-xs font-bold rounded-lg border bg-emerald-100 text-emerald-700";
+            let btn = document.getElementById(`btnSave_${stepIndex}`); btn.innerHTML = `<i class="fas fa-check"></i> Đã Lưu`; btn.className = "px-5 py-2 text-xs font-bold rounded-lg border bg-emerald-100 text-emerald-700 border-emerald-300";
             updateWorkspaceProgress();
         }
 
@@ -232,13 +242,46 @@
             let submitBtn = document.getElementById('btnSubmitEx');
             if(submitBtn) {
                 if(filledCount === theoryLen && theoryLen > 0) {
-                    submitBtn.disabled = false; submitBtn.classList.remove('opacity-50', 'cursor-not-allowed'); 
-                    submitBtn.innerHTML = data.isSubmitted ? `<i class="fas fa-sync"></i> Nộp Bản Bổ Sung Mới` : `<i class="fas fa-paper-plane"></i> Nộp Kịch Bản Này`;
+                    submitBtn.disabled = false; submitBtn.classList.remove('opacity-50', 'cursor-not-allowed'); submitBtn.classList.add('hover:scale-105');
+                    submitBtn.innerHTML = data.isSubmitted ? `<i class="fas fa-sync"></i> Nộp Bản Bổ Sung` : `<i class="fas fa-paper-plane"></i> Nộp Kịch Bản Này`;
                 } else {
-                    submitBtn.disabled = true; submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                    submitBtn.innerHTML = `<i class="fas fa-lock"></i> Hãy Lưu Đủ ${theoryLen} Bước Để Nộp`;
+                    submitBtn.disabled = true; submitBtn.classList.add('opacity-50', 'cursor-not-allowed'); submitBtn.classList.remove('hover:scale-105');
+                    submitBtn.innerHTML = `<i class="fas fa-lock"></i> Lưu Đủ ${theoryLen} Bước Để Nộp`;
                 }
             }
+        }
+
+        // HÀM MỞ MODAL XEM TỔNG THỂ VÀ COPY KỊCH BẢN
+        function openPreviewFull() {
+            const ex = currentExercises[activeScenarioIndex];
+            const data = stepDataStore[activeScenarioIndex] || {};
+            const answers = data.textAnswers || [];
+            
+            let html = `<div class="space-y-6" id="textToCopy">`;
+            ex.theory.forEach((q, idx) => {
+                let ans = answers[idx] || '(Chưa nhập kịch bản)';
+                html += `<div><h3 class="text-sm font-black text-indigo-700 uppercase mb-2 border-b border-indigo-100 pb-1">${q}</h3><p class="text-slate-700 text-sm leading-relaxed whitespace-pre-wrap font-medium">${ans}</p></div>`;
+            });
+            html += `</div>`;
+            document.getElementById('previewFullContent').innerHTML = html;
+            document.getElementById('previewFullModal').classList.remove('hidden');
+            document.getElementById('previewFullModal').classList.add('flex');
+        }
+
+        function copyFullScript() {
+            const ex = currentExercises[activeScenarioIndex];
+            const data = stepDataStore[activeScenarioIndex] || {};
+            const answers = data.textAnswers || [];
+            let copyText = `KỊCH BẢN TƯ VẤN\nTình huống: ${ex.title}\n\n`;
+            ex.theory.forEach((q, idx) => {
+                copyText += `${q}\n${answers[idx] || '(Chưa nhập)'}\n\n`;
+            });
+
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert("Đã Copy kịch bản thành công! Bạn có thể dán (Ctrl+V) gửi vào Zalo/Email cho Quản lý.");
+            }).catch(err => {
+                alert("Trình duyệt không hỗ trợ Copy tự động. Vui lòng bôi đen và copy thủ công.");
+            });
         }
 
         function submitCurrentExercise() {
@@ -250,30 +293,89 @@
             const btnEl = document.getElementById('btnSubmitEx'); const oldText = btnEl.innerHTML;
             btnEl.classList.replace('bg-indigo-600', 'bg-slate-500'); btnEl.disabled = true; btnEl.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Đang nộp bài...`; 
 
-            const linkAtt = document.getElementById('inpLink').value.trim(); currentData.linkAttachment = linkAtt;
-
-            const payload = { 
-                studentName: profile.name, department: profile.dept, courseName: courseName, session: "Thực hành Kịch bản", exerciseTitle: exerciseTitle, 
-                isUpdate: currentData.isSubmitted || false, textAnswers: currentData.textAnswers || [], linkAttachment: linkAtt 
-            };
+            const payload = { studentName: profile.name, department: profile.dept, courseName: courseName, session: "Thực hành Kịch bản", exerciseTitle: exerciseTitle, isUpdate: currentData.isSubmitted || false, textAnswers: currentData.textAnswers || [] };
 
             fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
             .then(r => r.json()).then(data => {
                 if(data.status === 'success') {
-                    currentData.isSubmitted = true; currentData.isUnread = false; // Reset chuông khi nộp lại
+                    currentData.isSubmitted = true; currentData.isUnread = false; 
                     localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore)); 
-                    alert("🎉 NỘP BÀI THÀNH CÔNG!\nHệ thống đã lưu trữ bài làm của bạn. Hãy chờ GV chấm điểm nhé!"); backToDashboard(); 
+                    alert("🎉 NỘP BÀI THÀNH CÔNG!\nKịch bản của bạn đã được lưu trữ an toàn."); backToDashboard(); 
                 } else alert("Lỗi server: " + data.message);
             }).catch(err => alert("Lỗi kết nối mạng!")).finally(() => { btnEl.classList.replace('bg-slate-500', 'bg-indigo-600'); btnEl.innerHTML = oldText; btnEl.disabled = false; });
         }
 
+        // TÍNH NĂNG VIEW TỔNG / XUẤT PDF NGOÀI DASHBOARD
+        function showCert() {
+            const reviewContainer = document.getElementById('reviewModalContent');
+            const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
+            
+            let reviewHtml = `<div class="max-w-4xl mx-auto space-y-6"><div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"><h1 class="text-2xl font-black text-slate-800 mb-4">Lịch Sử Nộp Bài Của Bạn</h1><div class="flex flex-wrap gap-4"><span class="bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-lg text-sm font-bold">👤 ${profile.name} - ${profile.dept}</span></div></div>`;
+
+            for(let i=0; i<currentExercises.length; i++) {
+                if(currentExercises[i].isGroupHeader) continue;
+                const ex = currentExercises[i]; const data = stepDataStore[i] || {};
+                if(!data.isSubmitted) continue; 
+                
+                reviewHtml += `<div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 relative"><button onclick="copySpecificScript(${i})" class="absolute top-6 right-6 bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 shadow-sm no-print"><i class="fas fa-copy"></i> Copy gửi Quản lý</button><h2 class="text-lg font-black text-indigo-700 mb-4 pb-2 border-b border-slate-100">${ex.title}</h2>`;
+                
+                if(ex.theory && ex.theory.length > 0) {
+                    let answersArr = data.textAnswers || [];
+                    ex.theory.forEach((q, qIndex) => {
+                        let ans = answersArr[qIndex] || '(Trống)';
+                        reviewHtml += `<div class="mb-3 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden"><div class="bg-indigo-50 px-4 py-2 border-b border-slate-200 font-bold text-slate-700 text-sm">${q}</div><p class="text-slate-800 p-4 text-sm font-medium whitespace-pre-wrap leading-relaxed">${ans}</p></div>`;
+                    });
+                }
+
+                let fbObj = parseFB(data.feedback);
+                if(fbObj.general) reviewHtml += `<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl mt-6"><h3 class="text-sm font-black text-amber-800 uppercase tracking-widest mb-2"><i class="fas fa-chalkboard-teacher"></i> Giảng viên nhận xét tổng quan:</h3><p class="text-amber-900 text-sm whitespace-pre-wrap font-medium">${fbObj.general}</p></div>`;
+                
+                reviewHtml += `</div>`;
+            }
+            reviewHtml += `</div>`; reviewContainer.innerHTML = reviewHtml;
+            document.getElementById('reviewModal').classList.remove('hidden'); document.getElementById('reviewModal').classList.add('flex');
+            buildPrintTemplate();
+        }
+
+        function copySpecificScript(index) {
+            const ex = currentExercises[index]; const data = stepDataStore[index] || {}; const answers = data.textAnswers || [];
+            let copyText = `KỊCH BẢN TƯ VẤN\nTình huống: ${ex.title}\n\n`;
+            ex.theory.forEach((q, idx) => { copyText += `${q}\n${answers[idx] || '(Chưa nhập)'}\n\n`; });
+            navigator.clipboard.writeText(copyText).then(() => { alert("Đã Copy kịch bản! Bạn có thể dán (Ctrl+V) gửi cho Quản lý."); }).catch(err => { alert("Lỗi trình duyệt. Không copy được."); });
+        }
+
+        function closeReviewModal() { document.getElementById('reviewModal').classList.add('hidden'); document.getElementById('reviewModal').classList.remove('flex'); }
+
+        function buildPrintTemplate() {
+            const pdfContent = document.getElementById('pdf-content'); const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
+            let reportHtml = `<div style="font-family: Arial, sans-serif; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;"><div style="text-align: center; border-bottom: 2px solid #4f46e5; margin-bottom: 30px; padding-bottom: 20px;"><h1 style="font-size: 28px; font-weight: 900; color: #1e3a8a; margin: 0 0 10px 0;">BÁO CÁO THỰC HÀNH KỊCH BẢN</h1><p style="font-size: 16px; color: #64748b; margin: 0;">Khóa học: ${APP_CONFIG.COURSE_NAME}</p></div><div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 40px;"><p style="margin: 0 0 10px 0; font-size: 16px;"><strong>Học viên:</strong> ${profile.name}</p><p style="margin: 0; font-size: 16px;"><strong>Phòng ban:</strong> ${profile.dept}</p></div>`;
+
+            for(let i=0; i<currentExercises.length; i++) {
+                if(currentExercises[i].isGroupHeader) continue;
+                const ex = currentExercises[i]; const data = stepDataStore[i] || {};
+                if(!data.isSubmitted) continue;
+                
+                reportHtml += `<div class="print-page-break"><h2 style="font-size: 20px; font-weight: bold; color: #4f46e5; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">Tình huống: ${ex.title}</h2>`;
+                if(ex.theory && ex.theory.length > 0) {
+                    let answersArr = data.textAnswers || [];
+                    ex.theory.forEach((q, qIndex) => {
+                        let ans = answersArr[qIndex] || '(Trống)';
+                        reportHtml += `<div style="margin-bottom: 20px;"><div style="background: #eef2ff; border-left: 4px solid #4f46e5; padding: 8px 15px; font-size: 14px; font-weight: bold; color: #312e81; margin-bottom: 8px;">${q}</div><div style="padding: 0 15px; font-size: 14px; white-space: pre-wrap; color: #334155; line-height: 1.6;">${ans}</div></div>`;
+                    });
+                }
+                let fbObj = parseFB(data.feedback);
+                if(fbObj.general) reportHtml += `<div style="background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 15px; margin-top: 20px; page-break-inside: avoid;"><p style="font-weight: bold; font-size: 14px; margin: 0 0 8px 0; color: #b45309;">💬 Giảng viên nhận xét:</p><p style="font-size: 14px; color: #78350f; white-space: pre-wrap; margin: 0; line-height: 1.6;">${fbObj.general}</p></div>`;
+                reportHtml += `</div>`;
+            }
+            pdfContent.innerHTML = reportHtml + `<div style="text-align: center; margin-top: 50px; font-size: 12px; color: #94a3b8;">Báo cáo xuất từ Hệ thống Đào tạo KiotViet</div></div>`;
+        }
+
+        function generatePDF() { window.print(); }
+
         function fetchFeedback(isManualClick) {
             const apiUrl = APP_CONFIG.API_URL; if(!apiUrl) return;
-            const profileRaw = localStorage.getItem('kv_trainer_profile'); if(!profileRaw) return;
-            const profile = JSON.parse(profileRaw);
-            
+            const profile = JSON.parse(localStorage.getItem('kv_trainer_profile'));
             if(isManualClick) document.getElementById('btnFeedbackText').innerText = "Đang tải...";
-            
             fetch(`${apiUrl}?studentName=${encodeURIComponent(profile.name)}`)
             .then(r => r.json()).then(res => {
                 if(res.status === 'success' && res.allData) {
@@ -284,18 +386,16 @@
                             if(!stepDataStore[i]) stepDataStore[i] = {};
                             if(stepDataStore[i].feedback !== sessionData[title]) {
                                 stepDataStore[i].feedback = sessionData[title]; 
-                                // CHỈ ĐÁNH DẤU CHUÔNG NẾU TRẠNG THÁI LÀ GRADED (Không báo chuông nếu GV bấm Bỏ Qua)
                                 let fbObj = parseFB(sessionData[title]);
                                 if(fbObj.status === 'graded') { stepDataStore[i].isUnread = true; hasNew = true; }
                             }
                         }
                     }
                     if(hasNew) { localStorage.setItem(DATA_KEY, JSON.stringify(stepDataStore)); renderDashboard(); updateGlobalNotification(); }
-                    if(isManualClick) { if(hasNew) alert("Bạn có nhận xét mới từ Giảng viên!"); else alert("Bạn chưa có nhận xét mới nào."); }
+                    if(isManualClick) { if(hasNew) alert("Bạn có nhận xét mới từ Giảng viên!"); else alert("Chưa có nhận xét mới."); }
                 }
-            }).catch(err => console.error(err)).finally(() => { if(isManualClick) document.getElementById('btnFeedbackText').innerText = "Kiểm tra Nhận Xét"; });
+            }).finally(() => { if(isManualClick) document.getElementById('btnFeedbackText').innerText = "Kiểm tra Nhận Xét"; });
         }
-
         function updateGlobalNotification() {
             let hasAnyUnread = false; for(let key in stepDataStore) { if(stepDataStore[key].isUnread) { hasAnyUnread = true; break; } }
             const dot = document.getElementById('globalNotificationDot'); if(hasAnyUnread) dot.classList.remove('hidden'); else dot.classList.add('hidden');

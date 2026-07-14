@@ -4,240 +4,232 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Công cụ Đánh giá Sản phẩm - Trainer OS</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS Chuẩn của hệ thống Trainer OS */
         body { background-color: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
         .saas-card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid #f1f5f9; padding: 1.25rem; }
-        .btn-primary { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .btn-primary:hover { background-color: #1d4ed8; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); }
-        .table-header { background-color: #f1f5f9; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
-        .editable-cell { transition: background-color 0.2s; }
-        .editable-cell:focus { background-color: #eff6ff; outline: none; border-radius: 0.25rem; }
-        
-        /* Layout Sidebar cố định */
+        .btn-primary { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-secondary { background-color: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; }
+        .btn-secondary:hover { background-color: #059669; }
+        .table-header { background-color: #f1f5f9; color: #334155; font-weight: 600; font-size: 0.85rem; }
+        .editable-cell { transition: background-color 0.2s; white-space: pre-line; }
+        .editable-cell:focus { background-color: #eff6ff; outline: 1px solid #93c5fd; border-radius: 0.25rem; }
         .sidebar { width: 250px; height: 100vh; position: fixed; top: 0; left: 0; z-index: 40; }
         .main-content { margin-left: 250px; min-height: 100vh; }
+        .step-badge { background-color: #dbeafe; color: #1e40af; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; margin-right: 0.5rem; }
     </style>
 </head>
 <body>
 
-    <!-- SIDEBAR NAVIGATION (Cần đồng bộ với các file khác) -->
+    <!-- SIDEBAR -->
     <aside class="sidebar bg-slate-900 text-white p-4 flex flex-col">
         <div class="flex items-center gap-3 px-2 mb-8 mt-2">
             <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-lg">T</div>
             <span class="font-bold text-xl tracking-wide">Trainer OS</span>
         </div>
-        
         <nav class="flex-1 space-y-2">
             <a href="index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-                <i class="fa-solid fa-chart-pie w-5"></i> Tổng quan (Dashboard)
+                <i class="fa-solid fa-chart-pie w-5"></i> Tổng quan
             </a>
-            <!-- LINK HIỆN TẠI ĐANG ACTIVE -->
             <a href="product-assessment.html" class="flex items-center gap-3 px-3 py-2.5 rounded-md bg-blue-600 text-white shadow-md">
                 <i class="fa-solid fa-clipboard-check w-5"></i> Bộ đánh giá SP
-            </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-                <i class="fa-solid fa-users w-5"></i> Hồ sơ học viên
-            </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-md text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-                <i class="fa-solid fa-file-word w-5"></i> Tài liệu hệ thống
             </a>
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="main-content flex flex-col">
-        <!-- TOP HEADER -->
+        <!-- HEADER -->
         <header class="bg-white h-16 border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-30">
-            <h1 class="text-xl font-semibold text-gray-800">Công cụ Đánh giá & Review Sản phẩm</h1>
-            <div class="flex items-center gap-4">
-                <button class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-bell"></i></button>
-                <div class="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-700 font-bold">QA</div>
-            </div>
+            <h1 class="text-xl font-semibold text-gray-800">Công cụ Tạo Kịch Bản Đào Tạo (Roleplay)</h1>
         </header>
 
         <!-- WORKSPACE -->
-        <div class="p-6 flex-1 bg-slate-50">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+        <div class="p-6 flex-1 bg-slate-50 overflow-auto">
+            
+            <!-- STEP 1 & 2: INPUT & GENERATE PROMPT -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 
-                <!-- CỘT TRÁI: NHẬP LIỆU WORDPRESS -->
-                <div class="lg:col-span-4 flex flex-col gap-4">
-                    <div class="saas-card flex-1 flex flex-col">
-                        <h2 class="text-base font-bold text-gray-800 mb-2 flex items-center gap-2">
-                            <i class="fa-brands fa-wordpress text-blue-600"></i> Code/Nội dung WordPress
-                        </h2>
-                        <p class="text-sm text-gray-500 mb-4">Dán mã HTML hoặc văn bản mô tả tính năng sản phẩm vào đây để hệ thống bóc tách.</p>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tên tính năng / Module:</label>
-                            <input type="text" id="moduleName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="VD: Tự động hóa Workflow">
-                        </div>
+                <!-- BƯỚC 1 -->
+                <div class="saas-card flex flex-col">
+                    <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center">
+                        <span class="step-badge">1</span> Nhập Tài Liệu Tính Năng
+                    </h2>
+                    <input type="text" id="moduleName" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Tên tính năng (VD: Quản lý Lô - Hạn sử dụng)">
+                    <textarea id="wpContent" class="w-full h-40 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm resize-none mb-3" placeholder="Dán nội dung tài liệu sản phẩm vào đây..."></textarea>
+                    <button id="btnGeneratePrompt" class="btn-primary w-full">
+                        <i class="fa-solid fa-microchip"></i> Tạo Lệnh Phân Tích (Master Prompt)
+                    </button>
+                </div>
 
-                        <div class="flex-1 min-h-[400px] flex flex-col">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nội dung bài viết (Raw Text/HTML):</label>
-                            <textarea id="wpContent" class="w-full flex-1 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-none" placeholder="<h1>Tính năng tự động hóa</h1>&#10;<p>Hệ thống cho phép người dùng tạo kịch bản tự động khi có khách hàng mới...</p>"></textarea>
-                        </div>
+                <!-- BƯỚC 2 -->
+                <div class="saas-card flex flex-col bg-blue-50 border-blue-100">
+                    <h2 class="text-base font-bold text-blue-900 mb-3 flex items-center">
+                        <span class="step-badge bg-blue-600 text-white">2</span> Lệnh Yêu Cầu AI (Prompt)
+                    </h2>
+                    <p class="text-xs text-blue-700 mb-2">Copy đoạn lệnh này dán vào ChatGPT/Claude để AI xử lý nghiệp vụ tái ký.</p>
+                    <textarea id="generatedPrompt" class="w-full h-40 p-3 border border-blue-200 rounded-md text-sm resize-none mb-3 bg-white" readonly placeholder="Lệnh sẽ xuất hiện ở đây..."></textarea>
+                    <button id="btnCopyPrompt" class="btn-secondary w-full" disabled>
+                        <i class="fa-regular fa-copy"></i> Copy lệnh mang sang ChatGPT
+                    </button>
+                </div>
+            </div>
 
-                        <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
-                            <button id="btnProcess" class="btn-primary w-full">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Bóc tách & Xây dựng Bộ Đánh Giá
-                            </button>
-                        </div>
+            <!-- STEP 3: RENDER TABLE -->
+            <div class="saas-card flex flex-col mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-base font-bold text-gray-800 flex items-center">
+                        <span class="step-badge bg-green-600 text-white">3</span> Hiển Thị Kết Quả Đánh Giá
+                    </h2>
+                    <div class="flex gap-2 w-1/2">
+                        <input type="text" id="jsonInput" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" placeholder="Dán kết quả JSON từ ChatGPT vào đây...">
+                        <button id="btnRenderTable" class="btn-secondary !bg-gray-800 hover:!bg-gray-900 whitespace-nowrap">
+                            <i class="fa-solid fa-table"></i> Vẽ Bảng
+                        </button>
                     </div>
                 </div>
 
-                <!-- CỘT PHẢI: BẢNG KẾT QUẢ RUBRIC -->
-                <div class="lg:col-span-8 flex flex-col gap-4">
-                    <div class="saas-card flex-1 flex flex-col">
-                        <div class="flex justify-between items-center mb-4">
-                            <div>
-                                <h2 class="text-base font-bold text-gray-800">Bảng Tiêu chí & Review Học Viên</h2>
-                                <p class="text-sm text-gray-500" id="currentModuleDisplay">Chưa có dữ liệu. Vui lòng nhập nội dung bên trái.</p>
-                            </div>
-                            <div class="flex gap-2">
-                                <button class="px-3 py-1.5 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors">
-                                    <i class="fa-solid fa-plus"></i> Thêm dòng
-                                </button>
-                                <button class="btn-primary !text-sm !py-1.5" onclick="saveRubric()">
-                                    <i class="fa-solid fa-floppy-disk"></i> Lưu bộ tiêu chí
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Trạng thái Loading (Mặc định ẩn) -->
-                        <div id="loadingState" class="hidden flex-1 flex flex-col items-center justify-center text-gray-500 gap-3">
-                            <i class="fa-solid fa-circle-notch fa-spin text-3xl text-blue-500"></i>
-                            <p>Đang xử lý nội dung & tạo tình huống...</p>
-                        </div>
-
-                        <!-- Bảng dữ liệu -->
-                        <div class="overflow-x-auto rounded-lg border border-gray-200 flex-1" id="tableContainer">
-                            <table class="w-full text-left text-sm" id="rubricTable">
-                                <thead class="table-header">
-                                    <tr>
-                                        <th class="px-4 py-3 w-16 text-center">STT</th>
-                                        <th class="px-4 py-3 w-1/4">Tiêu chí (Criteria)</th>
-                                        <th class="px-4 py-3 w-1/3">Tình huống (Scenario)</th>
-                                        <th class="px-4 py-3">Câu hỏi Review</th>
-                                        <th class="px-4 py-3 w-16 text-center">Xóa</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200 bg-white" id="rubricBody">
-                                    <!-- Dữ liệu trống ban đầu -->
-                                    <tr>
-                                        <td colspan="5" class="px-4 py-8 text-center text-gray-400 italic">
-                                            Chưa có tiêu chí nào được tạo.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <!-- KHUNG THAM CHIẾU ĐÁNH GIÁ (Ghim UI) -->
+                <div class="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4 text-sm flex gap-6">
+                    <div><strong class="text-amber-800">Chưa đạt:</strong> Nhớ tính năng rời rạc.</div>
+                    <div><strong class="text-amber-800">Đạt thao tác:</strong> Biết làm nhưng giải thích lợi ích chung chung.</div>
+                    <div><strong class="text-amber-800">Đạt ứng dụng:</strong> Chọn đúng tính năng, nói được lợi ích chính.</div>
+                    <div><strong class="text-amber-800">Tốt:</strong> Hỏi thêm vấn đề, diễn đạt lợi ích theo ngôn ngữ khách.</div>
                 </div>
 
+                <!-- BẢNG KẾT QUẢ -->
+                <div class="overflow-x-auto rounded-lg border border-gray-200" id="tableContainer">
+                    <table class="w-full text-left text-sm" id="rubricTable">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-4 py-3 w-12 text-center">STT</th>
+                                <th class="px-4 py-3 w-1/4">Tình huống (Vấn đề Khách hàng)</th>
+                                <th class="px-4 py-3 w-1/5">Câu hỏi cho Sale</th>
+                                <th class="px-4 py-3 w-1/4">Kỳ vọng trả lời (Giải pháp & Lợi ích)</th>
+                                <th class="px-4 py-3">Câu hỏi Đào sâu</th>
+                                <th class="px-4 py-3 w-12 text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white" id="rubricBody">
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-400 italic">
+                                    Dán JSON và bấm "Vẽ Bảng" để hiển thị kịch bản.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-4 flex justify-end">
+                    <button class="btn-primary" onclick="saveData()">
+                        <i class="fa-solid fa-floppy-disk"></i> Lưu Kịch Bản Vào Hệ Thống
+                    </button>
+                </div>
             </div>
         </div>
     </main>
 
-    <!-- LOGIC XỬ LÝ GIAO DIỆN -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const btnProcess = document.getElementById('btnProcess');
-            const loadingState = document.getElementById('loadingState');
-            const tableContainer = document.getElementById('tableContainer');
+            const btnGeneratePrompt = document.getElementById('btnGeneratePrompt');
+            const generatedPrompt = document.getElementById('generatedPrompt');
+            const btnCopyPrompt = document.getElementById('btnCopyPrompt');
+            const btnRenderTable = document.getElementById('btnRenderTable');
             const rubricBody = document.getElementById('rubricBody');
-            const moduleNameInput = document.getElementById('moduleName');
-            const currentModuleDisplay = document.getElementById('currentModuleDisplay');
 
-            // Nút xử lý - Giả lập Loading để test UI
-            btnProcess.addEventListener('click', () => {
-                const wpContent = document.getElementById('wpContent').value;
-                const moduleName = moduleNameInput.value.trim();
+            // 1. TẠO MASTER PROMPT DỰA TRÊN NGHIỆP VỤ BẠN CUNG CẤP
+            btnGeneratePrompt.addEventListener('click', () => {
+                const moduleName = document.getElementById('moduleName').value.trim() || '[Tên tính năng]';
+                const wpContent = document.getElementById('wpContent').value.trim();
 
                 if (!wpContent) {
-                    alert('Vui lòng nhập code hoặc nội dung WordPress cần bóc tách!');
+                    alert('Vui lòng dán nội dung tài liệu tính năng!');
                     return;
                 }
 
-                // Cập nhật tên Module
-                currentModuleDisplay.textContent = moduleName ? `Module: ${moduleName}` : 'Module: Chưa đặt tên';
+                const masterPrompt = `Đóng vai trò là Giám đốc Đào tạo L&D cho đội ngũ Sale phần mềm quản lý (mô hình SaaS).
+Tôi sẽ cung cấp tài liệu về tính năng: "${moduleName}".
+Nhiệm vụ của bạn là đọc hiểu sâu tính năng này và tạo ra 4-5 "Tình huống Roleplay" để tôi kiểm tra năng lực tư vấn của Sale.
 
-                // Thay đổi UI -> Loading
-                btnProcess.disabled = true;
-                btnProcess.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Đang phân tích...';
-                tableContainer.classList.add('hidden');
-                loadingState.classList.remove('hidden');
-                loadingState.classList.add('flex');
+YÊU CẦU NGHIỆP VỤ KHẮT KHE:
+1. "Tình huống" phải gắn với mô hình kinh doanh cụ thể (ví dụ: Mỹ phẩm, F&B, Điện thoại, Nội thất...) có nỗi đau rõ ràng.
+2. "Kỳ vọng trả lời" bắt buộc cấu trúc: Tính năng đề xuất + Lợi ích giải quyết đúng nỗi đau (không nói chung chung).
+3. "Câu hỏi đào sâu" là lời từ chối của khách (vd: chị dùng Excel cũng được) hoặc yêu cầu so sánh (khi nào dùng tính năng A thay vì tính năng B).
 
-                // Giả lập thời gian xử lý (Sau này sẽ gọi API thực tế ở đây)
-                setTimeout(() => {
-                    renderMockData();
-                    
-                    // Trả lại UI
-                    btnProcess.disabled = false;
-                    btnProcess.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Bóc tách & Xây dựng Bộ Đánh Giá';
-                    loadingState.classList.remove('flex');
-                    loadingState.classList.add('hidden');
-                    tableContainer.classList.remove('hidden');
-                }, 1500);
+TRẢ VỀ DUY NHẤT DỮ LIỆU DƯỚI DẠNG ARRAY JSON ĐỂ LẬP TRÌNH ĐỌC (Không giải thích thêm):
+[
+  {
+    "tinhHuong": "Khách là shop..., gặp vấn đề...",
+    "cauHoiSale": "Em sẽ gợi ý tính năng nào? Lợi ích là gì?",
+    "kyVong": "Gợi ý tính năng XYZ. Lợi ích: giúp khách giải quyết...",
+    "daoSau": "Nếu khách nói: ... thì em xử lý sao?"
+  }
+]
+
+TÀI LIỆU TÍNH NĂNG CẦN PHÂN TÍCH:
+${wpContent}`;
+
+                generatedPrompt.value = masterPrompt;
+                btnCopyPrompt.disabled = false;
+                btnCopyPrompt.classList.remove('opacity-50');
             });
 
-            // Hàm render dữ liệu mẫu (Mocking để xem UI)
-            function renderMockData() {
-                rubricBody.innerHTML = `
-                    <tr class="hover:bg-slate-50 transition-colors group">
-                        <td class="px-4 py-3 text-center text-gray-500 font-medium">1</td>
-                        <td class="px-4 py-3 text-gray-800 align-top editable-cell" contenteditable="true">
-                            Hiểu và thao tác được tính năng "Thêm mới Workflow"
-                        </td>
-                        <td class="px-4 py-3 text-gray-600 align-top editable-cell" contenteditable="true">
-                            Khách hàng yêu cầu: "Khi có người đăng ký Form, hệ thống tự động gửi Email sau 24h và gán thẻ VIP". Hãy thiết lập trên hệ thống.
-                        </td>
-                        <td class="px-4 py-3 text-gray-600 align-top editable-cell" contenteditable="true">
-                            1. Delay node (độ trễ) đặt ở đâu là đúng nhất?<br>
-                            2. Nếu email không gửi được, làm sao kiểm tra log?
-                        </td>
-                        <td class="px-4 py-3 text-center align-top">
-                            <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa dòng này">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition-colors group">
-                        <td class="px-4 py-3 text-center text-gray-500 font-medium">2</td>
-                        <td class="px-4 py-3 text-gray-800 align-top editable-cell" contenteditable="true">
-                            Xử lý lỗi phân quyền (Roles & Permissions)
-                        </td>
-                        <td class="px-4 py-3 text-gray-600 align-top editable-cell" contenteditable="true">
-                            User nhân viên vào xem báo cáo nhưng bị báo lỗi "Access Denied" mặc dù đã được Admin thêm vào nhóm "Marketing".
-                        </td>
-                        <td class="px-4 py-3 text-gray-600 align-top editable-cell" contenteditable="true">
-                            Làm thế nào để kiểm tra quyền của nhóm "Marketing" có chứa quyền "View Report" hay chưa? Trình bày các bước click chuột.
-                        </td>
-                        <td class="px-4 py-3 text-center align-top">
-                            <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" title="Xóa dòng này">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            }
+            // 2. COPY PROMPT
+            btnCopyPrompt.addEventListener('click', () => {
+                generatedPrompt.select();
+                document.execCommand('copy');
+                const originalText = btnCopyPrompt.innerHTML;
+                btnCopyPrompt.innerHTML = '<i class="fa-solid fa-check"></i> Đã Copy Thành Công!';
+                setTimeout(() => { btnCopyPrompt.innerHTML = originalText; }, 2000);
+            });
+
+            // 3. ĐỌC JSON VÀ VẼ BẢNG
+            btnRenderTable.addEventListener('click', () => {
+                const jsonText = document.getElementById('jsonInput').value.trim();
+                if (!jsonText) {
+                    alert('Vui lòng dán kết quả JSON từ AI!');
+                    return;
+                }
+
+                try {
+                    // Extract JSON if AI wrapped it in markdown code blocks
+                    const cleanedJson = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const data = JSON.parse(cleanedJson);
+                    
+                    if (!Array.isArray(data)) throw new Error('Dữ liệu không phải mảng JSON');
+
+                    rubricBody.innerHTML = ''; // Xóa bảng trống
+                    
+                    data.forEach((item, index) => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50 transition-colors group border-b border-gray-100';
+                        tr.innerHTML = `
+                            <td class="px-4 py-3 text-center text-gray-500 font-medium align-top">${index + 1}</td>
+                            <td class="px-4 py-3 text-gray-800 align-top editable-cell" contenteditable="true">${item.tinhHuong || ''}</td>
+                            <td class="px-4 py-3 text-blue-700 align-top font-medium editable-cell" contenteditable="true">${item.cauHoiSale || ''}</td>
+                            <td class="px-4 py-3 text-emerald-700 align-top editable-cell" contenteditable="true">${item.kyVong || ''}</td>
+                            <td class="px-4 py-3 text-amber-700 align-top editable-cell" contenteditable="true">${item.daoSau || ''}</td>
+                            <td class="px-4 py-3 text-center align-top">
+                                <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" onclick="this.closest('tr').remove()" title="Xóa dòng này">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        rubricBody.appendChild(tr);
+                    });
+                    
+                    document.getElementById('jsonInput').value = ''; // Xóa ô input cho gọn
+
+                } catch (error) {
+                    alert('Lỗi: Định dạng JSON không hợp lệ. Vui lòng copy đúng kết quả từ ChatGPT!\nChi tiết: ' + error.message);
+                }
+            });
         });
 
-        // Hàm giả lập lưu Local Storage
-        function saveRubric() {
-            // Thực tế sẽ lấy dữ liệu từ DOM table
-            const mockData = {
-                module: document.getElementById('moduleName').value,
-                timestamp: new Date().getTime(),
-                status: 'draft'
-            };
-            localStorage.setItem('kv_product_rubrics', JSON.stringify(mockData));
-            alert('Đã lưu thành công bộ tiêu chí vào Local Storage!');
+        function saveData() {
+            // Giả lập lưu xuống Local Storage theo chuẩn hệ thống
+            alert('Đã lưu dữ liệu thành công vào bộ nhớ hệ thống (kv_product_rubrics). Cấu trúc bảng này đã sẵn sàng cho buổi review 1:1!');
         }
     </script>
 </body>

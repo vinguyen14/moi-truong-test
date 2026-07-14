@@ -3,385 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đánh giá nhân sự mới Tái Ký - L&D</title>
+    <title>Chấm điểm L&D - Trainer OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f3f4f6; }
-        .saas-card { background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); padding: 1.5rem; }
-        .btn-primary { background-color: #4f46e5; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: background-color 0.2s; cursor: pointer; }
-        .btn-primary:hover { background-color: #4338ca; }
-        .btn-secondary { background-color: #e5e7eb; color: #374151; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: background-color 0.2s; cursor: pointer; }
-        .btn-secondary:hover { background-color: #d1d5db; }
-        
-        .tab-active { border-bottom-width: 2px; border-color: #4f46e5; color: #4f46e5; font-weight: 600; }
-        .tab-inactive { border-bottom-width: 2px; border-color: transparent; color: #6b7280; font-weight: 500; cursor: pointer; }
-        .tab-inactive:hover { color: #374151; border-color: #d1d5db; }
-        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.05);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.2s;
+        }
+        .glass-input:focus {
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            border-color: #4f46e5;
+        }
+        .tab-active { border-bottom-width: 3px; border-color: #4f46e5; color: #4f46e5; font-weight: 700; background: rgba(255,255,255,0.4); }
+        .tab-inactive { border-bottom-width: 3px; border-color: transparent; color: #4b5563; font-weight: 600; cursor: pointer; }
+        .tab-inactive:hover { color: #1f2937; background: rgba(255,255,255,0.2); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        
-        textarea::-webkit-scrollbar { width: 6px; }
-        textarea::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        textarea { font-size: 15px !important; line-height: 1.5; }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden text-gray-800 text-sm">
+<body class="flex flex-col h-screen overflow-hidden text-gray-800">
 
-    <!-- Header Full-width (Không có Sidebar) -->
-    <header class="bg-white border-b px-6 py-4 flex justify-between items-center z-10 shadow-sm shrink-0">
+    <header class="glass-panel px-6 py-4 flex justify-between items-center z-10 shrink-0 sticky top-0">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="text-gray-500 hover:text-indigo-600 transition-colors" title="Về trang chủ">
-                <i class="fas fa-arrow-left text-lg"></i>
+            <a href="index.html" class="bg-white/50 p-2 rounded-full hover:bg-white transition-colors" title="Về trang chủ">
+                <i class="fas fa-arrow-left text-xl text-indigo-600"></i>
             </a>
             <div>
-                <h1 class="text-xl font-bold text-gray-800">Form Đánh Giá Của L&D</h1>
-                <p class="text-xs text-gray-500 mt-1">Review 1:1 Nhân Sự Mới (Khối Tái Ký)</p>
+                <h1 class="text-2xl font-extrabold text-gray-800 tracking-tight">L&D Review Workspace</h1>
+                <p class="text-sm font-medium text-gray-600 mt-1">Đánh giá Sản phẩm Tuần 1 (Retail & Kế toán 01)</p>
             </div>
         </div>
-        <button onclick="submitReviewForm()" class="btn-primary" id="btnSubmitTop">
-            <i class="fas fa-save mr-2"></i>Lưu Đánh Giá
-        </button>
+        <div class="flex gap-3">
+            <button type="button" onclick="saveDraft()" class="bg-white/80 border border-indigo-200 text-indigo-700 font-bold px-5 py-2.5 rounded-xl hover:bg-white shadow-sm transition-all">
+                <i class="fas fa-pause-circle mr-2"></i>Lưu Tạm (Tiếp tục sau)
+            </button>
+        </div>
     </header>
 
-    <!-- Main Form Area -->
-    <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50">
-        <form id="reviewForm" class="saas-card max-w-5xl mx-auto mb-10">
-            <!-- Tab Navigation -->
-            <div class="flex border-b mb-6 overflow-x-auto">
-                <button type="button" class="tab-btn tab-active py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab1">
-                    1. Thông tin & Self-Check
-                </button>
-                <button type="button" class="tab-btn tab-inactive py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab2">
-                    2. Review Ngày 1 (Nhập/Hàng hóa)
-                </button>
-                <button type="button" class="tab-btn tab-inactive py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab3">
-                    3. Review Ngày 2 (Bán/Mở rộng)
-                </button>
-                <button type="button" class="tab-btn tab-inactive py-3 px-4 whitespace-nowrap focus:outline-none" data-target="tab4">
-                    4. Test Call & Kết Luận
+    <main class="flex-1 overflow-y-auto p-4 md:p-8">
+        
+        <!-- Khu vực Quản lý Drafts -->
+        <div class="max-w-6xl mx-auto mb-6 glass-panel rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+                <h3 class="font-bold text-gray-800 text-lg">Danh sách đang đánh giá:</h3>
+                <p class="text-sm text-gray-600">Chọn học viên để tiếp tục ghi nhận tiến độ ngày học tiếp theo.</p>
+            </div>
+            <div class="flex gap-3 w-full md:w-auto">
+                <select id="draftSelector" class="glass-input rounded-xl p-2.5 font-medium outline-none flex-1 min-w-[250px]" onchange="loadDraft(this.value)">
+                    <option value="">-- Chọn học viên đang học --</option>
+                    <!-- JS fill here -->
+                </select>
+                <button onclick="createNewRecord()" class="bg-indigo-600 text-white font-bold px-4 py-2.5 rounded-xl hover:bg-indigo-700 shadow-md">
+                    <i class="fas fa-plus mr-1"></i> Tạo Mới
                 </button>
             </div>
+        </div>
 
-            <!-- TAB 1 -->
-            <div id="tab1" class="tab-content active space-y-6">
-                <div>
-                    <h2 class="text-lg font-bold text-indigo-800 mb-4 border-b pb-2">I. Thông tin chung</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-1">Họ tên học viên <span class="text-red-500">*</span></label>
-                            <input type="text" name="trainee_name" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+        <form id="reviewForm" class="glass-panel max-w-6xl mx-auto mb-10 rounded-2xl overflow-hidden shadow-xl">
+            <input type="hidden" name="id" id="record_id">
+            <input type="hidden" name="status" id="record_status" value="Đang học">
+            
+            <div class="flex border-b border-white/40 overflow-x-auto bg-white/20">
+                <button type="button" class="tab-btn tab-active py-4 px-6 text-[15px] whitespace-nowrap outline-none transition-colors" data-target="tab1">1. Thông tin & Check</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-[15px] whitespace-nowrap outline-none transition-colors" data-target="tab2">2. Retail Ngày 1</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-[15px] whitespace-nowrap outline-none transition-colors" data-target="tab3">3. Retail Ngày 2</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-[15px] whitespace-nowrap outline-none transition-colors" data-target="tab4">4. Kế Toán Ngày 3</button>
+                <button type="button" class="tab-btn tab-inactive py-4 px-6 text-[15px] whitespace-nowrap outline-none transition-colors" data-target="tab5">5. Tổng Kết & Gửi</button>
+            </div>
+
+            <div class="p-8">
+                <!-- TAB 1 -->
+                <div id="tab1" class="tab-content active space-y-8">
+                    <div>
+                        <h2 class="text-xl font-bold text-indigo-900 mb-5 flex items-center"><i class="fas fa-user-circle mr-2"></i>I. Thông tin chung</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/40 p-6 rounded-xl">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Họ tên học viên <span class="text-red-500">*</span></label>
+                                <input type="text" name="trainee_name" class="w-full glass-input rounded-lg p-3 outline-none font-medium text-lg" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Ngày bắt đầu review <span class="text-red-500">*</span></label>
+                                <input type="date" name="review_date" class="w-full glass-input rounded-lg p-3 outline-none font-medium text-lg" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Tình trạng Bài thực hành</label>
+                                <input type="text" name="practice_status" placeholder="Ví dụ: Đã đủ bài 1, thiếu bài 2..." class="w-full glass-input rounded-lg p-3 outline-none text-base">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-1">Ngày review / Buổi review <span class="text-red-500">*</span></label>
-                            <input type="date" name="review_date" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-gray-700 font-medium mb-1">Bài thực hành đã hoàn thành (Đã đủ / Thiếu / Cần làm lại)</label>
-                            <input type="text" name="practice_status" placeholder="Ví dụ: Đã đủ bài 1, thiếu bài 2..." class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+
+                    <div>
+                        <h2 class="text-xl font-bold text-indigo-900 mb-5 flex items-center"><i class="fas fa-brain mr-2"></i>II. Self-check (5 Phút)</h2>
+                        <div class="space-y-5 bg-indigo-50/50 p-6 rounded-xl border border-indigo-100/50">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">1. Tính năng dễ hiểu nhất? Vì sao?</label>
+                                <textarea name="self_easy_feature" rows="2" class="w-full glass-input rounded-lg p-3 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">2. Khó giải thích cho khách nhất?</label>
+                                <textarea name="self_hard_feature" rows="2" class="w-full glass-input rounded-lg p-3 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">3. Giúp gì cho tư vấn tái ký (Khách đã dùng KiotViet)?</label>
+                                <textarea name="self_retention_value" rows="2" class="w-full glass-input rounded-lg p-3 outline-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">4. Điểm tự tin (1-10)</label>
+                                <select name="self_confidence_score" class="w-full glass-input rounded-lg p-3 outline-none md:w-1/3 text-base font-bold text-indigo-700">
+                                    <option value="">Chọn mức độ...</option>
+                                    <option value="1-3">1-3 Điểm (Rất yếu)</option>
+                                    <option value="4-6">4-6 Điểm (Trung bình)</option>
+                                    <option value="7-8">7-8 Điểm (Khá tự tin)</option>
+                                    <option value="9-10">9-10 Điểm (Rất tự tin)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div>
-                    <h2 class="text-lg font-bold text-indigo-800 mb-4 border-b pb-2 mt-8">II. Self-check (5 Phút)</h2>
-                    <div class="space-y-4 bg-indigo-50/50 p-4 rounded-lg border border-indigo-100">
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-1">1. Tính năng nào em thấy dễ hiểu nhất? Vì sao?</label>
-                            <textarea name="self_easy_feature" rows="2" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                <!-- TAB 2: Retail Ngày 1 -->
+                <div id="tab2" class="tab-content space-y-8">
+                    <div class="bg-yellow-100/70 border-l-4 border-yellow-500 p-5 rounded-r-xl shadow-sm">
+                        <p class="font-bold text-yellow-900 text-base"><i class="fas fa-lightbulb mr-1"></i> Nhắc nhở Cấu trúc trả lời:</p>
+                        <p class="text-sm text-yellow-800 mt-1 font-medium">Học viên phải trình bày theo: <strong>Vấn đề Khách -> Giải pháp -> Lợi ích mang lại.</strong></p>
+                    </div>
+
+                    <!-- Sáng Ngày 1 -->
+                    <div class="bg-white/40 p-6 rounded-xl border border-white/50">
+                        <h2 class="text-xl font-bold text-indigo-900 mb-4">Sáng Ngày 1: Các loại hàng hóa (Retail)</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Ghi chú tình huống (Mỹ phẩm date, ĐT IMEI, Giỏ quà, Hàng lắp ráp)</label>
+                                <textarea name="day1_morning_note" rows="4" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Đánh giá phản xạ tư vấn hàng hóa..."></textarea>
+                            </div>
+                            <div class="bg-white/60 p-4 rounded-lg inline-block w-full">
+                                <label class="block text-gray-800 font-bold mb-2">Đánh giá mức độ</label>
+                                <div class="flex flex-wrap gap-6 text-base">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Chưa đạt" class="w-4 h-4"> <span class="text-red-600 font-bold">Chưa đạt</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Đạt thao tác" class="w-4 h-4"> <span class="text-yellow-600 font-bold">Đạt thao tác</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Đạt ứng dụng" class="w-4 h-4"> <span class="text-emerald-600 font-bold">Đạt ứng dụng</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Tốt" class="w-4 h-4"> <span class="text-indigo-600 font-bold">Tốt</span></label>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-1">2. Tính năng nào em thấy khó giải thích cho khách nhất?</label>
-                            <textarea name="self_hard_feature" rows="2" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+
+                    <!-- Chiều Ngày 1 -->
+                    <div class="bg-white/40 p-6 rounded-xl border border-white/50">
+                        <h2 class="text-xl font-bold text-indigo-900 mb-4">Chiều Ngày 1: Nhập hàng, NCC, Giá, Kiểm kho</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Ghi chú tình huống (Công nợ NCC, Lệch tồn, Giá Sỉ/Lẻ)</label>
+                                <textarea name="day1_afternoon_note" rows="4" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Đánh giá khả năng tư vấn kiểm soát đầu vào..."></textarea>
+                            </div>
+                            <div class="bg-white/60 p-4 rounded-lg inline-block w-full">
+                                <label class="block text-gray-800 font-bold mb-2">Đánh giá mức độ</label>
+                                <div class="flex flex-wrap gap-6 text-base">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Chưa đạt" class="w-4 h-4"> <span class="text-red-600 font-bold">Chưa đạt</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Đạt thao tác" class="w-4 h-4"> <span class="text-yellow-600 font-bold">Đạt thao tác</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Đạt ứng dụng" class="w-4 h-4"> <span class="text-emerald-600 font-bold">Đạt ứng dụng</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Tốt" class="w-4 h-4"> <span class="text-indigo-600 font-bold">Tốt</span></label>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-1">3. Gặp khách đã dùng KiotViet, em nghĩ nội dung đã học giúp tư vấn tái ký ở điểm nào?</label>
-                            <textarea name="self_retention_value" rows="2" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Retail Ngày 2 -->
+                <div id="tab3" class="tab-content space-y-8">
+                    <!-- Sáng Ngày 2 -->
+                    <div class="bg-white/40 p-6 rounded-xl border border-white/50">
+                        <h2 class="text-xl font-bold text-indigo-900 mb-4">Sáng Ngày 2: Đặt hàng, Bán hàng, Data KH</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Ghi chú tình huống (Quên giữ đơn FB, Lịch sử mua KH)</label>
+                                <textarea name="day2_morning_note" rows="4" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Khả năng gợi mở lợi ích Data..."></textarea>
+                            </div>
+                            <div class="bg-white/60 p-4 rounded-lg inline-block w-full">
+                                <label class="block text-gray-800 font-bold mb-2">Đánh giá mức độ</label>
+                                <div class="flex flex-wrap gap-6 text-base">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Chưa đạt" class="w-4 h-4"> <span class="text-red-600 font-bold">Chưa đạt</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Đạt thao tác" class="w-4 h-4"> <span class="text-yellow-600 font-bold">Đạt thao tác</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Đạt ứng dụng" class="w-4 h-4"> <span class="text-emerald-600 font-bold">Đạt ứng dụng</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Tốt" class="w-4 h-4"> <span class="text-indigo-600 font-bold">Tốt</span></label>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Chiều Ngày 2 -->
+                    <div class="bg-white/40 p-6 rounded-xl border border-white/50">
+                        <h2 class="text-xl font-bold text-indigo-900 mb-4">Chiều Ngày 2: Trả hàng, Báo cáo, Phân quyền, TMĐT</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Ghi chú tình huống (Chủ ít mặt, Lệch tồn Sàn, Xem báo cáo giảm doanh thu)</label>
+                                <textarea name="day2_afternoon_note" rows="4" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Tư vấn tính năng mở rộng/quản trị cao..."></textarea>
+                            </div>
+                            <div class="bg-white/60 p-4 rounded-lg inline-block w-full">
+                                <label class="block text-gray-800 font-bold mb-2">Đánh giá mức độ</label>
+                                <div class="flex flex-wrap gap-6 text-base">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Chưa đạt" class="w-4 h-4"> <span class="text-red-600 font-bold">Chưa đạt</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Đạt thao tác" class="w-4 h-4"> <span class="text-yellow-600 font-bold">Đạt thao tác</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Đạt ứng dụng" class="w-4 h-4"> <span class="text-emerald-600 font-bold">Đạt ứng dụng</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Tốt" class="w-4 h-4"> <span class="text-indigo-600 font-bold">Tốt</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: Ngày 3 (Kế toán 01) -->
+                <div id="tab4" class="tab-content space-y-8">
+                    <div class="bg-white/40 p-6 rounded-xl border border-white/50">
+                        <h2 class="text-xl font-bold text-indigo-900 mb-4 flex items-center"><i class="fas fa-file-invoice-dollar mr-2"></i>Ngày 3: Khóa Kế Toán 01</h2>
+                        <p class="text-gray-600 mb-5 font-medium">Đánh giá khả năng hiểu luồng nghiệp vụ tài chính, thu chi, công nợ kế toán cơ bản.</p>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2 text-[15px]">Nhận xét phản xạ tình huống Kế toán</label>
+                                <textarea name="day3_accounting_note" rows="5" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Học viên hiểu sổ quỹ, thu chi, công nợ như thế nào?"></textarea>
+                            </div>
+                            <div class="bg-white/60 p-4 rounded-lg inline-block w-full">
+                                <label class="block text-gray-800 font-bold mb-2">Đánh giá mức độ</label>
+                                <div class="flex flex-wrap gap-6 text-base">
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day3_accounting_score" value="Chưa đạt" class="w-4 h-4"> <span class="text-red-600 font-bold">Chưa đạt</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day3_accounting_score" value="Đạt thao tác" class="w-4 h-4"> <span class="text-yellow-600 font-bold">Đạt thao tác</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day3_accounting_score" value="Đạt ứng dụng" class="w-4 h-4"> <span class="text-emerald-600 font-bold">Đạt ứng dụng</span></label>
+                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day3_accounting_score" value="Tốt" class="w-4 h-4"> <span class="text-indigo-600 font-bold">Tốt</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: Tổng kết -->
+                <div id="tab5" class="tab-content space-y-8">
+                    <div class="bg-white/40 p-6 rounded-xl border border-white/50">
+                        <h2 class="text-xl font-bold text-indigo-900 mb-4"><i class="fas fa-headset mr-2"></i>Test Call & Kỹ năng (Sản phẩm)</h2>
                         <div>
-                            <label class="block text-gray-700 font-medium mb-1">4. Thang điểm tự tin khi giới thiệu tính năng (1-10)</label>
-                            <select name="self_confidence_score" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none md:w-1/3">
-                                <option value="">Chọn mức độ...</option>
-                                <option value="1-3">1-3 Điểm (Rất yếu)</option>
-                                <option value="4-6">4-6 Điểm (Trung bình)</option>
-                                <option value="7-8">7-8 Điểm (Khá tự tin)</option>
-                                <option value="9-10">9-10 Điểm (Rất tự tin)</option>
+                            <label class="block text-gray-800 font-bold mb-2 text-[15px]">Nhận xét kỹ năng xử lý (45 phút)</label>
+                            <textarea name="test_call_note" rows="3" class="w-full glass-input rounded-lg p-3 outline-none"></textarea>
+                        </div>
+                        <div class="mt-4 bg-white/60 p-4 rounded-lg inline-block w-full">
+                            <label class="block text-gray-800 font-bold mb-2">Đánh giá Test Call</label>
+                            <div class="flex gap-6 text-base">
+                                <label class="flex items-center gap-2"><input type="radio" name="test_call_score" value="Chưa đạt"> <span class="text-red-600 font-bold">Chưa đạt</span></label>
+                                <label class="flex items-center gap-2"><input type="radio" name="test_call_score" value="Đạt"> <span class="text-emerald-600 font-bold">Đạt</span></label>
+                                <label class="flex items-center gap-2"><input type="radio" name="test_call_score" value="Tốt"> <span class="text-indigo-600 font-bold">Tốt</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50/70 p-8 rounded-xl border border-indigo-200 shadow-md">
+                        <h2 class="text-2xl font-extrabold text-indigo-900 mb-6 border-b border-indigo-200 pb-3">Kết Luận Tổng Thể (Tuần 1)</h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-gray-900 font-bold mb-2 text-base">Điểm mạnh & Tâm lý</label>
+                                <textarea name="final_strengths" rows="4" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Tự tin, giao tiếp tốt..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-gray-900 font-bold mb-2 text-base">Điểm yếu cần khắc phục</label>
+                                <textarea name="final_weaknesses" rows="4" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Lúng túng báo cáo..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-gray-900 font-bold mb-2 text-base">Khuyến nghị cho Quản lý Tái ký</label>
+                            <textarea name="final_recommendation" rows="3" class="w-full glass-input rounded-lg p-3 outline-none" placeholder="Ví dụ: Đủ nền tảng sang Tuần 2 Kỹ năng..."></textarea>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-900 font-extrabold mb-2 text-lg">Xếp Loại Chung <span class="text-red-500">*</span></label>
+                            <select name="final_status" id="final_status_select" class="w-full md:w-2/3 glass-input rounded-xl p-4 text-lg font-bold text-indigo-900 outline-none">
+                                <option value="">--- CHỌN XẾP LOẠI ---</option>
+                                <option value="Chưa đạt">❌ Chưa đạt (Cần học lại bản chất)</option>
+                                <option value="Đạt thao tác">⚠️ Đạt thao tác (Cần Manager coaching thêm)</option>
+                                <option value="Đạt ứng dụng">✅ Đạt ứng dụng (Đủ nền tảng sang thực chiến)</option>
+                                <option value="Tốt">⭐ Tốt (Giao khách hàng khó)</option>
                             </select>
                         </div>
                     </div>
-                </div>
-                
-                <div class="flex justify-end pt-4">
-                    <button type="button" class="btn-primary" onclick="switchTab('tab2')">Tiếp tục: Review Ngày 1 <i class="fas fa-arrow-right ml-2"></i></button>
+
+                    <div class="pt-6 border-t border-white/50 text-right">
+                        <button type="button" class="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-4 px-10 rounded-xl text-xl shadow-lg hover:shadow-xl hover:scale-105 transition-all" onclick="submitFinal()">
+                            <i class="fas fa-check-circle mr-2"></i> Chốt Kết Quả Đánh Giá
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <!-- TAB 2 -->
-            <div id="tab2" class="tab-content space-y-6">
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-                    <p class="font-bold text-yellow-800 text-sm"><i class="fas fa-lightbulb mr-1"></i> Mục tiêu L&D cần Test:</p>
-                    <p class="text-xs text-yellow-700 mt-1">Sale không chỉ nhớ thao tác, mà phải trình bày theo cấu trúc: <strong>Vấn đề Khách -> Giải pháp -> Lợi ích mang lại.</strong></p>
-                </div>
-
-                <div>
-                    <h2 class="text-lg font-bold text-indigo-800 mb-4 border-b pb-2">Sáng Ngày 1: Các loại hàng hóa</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-80 overflow-y-auto border border-gray-200">
-                            <h3 class="font-bold mb-2 text-gray-800">Gợi ý Tình huống (Dành cho L&D)</h3>
-                            <ul class="space-y-3">
-                                <li><strong>Mỹ phẩm (Nhiều date):</strong> Gợi ý Lô-HSD. Lợi ích: ưu tiên bán trước, giảm tồn cận date.</li>
-                                <li><strong>Điện thoại:</strong> Serial/IMEI. Lợi ích: bán đúng mã, tra lịch sử bảo hành nhanh.</li>
-                                <li><strong>Giỏ quà Tết:</strong> Combo. Lợi ích: bán nhanh 1 bộ, tự trừ tồn thành phần.</li>
-                                <li><strong>Bàn ghế lắp ráp:</strong> Hàng sản xuất. Lợi ích: quản lý định mức, ghi nhận thành phẩm/hao hụt.</li>
-                            </ul>
-                        </div>
-                        <div class="lg:col-span-2 space-y-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Sáng Ngày 1)</label>
-                                <textarea name="day1_morning_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ghi chú về cách học viên trả lời..."></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Sáng Ngày 1)</label>
-                                <div class="flex flex-wrap gap-4">
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_morning_score" value="Tốt"> <span class="text-indigo-600 font-medium">Tốt</span></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8">
-                    <h2 class="text-lg font-bold text-indigo-800 mb-4 border-b pb-2">Chiều Ngày 1: Nhập hàng, NCC, Thiết lập giá, Kiểm kho</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-80 overflow-y-auto border border-gray-200">
-                            <h3 class="font-bold mb-2 text-gray-800">Gợi ý Tình huống (Dành cho L&D)</h3>
-                            <ul class="space-y-3">
-                                <li><strong>Không rõ nợ NCC:</strong> Nhập hàng/Công nợ NCC.</li>
-                                <li><strong>Lệch tồn:</strong> Kiểm kho định kỳ. Lợi ích: giảm thất thoát.</li>
-                                <li><strong>Nhiều nhóm khách (Sỉ/Lẻ):</strong> Thiết lập giá/Bảng giá. Lợi ích: nhân viên không cần nhớ thủ công.</li>
-                            </ul>
-                        </div>
-                        <div class="lg:col-span-2 space-y-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Chiều Ngày 1)</label>
-                                <textarea name="day1_afternoon_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Học viên có tư vấn được việc kiểm soát đầu vào, giá vốn không?"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Chiều Ngày 1)</label>
-                                <div class="flex flex-wrap gap-4">
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day1_afternoon_score" value="Tốt"> <span class="text-indigo-600 font-medium">Tốt</span></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-between pt-4">
-                    <button type="button" class="btn-secondary" onclick="switchTab('tab1')"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
-                    <button type="button" class="btn-primary" onclick="switchTab('tab3')">Tiếp tục: Review Ngày 2 <i class="fas fa-arrow-right ml-2"></i></button>
-                </div>
+            
+            <div class="bg-white/30 p-4 border-t border-white/40 flex justify-center gap-4">
+                <button type="button" onclick="prevTab()" class="px-6 py-2 rounded-lg font-bold text-gray-600 hover:bg-white/50 transition-colors">&larr; Lùi lại</button>
+                <button type="button" onclick="nextTab()" class="px-6 py-2 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">Tiếp theo &rarr;</button>
             </div>
-
-            <!-- TAB 3 -->
-            <div id="tab3" class="tab-content space-y-6">
-                <div>
-                    <h2 class="text-lg font-bold text-indigo-800 mb-4 border-b pb-2">Sáng Ngày 2: Đặt hàng, Bán hàng, Thanh toán, Khách hàng</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-80 overflow-y-auto border border-gray-200">
-                            <h3 class="font-bold mb-2 text-gray-800">Gợi ý Tình huống (Dành cho L&D)</h3>
-                            <ul class="space-y-3">
-                                <li><strong>Khách đặt trước qua FB, hay quên giữ hàng:</strong> Đặt hàng → Hóa đơn. Lợi ích: tránh quên đơn.</li>
-                                <li><strong>Khách quen nhưng không biết lịch sử mua:</strong> Quản lý khách hàng. Lợi ích: tư vấn đúng nhu cầu.</li>
-                                <li><strong>Khách nói chỉ cần bán được hàng, ko cần nhập Data KH:</strong> Gợi mở lợi ích data để phân nhóm, chăm sóc lại, tăng doanh thu.</li>
-                            </ul>
-                        </div>
-                        <div class="lg:col-span-2 space-y-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Sáng Ngày 2)</label>
-                                <textarea name="day2_morning_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Học viên hiểu quy trình tạo doanh thu & dữ liệu KH không?"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Sáng Ngày 2)</label>
-                                <div class="flex flex-wrap gap-4">
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_morning_score" value="Tốt"> <span class="text-indigo-600 font-medium">Tốt</span></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8">
-                    <h2 class="text-lg font-bold text-indigo-800 mb-4 border-b pb-2">Chiều Ngày 2: Trả hàng, Báo cáo, Phân quyền, TMĐT</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-1 bg-gray-50 p-4 rounded text-xs text-gray-600 h-80 overflow-y-auto border border-gray-200">
-                            <h3 class="font-bold mb-2 text-gray-800">Gợi ý Tình huống (Dành cho L&D)</h3>
-                            <ul class="space-y-3">
-                                <li><strong>Chủ shop ít mặt, 4 NV, sợ gian lận:</strong> Quản lý người dùng/Phân quyền. Lợi ích: giảm rủi ro.</li>
-                                <li><strong>Bán sàn + Offline lệch tồn:</strong> Kết nối sàn TMĐT. Lợi ích: đồng bộ.</li>
-                                <li><strong>Doanh thu giảm không biết vì sao:</strong> Báo cáo phân tích. Lợi ích: báo cáo là công cụ ra quyết định, ko chỉ xem số.</li>
-                            </ul>
-                        </div>
-                        <div class="lg:col-span-2 space-y-4">
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Nhận xét phản xạ tình huống (Chiều Ngày 2)</label>
-                                <textarea name="day2_afternoon_note" rows="5" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Khả năng tư vấn tính năng mở rộng quản trị..."></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 font-medium mb-1">Mức độ đạt (Chiều Ngày 2)</label>
-                                <div class="flex flex-wrap gap-4">
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Đạt thao tác"> <span>Đạt thao tác</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Đạt ứng dụng"> <span class="text-green-600 font-medium">Đạt ứng dụng</span></label>
-                                    <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="day2_afternoon_score" value="Tốt"> <span class="text-indigo-600 font-medium">Tốt</span></label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-between pt-4">
-                    <button type="button" class="btn-secondary" onclick="switchTab('tab2')"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
-                    <button type="button" class="btn-primary" onclick="switchTab('tab4')">Tiếp tục: Test Call & Kết luận <i class="fas fa-arrow-right ml-2"></i></button>
-                </div>
-            </div>
-
-            <!-- TAB 4 -->
-            <div id="tab4" class="tab-content space-y-6">
-                <div>
-                    <h2 class="text-lg font-bold text-indigo-800 mb-4 border-b pb-2">Test Call Tái Ký</h2>
-                    <div class="bg-gray-100 p-4 rounded mb-4">
-                        <p class="text-sm"><strong>Tiêu chí:</strong> Ưu tiên giải quyết tình huống để khách hàng lắng nghe. Test kịch bản nguyên nhân & xử lý.</p>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 font-medium mb-1">Nhận xét kỹ năng xử lý tình huống cuộc gọi (45 phút trao đổi)</label>
-                        <textarea name="test_call_note" rows="4" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Học viên giải quyết tình huống thế nào? Giọng điệu, cách tạo lòng tin..."></textarea>
-                    </div>
-                    <div class="mt-4">
-                        <label class="block text-gray-700 font-medium mb-1">Mức độ đạt Test Call</label>
-                        <div class="flex flex-wrap gap-4">
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="test_call_score" value="Chưa đạt"> <span class="text-red-600 font-medium">Chưa đạt</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="test_call_score" value="Đạt"> <span class="text-green-600 font-medium">Đạt</span></label>
-                            <label class="flex items-center gap-2 cursor-pointer"><input type="radio" name="test_call_score" value="Tốt"> <span class="text-indigo-600 font-medium">Tốt</span></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 bg-indigo-50/50 p-6 rounded-lg border border-indigo-200 shadow-sm">
-                    <h2 class="text-xl font-bold text-indigo-900 mb-4 border-b border-indigo-200 pb-2">Kết Luận Chung Của L&D</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
-                            <label class="block text-gray-700 font-bold mb-1">Tâm lý & Điểm mạnh</label>
-                            <textarea name="final_strengths" rows="3" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ví dụ: Tự tin, giao tiếp tốt, tư duy logic..."></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-bold mb-1">Điểm yếu & Không tự tin ở đâu</label>
-                            <textarea name="final_weaknesses" rows="3" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ví dụ: Lúng túng phần Báo cáo, chưa biết cách gài lợi ích..."></textarea>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-gray-700 font-bold mb-1">Định hướng & Khuyến nghị cho Quản lý Tái ký</label>
-                        <textarea name="final_recommendation" rows="4" class="w-full border rounded p-2 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Đề xuất hành động tiếp theo: VD 'Cần coaching thêm cách liên kết tính năng', 'Đủ nền tảng sang tuần 2' ..."></textarea>
-                    </div>
-                    
-                    <div class="mt-6">
-                        <label class="block text-gray-700 font-bold mb-2">Đánh giá Xếp loại Tổng thể <span class="text-red-500">*</span></label>
-                        <select name="final_status" class="w-full md:w-1/2 border border-indigo-300 rounded p-3 text-base font-bold text-indigo-900 focus:ring-2 focus:ring-indigo-500 outline-none bg-white" required>
-                            <option value="">--- Chọn xếp loại ---</option>
-                            <option value="Chưa đạt">❌ Chưa đạt (Cần học lại bản chất)</option>
-                            <option value="Đạt thao tác">⚠️ Đạt thao tác (Cần Manager coaching thêm tình huống)</option>
-                            <option value="Đạt ứng dụng">✅ Đạt ứng dụng (Đủ nền tảng sang thực chiến)</option>
-                            <option value="Tốt">⭐ Tốt (Có thể giao tình huống khó/giữ gói lớn)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex justify-between pt-4 border-t mt-6">
-                    <button type="button" class="btn-secondary" onclick="switchTab('tab3')"><i class="fas fa-arrow-left mr-2"></i> Quay lại</button>
-                    <button type="button" class="btn-primary py-3 px-8 text-lg shadow-lg" onclick="submitReviewForm()">
-                        <i class="fas fa-paper-plane mr-2"></i> Hoàn Thành Đánh Giá
-                    </button>
-                </div>
-            </div>
-
         </form>
     </main>
 
     <script>
-        const tabs = document.querySelectorAll('.tab-btn');
+        // Tab Logic
+        const tabs = Array.from(document.querySelectorAll('.tab-btn'));
         const contents = document.querySelectorAll('.tab-content');
+        let currentTabIndex = 0;
 
-        function switchTab(targetId) {
-            tabs.forEach(tab => {
-                if (tab.getAttribute('data-target') === targetId) {
-                    tab.classList.remove('tab-inactive');
-                    tab.classList.add('tab-active');
-                } else {
-                    tab.classList.remove('tab-active');
-                    tab.classList.add('tab-inactive');
-                }
+        function switchTab(index) {
+            tabs.forEach((tab, i) => {
+                tab.className = i === index ? "tab-btn tab-active py-4 px-6 text-[15px] whitespace-nowrap outline-none transition-colors" : "tab-btn tab-inactive py-4 px-6 text-[15px] whitespace-nowrap outline-none transition-colors";
             });
-            contents.forEach(content => {
-                if (content.id === targetId) content.classList.add('active');
-                else content.classList.remove('active');
-            });
-            document.querySelector('.overflow-y-auto').scrollTop = 0;
+            contents.forEach((c, i) => c.classList.toggle('active', i === index));
+            currentTabIndex = index;
+            document.querySelector('main').scrollTop = 0;
         }
 
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => switchTab(tab.getAttribute('data-target')));
-        });
+        tabs.forEach((tab, i) => tab.addEventListener('click', () => switchTab(i)));
+        function nextTab() { if(currentTabIndex < tabs.length - 1) switchTab(currentTabIndex + 1); }
+        function prevTab() { if(currentTabIndex > 0) switchTab(currentTabIndex - 1); }
 
-        function submitReviewForm() {
-            const form = document.getElementById('reviewForm');
+        // Progressive Saving Logic
+        const DB_KEY = 'trainer_os_reviews';
+
+        function loadDraftList() {
+            const data = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            const select = document.getElementById('draftSelector');
+            select.innerHTML = '<option value="">-- Chọn học viên đang đánh giá --</option>';
             
-            if (!form.trainee_name.value || !form.review_date.value || !form.final_status.value) {
-                alert('Vui lòng điền đầy đủ Họ Tên, Ngày Review và Xếp Loại Tổng Thể ở Tab 4!');
-                if(!form.trainee_name.value || !form.review_date.value) switchTab('tab1');
-                else if(!form.final_status.value) switchTab('tab4');
+            data.filter(d => d.status === 'Đang học').forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.textContent = `${d.trainee_name} (${d.review_date})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function createNewRecord() {
+            document.getElementById('reviewForm').reset();
+            document.getElementById('record_id').value = 'TR_' + Date.now();
+            document.getElementById('record_status').value = 'Đang học';
+            document.getElementById('draftSelector').value = "";
+            switchTab(0);
+            alert("Đã tạo mới! Hãy điền thông tin và bấm 'Lưu Tạm' sau mỗi buổi học.");
+        }
+
+        function loadDraft(id) {
+            if(!id) return;
+            const data = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            const record = data.find(d => d.id === id);
+            if(record) {
+                const form = document.getElementById('reviewForm');
+                Object.keys(record).forEach(key => {
+                    const elements = form.elements[key];
+                    if(elements) {
+                        if(elements.length && elements[0].type === 'radio') {
+                            Array.from(elements).forEach(el => el.checked = (el.value === record[key]));
+                        } else {
+                            elements.value = record[key];
+                        }
+                    }
+                });
+                alert("Đã tải dữ liệu học viên: " + record.trainee_name);
+            }
+        }
+
+        function saveDraft() {
+            const form = document.getElementById('reviewForm');
+            if(!form.trainee_name.value) { alert("Vui lòng nhập ÍT NHẤT Họ Tên học viên ở Tab 1 trước khi lưu tạm!"); switchTab(0); return; }
+            
+            if(!document.getElementById('record_id').value) {
+                document.getElementById('record_id').value = 'TR_' + Date.now();
+            }
+            
+            document.getElementById('record_status').value = 'Đang học';
+            saveToDB();
+            alert("Đã lưu nháp tiến độ! Quản lý hiện có thể xem được dữ liệu này trên Báo cáo.");
+            loadDraftList();
+            document.getElementById('draftSelector').value = document.getElementById('record_id').value;
+        }
+
+        function submitFinal() {
+            const form = document.getElementById('reviewForm');
+            if(!form.trainee_name.value || !document.getElementById('final_status_select').value) {
+                alert("Vui lòng điền Tên học viên và Xếp Loại Chung (Tab 5) trước khi chốt!");
                 return;
             }
+            document.getElementById('record_status').value = 'Đã hoàn thành';
+            saveToDB();
+            alert("Đã chốt đánh giá thành công! Dữ liệu đã chuyển sang Quản lý.");
+            createNewRecord();
+            loadDraftList();
+        }
 
+        function saveToDB() {
+            const form = document.getElementById('reviewForm');
             const formData = new FormData(form);
             const payload = Object.fromEntries(formData.entries());
+            payload.last_updated = new Date().toLocaleString('vi-VN');
+
+            let db = JSON.parse(localStorage.getItem(DB_KEY)) || [];
+            const existingIndex = db.findIndex(d => d.id === payload.id);
             
-            // Add ID and timestamp for tracking
-            payload.id = 'TR_' + Date.now();
-            payload.created_at = new Date().toISOString();
-
-            const btnTop = document.getElementById('btnSubmitTop');
-            const originalText = btnTop.innerHTML;
-            btnTop.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Đang lưu...';
-            btnTop.disabled = true;
-
-            // LƯU VÀO LOCAL STORAGE (Giả lập Database) để Manager xem được ngay
-            setTimeout(() => {
-                try {
-                    let existingData = JSON.parse(localStorage.getItem('trainer_os_reviews')) || [];
-                    existingData.unshift(payload); // Thêm lên đầu danh sách
-                    localStorage.setItem('trainer_os_reviews', JSON.stringify(existingData));
-                    
-                    alert('Lưu đánh giá thành công! Dữ liệu đã được chuyển sang phân hệ Quản lý.');
-                    form.reset();
-                    switchTab('tab1');
-                } catch (error) {
-                    console.error("Lỗi khi lưu dữ liệu:", error);
-                    alert("Có lỗi khi lưu dữ liệu!");
-                } finally {
-                    btnTop.innerHTML = originalText;
-                    btnTop.disabled = false;
-                }
-            }, 500);
+            if(existingIndex >= 0) db[existingIndex] = payload;
+            else db.unshift(payload);
+            
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
         }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDraftList();
+            if(!document.getElementById('record_id').value) createNewRecord();
+        });
     </script>
 </body>
 </html>

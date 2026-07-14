@@ -9,11 +9,10 @@
     <style>
         body { background-color: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
         .saas-card { background-color: #ffffff; border-radius: 0.75rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); border: 1px solid #f1f5f9; padding: 1.25rem; }
-        .btn-primary { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; }
-        .btn-primary:hover:not(:disabled) { background-color: #1d4ed8; }
-        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
-        .btn-secondary { background-color: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; }
-        .btn-secondary:hover:not(:disabled) { background-color: #059669; }
+        .btn-primary { background-color: #2563eb; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; border: none; }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-secondary { background-color: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; border: none; }
+        .btn-secondary:hover { background-color: #059669; }
         .btn-outline { border: 1px solid #d1d5db; color: #4b5563; padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; background: white; }
         .btn-outline:hover { background-color: #f3f4f6; }
         
@@ -23,9 +22,6 @@
         .sidebar { width: 250px; height: 100vh; position: fixed; top: 0; left: 0; z-index: 40; }
         .main-content { margin-left: 250px; min-height: 100vh; }
         .step-badge { background-color: #dbeafe; color: #1e40af; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; margin-right: 0.5rem; }
-        
-        /* Loading Overlay */
-        .ai-loading-overlay { display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.8); z-index: 10; align-items: center; justify-content: center; flex-direction: column; border-radius: 0.75rem; backdrop-filter: blur(2px); }
     </style>
 </head>
 <body>
@@ -49,119 +45,86 @@
     <main class="main-content flex flex-col relative">
         <!-- HEADER -->
         <header class="bg-white h-16 border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-30">
-            <h1 class="text-xl font-semibold text-gray-800">Công cụ Tạo Kịch Bản Đào Tạo (Roleplay AI)</h1>
+            <h1 class="text-xl font-semibold text-gray-800">Công cụ Tạo Kịch Bản Đào Tạo (Hệ Thống Nội Bộ)</h1>
             <div class="flex items-center gap-3">
-                <span class="text-sm font-medium text-gray-500">Mô hình: GPT-4o-mini</span>
-                <button onclick="document.getElementById('apiSettings').classList.toggle('hidden')" class="btn-outline !py-1.5 !text-sm">
-                    <i class="fa-solid fa-gear"></i> Cấu hình API Key
-                </button>
+                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-bolt"></i> Database Siêu Tốc
+                </span>
             </div>
         </header>
 
         <!-- WORKSPACE -->
         <div class="p-6 flex-1 bg-slate-50 overflow-auto">
             
-            <!-- CẤU HÌNH API (Ẩn/Hiện) -->
-            <div id="apiSettings" class="saas-card hidden mb-6 bg-slate-800 text-white border-none">
-                <h2 class="text-base font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-key text-yellow-400"></i> Cài đặt OpenAI API Key</h2>
-                <p class="text-sm text-slate-300 mb-4">API Key sẽ được lưu an toàn trực tiếp trên trình duyệt của bạn (Local Storage). Không gửi đi bất kỳ server nào ngoài OpenAI.</p>
-                <div class="flex gap-2">
-                    <input type="password" id="openAiKey" class="flex-1 px-3 py-2 rounded-md text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxx...">
-                    <button id="btnSaveKey" class="btn-primary !bg-blue-500 hover:!bg-blue-400">Lưu Key</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 relative">
-                <!-- AI LOADING OVERLAY -->
-                <div id="aiLoadingOverlay" class="ai-loading-overlay">
-                    <i class="fa-solid fa-microchip fa-bounce text-4xl text-blue-600 mb-3"></i>
-                    <p class="text-lg font-bold text-gray-800">AI Đang phân tích tài liệu...</p>
-                    <p class="text-sm text-gray-500 mt-1">Đang xây dựng kịch bản tái ký, vui lòng đợi 5-10 giây.</p>
-                </div>
-
-                <!-- BƯỚC 1: INPUT -->
-                <div class="saas-card flex flex-col">
-                    <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center">
-                        <span class="step-badge">1</span> Nhập Tài Liệu Tính Năng
-                    </h2>
-                    <input type="text" id="moduleName" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-3 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Tên tính năng (VD: Quản lý Lô - Hạn sử dụng)">
-                    <textarea id="wpContent" class="w-full h-40 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm resize-none mb-3" placeholder="Dán nội dung tài liệu sản phẩm vào đây..."></textarea>
-                    
-                    <div class="grid grid-cols-2 gap-2">
-                        <!-- NÚT GỌI AI TRỰC TIẾP (NEW) -->
-                        <button id="btnAutoGenerateAI" class="btn-secondary !bg-indigo-600 hover:!bg-indigo-700 col-span-2 py-3 text-base shadow-md">
-                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Tự Động Phân Tích & Vẽ Bảng Nhanh
-                        </button>
-                        
-                        <!-- NÚT THỦ CÔNG (FALLBACK) -->
-                        <button id="btnGeneratePrompt" class="btn-outline col-span-2 text-xs text-gray-500">
-                            <i class="fa-solid fa-chevron-down"></i> Hiển thị chế độ thủ công (Lấy Prompt)
-                        </button>
-                    </div>
-                </div>
-
-                <!-- BƯỚC 2: PROMPT (FALLBACK) - Mặc định ẩn, bật khi bấm nút thủ công -->
-                <div id="manualModeBox" class="saas-card flex flex-col bg-blue-50 border-blue-100 hidden">
-                    <h2 class="text-base font-bold text-blue-900 mb-3 flex items-center">
-                        <span class="step-badge bg-blue-600 text-white">2</span> Lệnh Yêu Cầu AI (Chế độ thủ công)
-                    </h2>
-                    <p class="text-xs text-blue-700 mb-2">Copy đoạn lệnh này dán vào ChatGPT nếu bạn không dùng API Key.</p>
-                    <textarea id="generatedPrompt" class="w-full h-28 p-3 border border-blue-200 rounded-md text-sm resize-none mb-3 bg-white" readonly placeholder="Lệnh sẽ xuất hiện ở đây..."></textarea>
-                    <button id="btnCopyPrompt" class="btn-primary !bg-blue-600 w-full mb-3" disabled>
-                        <i class="fa-regular fa-copy"></i> Copy lệnh
-                    </button>
-                    <div class="flex gap-2 w-full mt-auto">
-                        <input type="text" id="jsonInput" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm" placeholder="Dán JSON trả về từ ChatGPT...">
-                        <button id="btnRenderTable" class="btn-secondary !bg-gray-800 hover:!bg-gray-900 whitespace-nowrap">
-                            <i class="fa-solid fa-table"></i> Vẽ
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BƯỚC 3: RENDER TABLE -->
-            <div class="saas-card flex flex-col mb-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-base font-bold text-gray-800 flex items-center">
-                        <span class="step-badge bg-green-600 text-white">3</span> Hiển Thị Kết Quả Kịch Bản AI
-                    </h2>
-                </div>
-
-                <!-- KHUNG THAM CHIẾU ĐÁNH GIÁ -->
-                <div class="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4 text-sm flex gap-6 overflow-x-auto">
-                    <div class="whitespace-nowrap"><strong class="text-amber-800">Chưa đạt:</strong> Nhớ tính năng rời rạc.</div>
-                    <div class="whitespace-nowrap"><strong class="text-amber-800">Đạt thao tác:</strong> Biết làm nhưng giải thích lợi ích chung chung.</div>
-                    <div class="whitespace-nowrap"><strong class="text-amber-800">Đạt ứng dụng:</strong> Chọn đúng tính năng, nói được lợi ích chính.</div>
-                    <div class="whitespace-nowrap"><strong class="text-amber-800">Tốt:</strong> Hỏi thêm vấn đề, diễn đạt lợi ích theo ngôn ngữ khách.</div>
-                </div>
-
-                <!-- BẢNG KẾT QUẢ -->
-                <div class="overflow-x-auto rounded-lg border border-gray-200" id="tableContainer">
-                    <table class="w-full text-left text-sm" id="rubricTable">
-                        <thead class="table-header">
-                            <tr>
-                                <th class="px-4 py-3 w-12 text-center">STT</th>
-                                <th class="px-4 py-3 w-1/4">Tình huống (Vấn đề Khách hàng)</th>
-                                <th class="px-4 py-3 w-1/5">Câu hỏi cho Sale</th>
-                                <th class="px-4 py-3 w-1/4">Kỳ vọng trả lời (Giải pháp & Lợi ích)</th>
-                                <th class="px-4 py-3">Câu hỏi Đào sâu</th>
-                                <th class="px-4 py-3 w-12 text-center">Xóa</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white" id="rubricBody">
-                            <tr>
-                                <td colspan="6" class="px-4 py-8 text-center text-gray-400 italic" id="emptyStateText">
-                                    Hãy nhập tài liệu và bấm "AI Tự Động Phân Tích" để hiển thị kịch bản.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
                 
-                <div class="mt-4 flex justify-end">
-                    <button class="btn-primary" onclick="saveData()">
-                        <i class="fa-solid fa-floppy-disk"></i> Lưu Kịch Bản Vào Hệ Thống
+                <!-- BƯỚC 1: INPUT TÌM KIẾM (BÊN TRÁI) -->
+                <div class="lg:col-span-4 saas-card flex flex-col h-fit">
+                    <h2 class="text-base font-bold text-gray-800 mb-3 flex items-center">
+                        <span class="step-badge">1</span> CSDL Tính Năng
+                    </h2>
+                    <p class="text-sm text-gray-500 mb-4">Nhập tên tính năng hoặc dán bài viết để hệ thống quét từ khóa và lấy kịch bản chuẩn.</p>
+                    
+                    <input type="text" id="searchInput" class="w-full px-3 py-2 border border-gray-300 rounded-md mb-3 text-sm focus:ring-2 focus:ring-blue-500 font-medium" placeholder="VD: Lô, IMEI, Combo, Sản xuất, Bảng giá...">
+                    
+                    <textarea id="wpContent" class="w-full h-32 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 text-sm resize-none mb-4" placeholder="(Tùy chọn) Dán nội dung tài liệu chi tiết vào đây..."></textarea>
+                    
+                    <button id="btnScanKB" class="btn-primary w-full py-2.5 text-base shadow-sm">
+                        <i class="fa-solid fa-radar"></i> Quét Dữ Liệu & Phân Tích
                     </button>
+
+                    <div class="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
+                        <i class="fa-solid fa-circle-info text-blue-500"></i> Tool hoạt động dựa trên bộ từ khóa kịch bản nội bộ do L&D biên soạn, không cần Internet.
+                    </div>
+                </div>
+
+                <!-- BƯỚC 2: RENDER TABLE (BÊN PHẢI) -->
+                <div class="lg:col-span-8 saas-card flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-base font-bold text-gray-800 flex items-center">
+                            <span class="step-badge bg-green-600 text-white">2</span> Kết Quả Đánh Giá & Kịch Bản
+                        </h2>
+                        <button class="btn-outline !text-sm !py-1.5" onclick="addEmptyRow()">
+                            <i class="fa-solid fa-plus"></i> Thêm Dòng Trống
+                        </button>
+                    </div>
+
+                    <!-- KHUNG THAM CHIẾU ĐÁNH GIÁ -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4 text-xs lg:text-sm flex flex-wrap gap-x-6 gap-y-2">
+                        <div><strong class="text-amber-800">Chưa đạt:</strong> Nhớ tên tính năng rời rạc, không biết dùng cho khách nào.</div>
+                        <div><strong class="text-amber-800">Đạt thao tác:</strong> Biết làm nhưng giải thích lợi ích còn chung chung.</div>
+                        <div><strong class="text-amber-800">Đạt ứng dụng:</strong> Chọn đúng tính năng trong tình huống và nói được lợi ích.</div>
+                        <div><strong class="text-amber-800">Tốt:</strong> Hỏi thêm, phân tích đúng vấn đề, diễn đạt lợi ích theo ngôn ngữ khách.</div>
+                    </div>
+
+                    <!-- BẢNG KẾT QUẢ -->
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 flex-1" id="tableContainer">
+                        <table class="w-full text-left text-sm" id="rubricTable">
+                            <thead class="table-header">
+                                <tr>
+                                    <th class="px-4 py-3 w-12 text-center">STT</th>
+                                    <th class="px-4 py-3 w-1/4">Tình huống (Vấn đề Khách)</th>
+                                    <th class="px-4 py-3 w-1/5">Câu hỏi cho Sale</th>
+                                    <th class="px-4 py-3 w-1/4">Kỳ vọng trả lời</th>
+                                    <th class="px-4 py-3">Câu hỏi Đào sâu</th>
+                                    <th class="px-4 py-3 w-12 text-center">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white" id="rubricBody">
+                                <tr>
+                                    <td colspan="6" class="px-4 py-8 text-center text-gray-400 italic" id="emptyStateText">
+                                        Hãy nhập từ khóa tính năng và bấm "Quét Dữ Liệu".
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-end gap-3">
+                        <button class="btn-primary" onclick="saveData()">
+                            <i class="fa-solid fa-floppy-disk"></i> Lưu Vào Khóa Học
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -169,198 +132,158 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // === PHẦN 1: QUẢN LÝ API KEY ===
-            const openAiKeyInput = document.getElementById('openAiKey');
-            const btnSaveKey = document.getElementById('btnSaveKey');
             
-            // Load key cũ nếu có
-            const savedKey = localStorage.getItem('kv_openai_key');
-            if (savedKey) openAiKeyInput.value = savedKey;
-
-            btnSaveKey.addEventListener('click', () => {
-                const key = openAiKeyInput.value.trim();
-                if(key) {
-                    localStorage.setItem('kv_openai_key', key);
-                    alert('Đã lưu API Key thành công!');
-                    document.getElementById('apiSettings').classList.add('hidden');
-                } else {
-                    alert('Vui lòng nhập Key!');
+            // 1. DATABASE KỊCH BẢN CHUẨN DO BẠN CUNG CẤP (KHÔNG CẦN AI)
+            const defaultKnowledgeBase = [
+                {
+                    keywords: ["lô", "date", "hạn sử dụng", "mỹ phẩm", "thực phẩm", "lo", "han su dung"],
+                    tinhHuong: "Khách là shop mỹ phẩm, thường nhập nhiều đợt hàng, mỗi đợt có hạn sử dụng khác nhau. Gần đây khách than hay quên hàng cận date.",
+                    cauHoiSale: "Em sẽ gợi ý tính năng nào? Nói lợi ích thế nào?",
+                    kyVong: "Gợi ý quản lý lô-HSD.\nLợi ích: kiểm soát từng lô, biết lô nào gần hết hạn, ưu tiên bán trước, giảm tồn cận date.",
+                    daoSau: "Nếu khách nói: “Chị vẫn quản lý Excel được, cần gì dùng phần này”, em trả lời sao?\nLợi ích nào là quan trọng nhất với khách này: tiết kiệm thời gian hay giảm thất thoát?"
+                },
+                {
+                    keywords: ["imei", "serial", "điện thoại", "máy móc", "bảo hành", "dien thoai", "bao hanh"],
+                    tinhHuong: "Khách bán điện thoại, mỗi máy có mã IMEI riêng, khách hay cần tra lại máy đã bán để hỗ trợ bảo hành.",
+                    cauHoiSale: "Tính năng nào phù hợp? Vì sao không chỉ tạo hàng hóa thường?",
+                    kyVong: "Gợi ý Serial/IMEI.\nLợi ích: kiểm soát từng máy, bán đúng mã, tra lịch sử khi bảo hành/khiếu nại nhanh chóng.",
+                    daoSau: "Tình huống: Nhân viên mất rất lâu để tra lại máy đó bán ngày nào, ai bán. Em sẽ dùng ngôn từ bán hàng nào để thuyết phục chủ shop dùng tính năng này?"
+                },
+                {
+                    keywords: ["combo", "giỏ quà", "đóng gói", "dong goi", "gio qua", "thành phần"],
+                    tinhHuong: "Khách bán giỏ quà Tết gồm nhiều sản phẩm thành phần. Khi bán 1 giỏ quà, khách muốn tự động trừ tồn từng món bên trong.",
+                    cauHoiSale: "Em chọn Combo hay Hàng sản xuất? Vì sao?",
+                    kyVong: "Gợi ý Combo - đóng gói (vì chỉ gộp nhiều sản phẩm để bán thành 1 bộ).\nLợi ích: bán nhanh theo combo, vẫn tự động trừ tồn thành phần chính xác.",
+                    daoSau: "Khi nào dùng Combo, khi nào dùng Hàng sản xuất? Điểm khác biệt lớn nhất là gì?"
+                },
+                {
+                    keywords: ["sản xuất", "bàn ghế", "lắp ráp", "nguyên vật liệu", "hao hụt", "san xuat"],
+                    tinhHuong: "Khách bán bàn ghế, cần lắp ráp từ mặt bàn, chân bàn, linh kiện. Khi xưởng hoàn thiện 5 bàn thì muốn ghi nhận thành phẩm và trừ nguyên liệu.",
+                    cauHoiSale: "Nên dùng tính năng nào? Lợi ích là gì?",
+                    kyVong: "Gợi ý Hàng sản xuất.\nLợi ích: quản lý định mức nguyên liệu, tự động ghi nhận thành phẩm, kiểm soát hao hụt nguyên vật liệu kho xưởng.",
+                    daoSau: "Nếu khách hàng muốn tính cả chi phí nhân công vào giá vốn của cái bàn thì làm trên hệ thống thế nào?"
+                },
+                {
+                    keywords: ["đơn vị tính", "thùng", "chai", "quy đổi", "don vi", "lon"],
+                    tinhHuong: "Khách bán nước giải khát, nhập theo thùng nhưng bán lẻ theo chai.",
+                    cauHoiSale: "Nên gợi ý tính năng nào để giải quyết?",
+                    kyVong: "Gợi ý Quản lý đơn vị tính.\nLợi ích: nhập/bán linh hoạt theo thùng/chai, hạn chế nhầm lẫn quy đổi kho, tự động tính giá vốn.",
+                    daoSau: "Nếu khách thiết lập quy đổi sai (1 thùng = 10 chai thay vì 24), hậu quả lúc kiểm kho là gì?"
+                },
+                {
+                    keywords: ["bảng giá", "giá", "khách sỉ", "khách vip", "khách quen", "bang gia", "gia ban"],
+                    tinhHuong: "Khách có nhiều nhóm khách: khách lẻ, khách sỉ, khách VIP với mức giá khác nhau nhưng nhân viên hay nhớ nhầm và thu sai tiền.",
+                    cauHoiSale: "Em sẽ setup hệ thống như thế nào để xử lý triệt để lỗi này?",
+                    kyVong: "Gợi ý Thiết lập Bảng giá.\nLợi ích: Giúp mỗi nhóm có mức giá tự động, thu ngân chỉ cần chọn đúng tên khách là hiện giá chính xác, chống thất thoát doanh thu.",
+                    daoSau: "Khách hỏi: Lỡ anh muốn đổi giá 1 loạt 100 sản phẩm cho dịp lễ thì phần mềm làm nhanh được không?"
                 }
-            });
+            ];
 
-            // === PHẦN 2: LOGIC TỰ ĐỘNG GỌI AI (AUTO MODE) ===
-            const btnAutoGenerateAI = document.getElementById('btnAutoGenerateAI');
-            const aiLoadingOverlay = document.getElementById('aiLoadingOverlay');
+            // Lưu Database vào Local Storage nếu chưa có (Để L&D có thể mở rộng sau này)
+            if (!localStorage.getItem('kv_product_kb')) {
+                localStorage.setItem('kv_product_kb', JSON.stringify(defaultKnowledgeBase));
+            }
 
-            btnAutoGenerateAI.addEventListener('click', async () => {
-                const apiKey = localStorage.getItem('kv_openai_key');
-                if (!apiKey) {
-                    alert('Bạn chưa cài đặt OpenAI API Key!\nVui lòng click "Cấu hình API Key" ở góc trên bên phải.');
-                    document.getElementById('apiSettings').classList.remove('hidden');
-                    openAiKeyInput.focus();
-                    return;
-                }
-
-                const moduleName = document.getElementById('moduleName').value.trim() || '[Tên tính năng]';
-                const wpContent = document.getElementById('wpContent').value.trim();
-
-                if (!wpContent) {
-                    alert('Vui lòng dán nội dung tài liệu tính năng!');
-                    document.getElementById('wpContent').focus();
-                    return;
-                }
-
-                // Hiển thị trạng thái Loading
-                btnAutoGenerateAI.disabled = true;
-                aiLoadingOverlay.style.display = 'flex';
-
-                const promptText = getMasterPrompt(moduleName, wpContent);
-
-                try {
-                    // Gọi thẳng API OpenAI
-                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: 'gpt-4o-mini', // Model siêu nhanh, rẻ, phù hợp JSON
-                            messages: [
-                                { role: 'system', content: 'You are an expert L&D Director. You must follow the instructions strictly and output ONLY valid JSON format. No markdown tags, no explanations.' },
-                                { role: 'user', content: promptText }
-                            ],
-                            temperature: 0.7,
-                            response_format: { type: "json_object" } // Ép AI trả ra chuẩn JSON
-                        })
-                    });
-
-                    const data = await response.json();
-                    
-                    if (data.error) {
-                        throw new Error(data.error.message);
-                    }
-
-                    // OpenAI's response_format {type:"json_object"} requires outputting an object.
-                    // So we must expect an object wrapping our array, e.g., {"data": [ ... ]}
-                    const jsonString = data.choices[0].message.content;
-                    let parsedData = JSON.parse(jsonString);
-                    
-                    // Xử lý linh hoạt nếu AI bọc array trong object { "danhSach": [...] }
-                    let finalArray = Array.isArray(parsedData) ? parsedData : (parsedData.data || parsedData[Object.keys(parsedData)[0]]);
-                    
-                    if (!Array.isArray(finalArray)) {
-                        throw new Error("AI không trả về định dạng mảng (Array) như yêu cầu.");
-                    }
-
-                    // Vẽ bảng
-                    renderTable(finalArray);
-
-                    // Cuộn màn hình xuống bảng
-                    document.getElementById('tableContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-                } catch (error) {
-                    console.error(error);
-                    alert(`Lỗi khi gọi AI: ${error.message}\n\nHướng xử lý:\n1. Kiểm tra lại mạng.\n2. API Key có thể đã hết hạn/hết tiền (Quota exceeded).\n3. Copy prompt và dùng chế độ thủ công bên dưới.`);
-                } finally {
-                    // Tắt Loading
-                    btnAutoGenerateAI.disabled = false;
-                    aiLoadingOverlay.style.display = 'none';
-                }
-            });
-
-            // === PHẦN 3: LOGIC THỦ CÔNG (FALLBACK) ===
-            const btnGeneratePrompt = document.getElementById('btnGeneratePrompt');
-            const manualModeBox = document.getElementById('manualModeBox');
-            const generatedPrompt = document.getElementById('generatedPrompt');
-            const btnCopyPrompt = document.getElementById('btnCopyPrompt');
-            const btnRenderTable = document.getElementById('btnRenderTable');
+            const btnScanKB = document.getElementById('btnScanKB');
             const rubricBody = document.getElementById('rubricBody');
 
-            function getMasterPrompt(moduleName, content) {
-                return `Đóng vai trò là Giám đốc Đào tạo L&D cho đội ngũ Sale phần mềm quản lý (mô hình SaaS).
-Tôi sẽ cung cấp tài liệu về tính năng: "${moduleName}".
-Nhiệm vụ của bạn là đọc hiểu sâu tính năng này và tạo ra 4-5 "Tình huống Roleplay" để tôi kiểm tra năng lực tư vấn của Sale.
+            // 2. LOGIC QUÉT TỪ KHÓA
+            btnScanKB.addEventListener('click', () => {
+                const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
+                const wpContent = document.getElementById('wpContent').value.trim().toLowerCase();
+                const fullTextToScan = searchInput + " " + wpContent;
 
-YÊU CẦU NGHIỆP VỤ:
-1. "Tình huống" phải gắn với mô hình kinh doanh cụ thể (Mỹ phẩm, F&B, Điện thoại...) có nỗi đau rõ ràng.
-2. "Kỳ vọng trả lời" bắt buộc cấu trúc: Tính năng đề xuất + Lợi ích giải quyết đúng nỗi đau.
-3. "Câu hỏi đào sâu" là lời từ chối của khách (vd: chị dùng Excel cũng được) hoặc yêu cầu so sánh.
-
-BẮT BUỘC TRẢ VỀ DUY NHẤT 1 OBJECT JSON CÓ KEY LÀ "data" CHỨA ARRAY, KHÔNG GIẢI THÍCH GÌ THÊM:
-{
-  "data": [
-    {
-      "tinhHuong": "Khách là shop..., gặp vấn đề...",
-      "cauHoiSale": "Em sẽ gợi ý tính năng nào? Lợi ích là gì?",
-      "kyVong": "Gợi ý tính năng XYZ. Lợi ích: giúp khách giải quyết...",
-      "daoSau": "Nếu khách nói: ... thì em xử lý sao?"
-    }
-  ]
-}
-
-TÀI LIỆU TÍNH NĂNG CẦN PHÂN TÍCH:
-${content}`;
-            }
-
-            btnGeneratePrompt.addEventListener('click', () => {
-                manualModeBox.classList.toggle('hidden');
-                const moduleName = document.getElementById('moduleName').value.trim() || '[Tên tính năng]';
-                const wpContent = document.getElementById('wpContent').value.trim();
-                if(wpContent) {
-                    generatedPrompt.value = getMasterPrompt(moduleName, wpContent);
-                    btnCopyPrompt.disabled = false;
+                if (!fullTextToScan.trim()) {
+                    alert('Vui lòng nhập tên tính năng hoặc từ khóa!');
+                    document.getElementById('searchInput').focus();
+                    return;
                 }
-            });
 
-            btnCopyPrompt.addEventListener('click', () => {
-                generatedPrompt.select();
-                document.execCommand('copy');
-                const originalText = btnCopyPrompt.innerHTML;
-                btnCopyPrompt.innerHTML = '<i class="fa-solid fa-check"></i> Đã Copy!';
-                setTimeout(() => { btnCopyPrompt.innerHTML = originalText; }, 2000);
-            });
+                // Lấy Data từ hệ thống
+                const kbData = JSON.parse(localStorage.getItem('kv_product_kb'));
+                let matchedScenarios = [];
 
-            btnRenderTable.addEventListener('click', () => {
-                const jsonText = document.getElementById('jsonInput').value.trim();
-                if (!jsonText) return alert('Vui lòng dán kết quả JSON!');
-                try {
-                    const cleanedJson = jsonText.replace(/```json/g, '').replace(/```/g, '').trim();
-                    const data = JSON.parse(cleanedJson);
-                    let finalArray = Array.isArray(data) ? data : (data.data || data[Object.keys(data)[0]]);
-                    renderTable(finalArray);
-                    document.getElementById('jsonInput').value = ''; 
-                } catch (error) {
-                    alert('Lỗi: Định dạng JSON không hợp lệ!\n' + error.message);
-                }
-            });
-
-            // HÀM VẼ BẢNG CHUNG
-            function renderTable(dataArray) {
-                rubricBody.innerHTML = ''; 
-                dataArray.forEach((item, index) => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'hover:bg-slate-50 transition-colors group border-b border-gray-100';
-                    tr.innerHTML = `
-                        <td class="px-4 py-3 text-center text-gray-500 font-medium align-top">${index + 1}</td>
-                        <td class="px-4 py-3 text-gray-800 align-top editable-cell" contenteditable="true">${item.tinhHuong || ''}</td>
-                        <td class="px-4 py-3 text-blue-700 align-top font-medium editable-cell" contenteditable="true">${item.cauHoiSale || ''}</td>
-                        <td class="px-4 py-3 text-emerald-700 align-top editable-cell" contenteditable="true">${item.kyVong || ''}</td>
-                        <td class="px-4 py-3 text-amber-700 align-top editable-cell" contenteditable="true">${item.daoSau || ''}</td>
-                        <td class="px-4 py-3 text-center align-top">
-                            <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" onclick="this.closest('tr').remove()" title="Xóa dòng này">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    `;
-                    rubricBody.appendChild(tr);
+                // Thuật toán: Chạy qua từng kịch bản, nếu fullTextToScan chứa bất kỳ keyword nào -> lấy kịch bản đó
+                kbData.forEach(scenario => {
+                    const isMatch = scenario.keywords.some(keyword => fullTextToScan.includes(keyword.toLowerCase()));
+                    if (isMatch) {
+                        matchedScenarios.push(scenario);
+                    }
                 });
-            }
+
+                // 3. HIỂN THỊ KẾT QUẢ
+                rubricBody.innerHTML = ''; // Xóa bảng cũ
+
+                if (matchedScenarios.length > 0) {
+                    matchedScenarios.forEach((item, index) => {
+                        appendRow(index + 1, item.tinhHuong, item.cauHoiSale, item.kyVong, item.daoSau);
+                    });
+                } else {
+                    // Xử lý Edge Case: Nếu không match được keyword nào
+                    alert('Hệ thống chưa có sẵn kịch bản mẫu cho từ khóa này. Đã tạo một dòng trống để bạn tự biên soạn!');
+                    addEmptyRow();
+                }
+            });
         });
 
-        function saveData() {
-            alert('Đã lưu dữ liệu thành công vào bộ nhớ hệ thống (kv_product_rubrics).');
+        // Hàm hỗ trợ: Vẽ 1 dòng dữ liệu vào bảng
+        function appendRow(stt, tinhHuong, cauHoi, kyVong, daoSau) {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-50 transition-colors group border-b border-gray-100';
+            tr.innerHTML = `
+                <td class="px-4 py-3 text-center text-gray-500 font-medium align-top row-stt">${stt}</td>
+                <td class="px-4 py-3 text-gray-800 align-top editable-cell" contenteditable="true">${tinhHuong || ''}</td>
+                <td class="px-4 py-3 text-blue-700 align-top font-medium editable-cell" contenteditable="true">${cauHoi || ''}</td>
+                <td class="px-4 py-3 text-emerald-700 align-top editable-cell" contenteditable="true">${kyVong || ''}</td>
+                <td class="px-4 py-3 text-amber-700 align-top editable-cell" contenteditable="true">${daoSau || ''}</td>
+                <td class="px-4 py-3 text-center align-top">
+                    <button class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" onclick="deleteRow(this)" title="Xóa dòng này">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            document.getElementById('rubricBody').appendChild(tr);
+            updateSTT();
         }
+
+        // Hàm hỗ trợ: Thêm dòng trống cho Trainer tự gõ tay
+        window.addEmptyRow = function() {
+            const tbody = document.getElementById('rubricBody');
+            // Nếu đang là text báo trống, xóa đi
+            if (document.getElementById('emptyStateText')) {
+                tbody.innerHTML = '';
+            }
+            appendRow('-', '[Gõ tình huống khách hàng...]', '[Hỏi sale cần gợi ý tính năng nào...]', '[Tính năng + Lợi ích xử lý nỗi đau...]', '[Khách từ chối thì sao...]');
+        };
+
+        // Hàm hỗ trợ: Xóa dòng và cập nhật lại STT
+        window.deleteRow = function(btn) {
+            btn.closest('tr').remove();
+            updateSTT();
+            // Nếu xóa hết, hiển thị lại dòng trống
+            const tbody = document.getElementById('rubricBody');
+            if (tbody.children.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 italic" id="emptyStateText">Dữ liệu trống. Hãy tìm kiếm từ khóa mới hoặc thêm dòng trống.</td></tr>`;
+            }
+        };
+
+        // Hàm hỗ trợ: Cập nhật STT tự động
+        function updateSTT() {
+            const sttCells = document.querySelectorAll('.row-stt');
+            sttCells.forEach((cell, index) => {
+                cell.textContent = index + 1;
+            });
+        }
+
+        // Hàm lưu dữ liệu (Giả lập chức năng của hệ thống)
+        window.saveData = function() {
+            const tbody = document.getElementById('rubricBody');
+            if (tbody.children.length === 0 || document.getElementById('emptyStateText')) {
+                alert('Không có dữ liệu để lưu!');
+                return;
+            }
+            alert('Đã lưu dữ liệu Kịch Bản Roleplay thành công vào Local Storage của Trainer OS. Bạn có thể mang bảng này đi review đội Sale!');
+        };
     </script>
 </body>
 </html>

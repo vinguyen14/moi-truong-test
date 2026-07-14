@@ -1,8 +1,8 @@
 // CẤU HÌNH HỆ THỐNG DÀNH CHO ADMIN
 const APP_CONFIG = {
     // CHỈ DÁN ĐƯỜNG LINK TỪ GOOGLE APPS SCRIPT (CÓ ĐUÔI /exec) VÀO GIỮA 2 DẤU NGOẶC KÉP BÊN DƯỚI:
-    API_URL: "https://script.google.com/macros/s/AKfycbysx25wLo3Heb2yFbTrkVMDsg1okIOrJQ-7tAEg_WNrtvfe5yBqcvmh6WBVW4NUhATDYA/exec", 
-    COURSE_NAME: "26KV15" 
+    API_URL: "https://script.google.com/macros/s/AKfycbzGViS8Tnc6X_AaYnqfC3Y1GyDW8VtwBgvzNiS5aPUsQJeRxKTnXC8DKCAWo5mNuYy25g/exec", 
+    COURSE_NAME: "26KV16" 
 };
 
 // ============================================================================

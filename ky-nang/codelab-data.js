@@ -17,7 +17,8 @@ const CODELAB_DATA = [
       {
         title: "Tình huống 1: Mẹ & Bé (Chị Nga)",
         hints: [
-          "**TÌNH HUỐNG:** Chị Nga kinh doanh ngành Mẹ và Bé, bán cả trực tiếp tại cửa hàng lẫn online trên Facebook."
+          "**TÌNH HUỐNG:** Chị Nga kinh doanh ngành Mẹ và Bé, bán cả trực tiếp tại cửa hàng lẫn online trên Facebook.",
+          "**⚠️ YÊU CẦU QUAN TRỌNG:** Hãy bám sát Cấu trúc và Lời thoại của **Kịch bản mẫu** (Nằm ở mục Tham khảo ngoài trang chủ) để viết kịch bản của bạn."
         ],
         theory: [
           "BƯỚC 1: Tiếp cận (Chào hỏi, Phá băng, Đặt vấn đề)",
@@ -26,14 +27,13 @@ const CODELAB_DATA = [
           "BƯỚC 4: Tư vấn giải pháp (Tính năng KV giải quyết nỗi đau)",
           "BƯỚC 5: Dẫn dắt Demo & Chốt (Báo giá, Chốt Sale)"
         ],
-        requirements: ["Hoàn thiện kịch bản chi tiết cho cả 5 bước tư vấn."],
-        instructions: ["Hãy đóng vai bạn là nhân viên Direct Sales của KiotViet.", "Lưu ý: Bạn phải nhấn nút 'Lưu cập nhật' ở từng bước thì mới có thể nộp bài."],
-        confirm: "Không yêu cầu nộp ảnh minh chứng."
+        requirements: [], instructions: [], confirm: ""
       },
       {
         title: "Tình huống 2: Tạp hóa (Cô Mai)",
         hints: [
-          "**TÌNH HUỐNG:** Cô Mai bán tạp hóa dưới chân chung cư, có 2 nhân viên phụ việc bán hàng."
+          "**TÌNH HUỐNG:** Cô Mai bán tạp hóa dưới chân chung cư, có 2 nhân viên phụ việc bán hàng.",
+          "**⚠️ YÊU CẦU QUAN TRỌNG:** Hãy bám sát Cấu trúc và Lời thoại của **Kịch bản mẫu** (Nằm ở mục Tham khảo ngoài trang chủ) để viết kịch bản của bạn."
         ],
         theory: [
           "BƯỚC 1: Tiếp cận (Chào hỏi, Phá băng, Đặt vấn đề)",
@@ -42,14 +42,13 @@ const CODELAB_DATA = [
           "BƯỚC 4: Tư vấn giải pháp (Tính năng KV giải quyết nỗi đau)",
           "BƯỚC 5: Dẫn dắt Demo & Chốt (Báo giá, Chốt Sale)"
         ],
-        requirements: ["Hoàn thiện kịch bản chi tiết cho cả 5 bước tư vấn."],
-        instructions: ["Hãy đóng vai bạn là nhân viên Direct Sales của KiotViet.", "Lưu ý: Bạn phải nhấn nút 'Lưu cập nhật' ở từng bước thì mới có thể nộp bài."],
-        confirm: "Không yêu cầu nộp ảnh minh chứng."
+        requirements: [], instructions: [], confirm: ""
       },
       {
         title: "Tình huống 3: Thời trang Nam (Anh Hào)",
         hints: [
-          "**TÌNH HUỐNG:** Anh Hào kinh doanh thời trang Nam Quảng Châu, bán tại cửa hàng và trên Shopee."
+          "**TÌNH HUỐNG:** Anh Hào kinh doanh thời trang Nam Quảng Châu, bán tại cửa hàng và trên Shopee.",
+          "**⚠️ YÊU CẦU QUAN TRỌNG:** Hãy bám sát Cấu trúc và Lời thoại của **Kịch bản mẫu** (Nằm ở mục Tham khảo ngoài trang chủ) để viết kịch bản của bạn."
         ],
         theory: [
           "BƯỚC 1: Tiếp cận (Chào hỏi, Phá băng, Đặt vấn đề)",
@@ -58,9 +57,7 @@ const CODELAB_DATA = [
           "BƯỚC 4: Tư vấn giải pháp (Tính năng KV giải quyết nỗi đau)",
           "BƯỚC 5: Dẫn dắt Demo & Chốt (Báo giá, Chốt Sale)"
         ],
-        requirements: ["Hoàn thiện kịch bản chi tiết cho cả 5 bước tư vấn."],
-        instructions: ["Hãy đóng vai bạn là nhân viên Direct Sales của KiotViet.", "Lưu ý: Bạn phải nhấn nút 'Lưu cập nhật' ở từng bước thì mới có thể nộp bài."],
-        confirm: "Không yêu cầu nộp ảnh minh chứng."
+        requirements: [], instructions: [], confirm: ""
       },
       { title: '💡 Tài liệu Tham khảo', isGroupHeader: true },
       {

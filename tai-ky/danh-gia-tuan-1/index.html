@@ -3,72 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ thống Đánh giá Nhân sự Tái Ký</title>
+    <title>E-Learning | Trainer OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Font Plus Jakarta Sans: Tròn trịa, hiện đại, dễ đọc -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            /* Nền Gradient mượt mà */
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
-            min-height: 100vh;
-        }
-        /* Hiệu ứng Glassmorphism */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-        }
-        .hover-glass:hover {
-            background: rgba(255, 255, 255, 0.85);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px 0 rgba(31, 38, 135, 0.15);
-            transition: all 0.3s ease;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f4f6fa; }
+        .kv-btn-primary { background-color: #007aff; color: white; transition: background-color 0.2s; }
+        .kv-btn-primary:hover { background-color: #0062cc; }
+        .kv-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid #edf2f7; }
+        .hover-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); transition: all 0.3s ease; }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
+<body class="flex flex-col h-screen">
 
-    <div class="max-w-4xl w-full z-10">
-        <div class="text-center mb-12">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-full glass-panel text-indigo-600 mb-6 shadow-lg">
-                <i class="fas fa-graduation-cap text-4xl"></i>
+    <!-- Topbar (Giống hình tham khảo) -->
+    <header class="bg-white border-b px-8 py-4 flex justify-between items-center sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1">
+                <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+                <div class="w-4 h-4 rounded-full bg-green-500"></div>
             </div>
-            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-4 drop-shadow-sm">Review Nhân Sự Tái Ký</h1>
-            <p class="text-slate-700 text-lg md:text-xl font-medium">Hệ thống L&D Training OS - Tuần 1 (Sản phẩm)</p>
+            <h1 class="text-xl font-bold text-gray-800 ml-2">Trainer OS <span class="text-blue-600 font-bold ml-1">E-LEARNING</span></h1>
         </div>
+    </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <main class="flex-1 flex items-center justify-center p-6 relative">
+        <div class="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 z-10">
             <!-- Cổng L&D -->
-            <a href="lnd-review.html" class="block rounded-2xl p-8 glass-panel hover-glass text-center group cursor-pointer transition-all duration-300">
-                <div class="w-24 h-24 mx-auto bg-white/60 rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                    <i class="fas fa-clipboard-list text-5xl text-indigo-600"></i>
+            <div onclick="openModal()" class="kv-card p-10 hover-card text-center cursor-pointer group">
+                <div class="w-20 h-20 mx-auto bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600">
+                    <i class="fas fa-clipboard-check text-4xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-3">L&D Coach</h2>
-                <p class="text-gray-600 mb-8 text-base">Đánh giá 1:1, chấm điểm phản xạ tình huống, ghi nhận tiến độ từng ngày của học viên.</p>
-                <span class="inline-block bg-indigo-600 text-white font-semibold text-lg py-3 px-8 rounded-xl hover:bg-indigo-700 shadow-md w-full">
-                    Bắt đầu Chấm Điểm
-                </span>
-            </a>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">L&D Coach</h2>
+                <p class="text-gray-500 mb-8 leading-relaxed">Đánh giá thực hành 1:1, chấm điểm phản xạ tình huống và ghi nhận nhận xét cho nhân sự mới.</p>
+                <button class="kv-btn-primary font-semibold py-3 px-8 rounded-full w-full">Bắt đầu đánh giá <i class="fas fa-arrow-right ml-2"></i></button>
+            </div>
 
             <!-- Cổng Manager -->
-            <a href="manager-tracking.html" class="block rounded-2xl p-8 glass-panel hover-glass text-center group cursor-pointer transition-all duration-300">
-                <div class="w-24 h-24 mx-auto bg-white/60 rounded-full flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                    <i class="fas fa-chart-line text-5xl text-emerald-600"></i>
+            <a href="manager-tracking.html" class="kv-card p-10 hover-card text-center block group">
+                <div class="w-20 h-20 mx-auto bg-teal-50 rounded-2xl flex items-center justify-center mb-6 text-teal-600">
+                    <i class="fas fa-chart-bar text-4xl"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800 mb-3">Quản lý Tái Ký</h2>
-                <p class="text-gray-600 mb-8 text-base">Theo dõi tiến độ, đọc full review từng buổi, tải PDF phiếu kết quả để phân bổ khách hàng.</p>
-                <span class="inline-block bg-emerald-600 text-white font-semibold text-lg py-3 px-8 rounded-xl hover:bg-emerald-700 shadow-md w-full">
-                    Xem Báo Cáo Tracker
-                </span>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Quản lý Tái Ký</h2>
+                <p class="text-gray-500 mb-8 leading-relaxed">Theo dõi tiến độ, xem báo cáo tổng quan, xuất Excel và in phiếu PDF kết quả đào tạo.</p>
+                <div class="bg-teal-600 text-white font-semibold py-3 px-8 rounded-full w-full hover:bg-teal-700 transition-colors">Xem Dashboard <i class="fas fa-arrow-right ml-2"></i></div>
             </a>
         </div>
-    </div>
 
+        <!-- Popup Lựa Chọn (L&D) -->
+        <div id="courseModal" class="fixed inset-0 bg-black/40 hidden flex items-center justify-center z-50 transition-opacity">
+            <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl transform scale-100">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Chọn Phiếu Đánh Giá</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-700"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <a href="lnd-review.html?type=product" class="block border border-gray-200 rounded-xl p-4 hover:border-blue-500 hover:bg-blue-50 transition-colors group">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-gray-900 group-hover:text-blue-700">1. Đánh giá Sản phẩm</h4>
+                                <p class="text-sm text-gray-500 mt-1">Tuần 1 - Retail & Kế toán</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300 group-hover:text-blue-500"></i>
+                        </div>
+                    </a>
+                    <a href="#" onclick="alert('Tính năng Tuần 2 đang được xây dựng dữ liệu!')" class="block border border-gray-200 rounded-xl p-4 hover:border-blue-500 hover:bg-blue-50 transition-colors group">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-gray-900 group-hover:text-blue-700">2. Đánh giá Kỹ năng</h4>
+                                <p class="text-sm text-gray-500 mt-1">Tuần 2 - Đang cập nhật...</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-300 group-hover:text-blue-500"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function openModal() { document.getElementById('courseModal').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('courseModal').classList.add('hidden'); }
+    </script>
 </body>
 </html>

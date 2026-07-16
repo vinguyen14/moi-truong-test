@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đào tạo Sản phẩm - Trainer OS (KiotViet)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { kvBlue: '#0055cc', kvDark: '#003380', kvSidebar: '#1a233a', kvBg: '#f8fafc' },
+                    boxShadow: { 'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)', 'floating': '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Cuộn tùy chỉnh hiện đại */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Hiệu ứng kéo giãn Sidebar */
+        #sidebarResizer { cursor: col-resize; transition: background 0.2s; }
+        #sidebarResizer:hover, .resizing #sidebarResizer { background: rgba(59, 130, 246, 0.5); }
+        
+        /* Hiệu ứng trượt ngang cho 2 cột */
+        #leftPanel { transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), min-width 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        #leftPanelContent { transition: opacity 0.3s ease; }
+        
+        /* Nút Toggle hiện đại */
+        .toggle-btn { background: linear-gradient(135deg, #ffffff, #f1f5f9); transition: all 0.3s ease; }
+        .toggle-btn:hover { background: linear-gradient(135deg, #eff6ff, #dbeafe); transform: scale(1.05); box-shadow: 0 4px 12px rgba(59,130,246,0.2); }
+        
+        /* Timeline dọc */
+        .timeline-line::before { content: ''; position: absolute; top: 12px; bottom: 0; left: 16px; width: 2px; background: #e2e8f0; z-index: 0; }
+        
+        /* Style Quiz Trắc nghiệm bo góc đẹp */
+        .mcq-btn { transition: all 0.2s ease; text-align: left; border-radius: 1rem; }
+        .mcq-btn:hover:not(:disabled) { border-color: #3b82f6; background-color: #eff6ff; box-shadow: 0 4px 12px rgba(59,130,246,0.1); transform: translateY(-1px); }
+        .mcq-correct { border-color: #10b981 !important; background: linear-gradient(to right, #ecfdf5, #ffffff) !important; color: #047857 !important; box-shadow: 0 4px 15px rgba(16,185,129,0.15); }
+        .mcq-wrong { border-color: #ef4444 !important; background: linear-gradient(to right, #fef2f2, #ffffff) !important; color: #b91c1c !important; }
+        
+        /* Mobile Hamburger */
+        @media (max-width: 768px) {
+            #mainSidebar { position: absolute; height: 100%; z-index: 50; transform: translateX(-100%); transition: transform 0.3s ease; }
+            #mainSidebar.open { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body class="bg-kvBg text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
+
+    <!-- HEADER GRADIENT -->
+    <header class="h-[60px] bg-gradient-to-r from-kvDark to-kvBlue text-white flex justify-between items-center px-4 md:px-6 flex-shrink-0 shadow-md z-40 relative">
+        <div class="flex items-center gap-4">
+            <!-- Hamburger cho Mobile -->
+            <button onclick="toggleMobileMenu()" class="md:hidden text-white text-xl p-2 focus:outline-none"><i class="fas fa-bars"></i></button>
+            
+            <!-- Logo Box -->
+            <div class="bg-white/95 text-kvBlue font-black px-4 py-1.5 rounded-lg text-sm tracking-wide shadow-floating flex items-center gap-2 border border-blue-200">
+                <i class="fas fa-layer-group text-blue-500"></i> TRAINER OS
+            </div>
+            
+            <div class="hidden sm:block border-l border-white/20 pl-4">
+                <h1 class="text-sm font-bold tracking-wide">ĐÀO TẠO QUY TRÌNH TÁI KÝ</h1>
+                <p class="text-[11px] text-blue-200 font-medium">HỌC TẬP & XỬ LÝ TÌNH HUỐNG (TUẦN 2)</p>
+            </div>
+        </div>
+        <div class="hidden sm:flex items-center gap-3">
+            <div class="bg-blue-900/40 border border-blue-400/30 px-3 py-1.5 rounded-full text-[11px] font-semibold text-blue-100 flex items-center gap-1.5 backdrop-blur">
+                <i class="fas fa-shield-alt"></i> Phiên bản Học tập nội bộ
+            </div>
+        </div>
+    </header>
+
+    <!-- Overlay cho Mobile -->
+    <div id="mobileOverlay" onclick="toggleMobileMenu()" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+
+    <!-- MAIN WRAPPER -->
+    <div class="flex flex-1 overflow-hidden relative w-full">
+        
+        <!-- SIDEBAR -->
+        <aside id="mainSidebar" class="w-[280px] bg-kvSidebar flex flex-col flex-shrink-0 border-r border-slate-700 shadow-2xl relative">
+            <div class="p-5 border-b border-slate-700/50 bg-gradient-to-b from-slate-900/50 to-transparent">
+                <div class="flex justify-between items-end mb-2">
+                    <h2 class="text-[11px] font-bold text-slate-400 tracking-wider">TIẾN TRÌNH HỌC TẬP</h2>
+                    <span id="progressText" class="text-lg font-black text-emerald-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-1.5 mb-2 overflow-hidden border border-slate-700">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-emerald-400 h-1.5 rounded-full transition-all duration-700 w-0"></div>
+                </div>
+                <div class="text-[11px] text-slate-400 font-medium" id="completedCountText">Hoàn thành: 0 / 12 chủ đề</div>
+            </div>
+
+            <div class="px-5 py-4 bg-slate-800/50 sticky top-0 flex items-center gap-2 text-blue-400 font-bold text-sm border-b border-slate-700/50 cursor-pointer" onclick="switchMode('learn')">
+                <i class="fas fa-folder-open"></i> DANH SÁCH CHỦ ĐỀ
+            </div>
+
+            <ul id="lessonMenu" class="flex-1 overflow-y-auto py-2"></ul>
+
+            <div class="p-5 border-t border-slate-700/50 bg-slate-900/80">
+                <button onclick="switchMode('quiz')" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-bold py-3 px-4 rounded-xl flex justify-center items-center gap-2 transition-all shadow-floating border border-emerald-400/50">
+                    <i class="fas fa-brain text-lg"></i> Làm bài Quiz
+                </button>
+            </div>
+            
+            <!-- Resizer Handle -->
+            <div id="sidebarResizer" class="absolute top-0 right-0 w-1.5 h-full z-10 hidden md:block"></div>
+        </aside>
+
+        <!-- VIEW: HỌC TẬP (LEARN MODE) -->
+        <main id="view-learn" class="flex-1 flex flex-col relative hidden bg-slate-50 w-full overflow-hidden">
+            
+            <!-- Tiêu đề Bài học -->
+            <div class="h-14 bg-white border-b border-slate-200 flex justify-between items-center px-4 md:px-8 shadow-sm z-10 flex-shrink-0">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="w-1.5 h-6 bg-blue-500 rounded-full shrink-0"></div>
+                    <h2 id="learnTitle" class="font-bold text-slate-800 text-sm md:text-base uppercase truncate">Đang tải...</h2>
+                </div>
+            </div>
+
+            <!-- Giao diện Chia Cột Mượt mà -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+                
+                <!-- CỘT TRÁI (Box Vàng & Danh sách) -->
+                <div id="leftPanel" class="w-full md:w-[35%] md:min-w-[320px] bg-slate-50/80 md:border-r border-b md:border-b-0 border-slate-200 relative flex flex-col z-10">
+                    <!-- Nút Toggle Ẩn/Hiện Mũi tên bo tròn gradient -->
+                    <button onclick="toggleSidePanel()" id="togglePanelBtn" class="hidden md:flex absolute -right-3.5 top-8 w-7 h-7 rounded-full items-center justify-center z-20 border border-slate-200 toggle-btn text-blue-600 focus:outline-none">
+                        <i class="fas fa-chevron-left text-[10px]"></i>
+                    </button>
+                    
+                    <div id="leftPanelContent" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-5">
+                        <!-- Box Vàng (Có Update L&D) -->
+                        <div id="yellowBox" class="bg-gradient-to-br from-[#fffbeb] to-[#fef3c7] border border-amber-200/80 rounded-2xl shadow-soft hidden overflow-hidden">
+                            <div class="px-5 py-3.5 bg-amber-100/40 border-b border-amber-200/50 flex items-center gap-2.5">
+                                <i class="fas fa-lightbulb text-amber-500 text-lg"></i>
+                                <h3 class="font-bold text-amber-800 text-[12px] uppercase tracking-wider">Lưu ý cập nhật L&D</h3>
+                            </div>
+                            <div id="yellowText" class="p-5 text-[13.5px] text-amber-900 leading-relaxed whitespace-pre-wrap font-medium"></div>
+                        </div>
+
+                        <!-- Box Xanh (Có Danh sách) -->
+                        <div id="greenBox" class="bg-gradient-to-br from-emerald-50 to-teal-50/50 border border-emerald-200/60 rounded-2xl shadow-soft hidden overflow-hidden flex-col">
+                            <div class="px-5 py-3.5 bg-emerald-100/30 border-b border-emerald-200/50 flex items-center gap-2.5">
+                                <i class="fas fa-clipboard-list text-emerald-600 text-lg"></i>
+                                <h3 class="font-bold text-emerald-800 text-[12px] uppercase tracking-wider">Danh sách Picklist CRM</h3>
+                            </div>
+                            <div class="p-5 flex-1 overflow-y-auto max-h-[40vh]">
+                                <ul id="greenList" class="list-disc pl-4 space-y-2 text-[13px] text-emerald-800 font-medium"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI (Luồng xử lý B1, B2) -->
+                <div id="rightPanel" class="flex-1 overflow-y-auto bg-white flex flex-col relative w-full">
+                    <div class="p-4 md:p-8 space-y-6 fade-in pb-[100px]" id="flowContent">
+                        <!-- Render Luồng Xử Lý bằng JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- THANH ĐIỀU HƯỚNG BOTTOM (Giống thiết kế yêu cầu) -->
+            <div class="absolute bottom-0 left-0 w-full h-[70px] border-t border-slate-200 bg-white/95 backdrop-blur flex items-center justify-between px-4 md:px-8 z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.03)]">
+                <!-- Nút Prev -->
+                <button onclick="navLesson(-1)" id="btnLPrev" class="px-3 md:px-5 py-2 md:py-2.5 bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+                    <i class="fas fa-chevron-left text-xs"></i> <span class="hidden sm:inline">Bài trước</span>
+                </button>
+                
+                <!-- Chấm tròn lướt (Dots) -->
+                <div class="flex items-center gap-1.5 md:gap-2 hidden sm:flex" id="lessonDots">
+                    <!-- JS Render Dots -->
+                </div>
+                <div class="sm:hidden text-xs font-bold text-slate-400" id="lessonCounterMobile">1/12</div>
+
+                <!-- Nhóm nút Right (Đã hiểu + Next) -->
+                <div class="flex items-center gap-2 md:gap-3">
+                    <button id="btnMarkDone" class="px-3 md:px-4 py-2 md:py-2.5 bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-sm font-bold hover:bg-emerald-200 transition-colors flex items-center gap-1.5 shadow-sm">
+                        <i class="fas fa-check"></i> <span class="hidden sm:inline">Đã hiểu bài</span>
+                    </button>
+                    <button onclick="navLesson(1)" id="btnLNext" class="px-3 md:px-5 py-2 md:py-2.5 bg-blue-600 border border-blue-600 rounded-lg text-sm font-semibold text-white hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-40 flex items-center gap-2">
+                        <span class="hidden sm:inline">Bài sau</span> <i class="fas fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW: QUIZ TRẮC NGHIỆM (MCQ bo góc) -->
+        <main id="view-quiz" class="flex-1 overflow-hidden bg-slate-50 flex flex-col hidden w-full">
+            <div class="h-14 bg-white border-b border-slate-200 px-4 md:px-8 flex justify-between items-center shadow-sm flex-shrink-0">
+                <div class="font-bold text-slate-700 flex items-center gap-2.5 text-sm md:text-base">
+                    <i class="fas fa-bolt text-amber-500 text-lg"></i> Ôn luyện trắc nghiệm (MCQ)
+                </div>
+                <button onclick="switchMode('learn')" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full text-[13px] font-bold transition-colors">
+                    Đóng <i class="fas fa-times ml-1"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden p-4 md:p-6 gap-6 fade-in">
+                
+                <!-- Cột CÂU HỎI & ĐÁP ÁN -->
+                <div class="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-soft flex-1 flex flex-col relative overflow-hidden">
+                        
+                        <!-- Box Header Câu Hỏi -->
+                        <div class="p-6 md:p-8 bg-gradient-to-b from-blue-50/50 to-white flex-shrink-0">
+                            <div class="flex justify-between items-center mb-5">
+                                <span class="bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full shadow-sm tracking-widest" id="qBadge">CÂU HỎI 1</span>
+                                <span class="text-sm font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full" id="qCounter">1 / 12</span>
+                            </div>
+                            <h3 id="qText" class="text-lg md:text-xl font-bold text-slate-800 leading-relaxed">Đang tải câu hỏi...</h3>
+                        </div>
+                        
+                        <!-- 3 Box Đáp án -->
+                        <div class="px-6 md:px-8 pb-8 flex-1 overflow-y-auto space-y-4" id="mcqOptionsBox">
+                            <button onclick="answerMCQ(0)" id="btnOpt0" class="mcq-btn w-full p-4 md:p-5 border-2 border-slate-200 bg-white flex items-center gap-4">
+                                <div class="w-8 h-8 shrink-0 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm border border-slate-200">A</div>
+                                <div id="txtOpt0" class="text-[14px] font-medium text-slate-700 leading-relaxed text-left"></div>
+                            </button>
+                            <button onclick="answerMCQ(1)" id="btnOpt1" class="mcq-btn w-full p-4 md:p-5 border-2 border-slate-200 bg-white flex items-center gap-4">
+                                <div class="w-8 h-8 shrink-0 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm border border-slate-200">B</div>
+                                <div id="txtOpt1" class="text-[14px] font-medium text-slate-700 leading-relaxed text-left"></div>
+                            </button>
+                            <button onclick="answerMCQ(2)" id="btnOpt2" class="mcq-btn w-full p-4 md:p-5 border-2 border-slate-200 bg-white flex items-center gap-4">
+                                <div class="w-8 h-8 shrink-0 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm border border-slate-200">C</div>
+                                <div id="txtOpt2" class="text-[14px] font-medium text-slate-700 leading-relaxed text-left"></div>
+                            </button>
+                        </div>
+                        
+                        <!-- Box Giải thích (Hiện khi đã chọn) -->
+                        <div id="feedbackBox" class="border-t border-slate-100 bg-slate-50 p-6 md:p-8 hidden flex-col transition-all">
+                            <div class="flex items-center gap-4 mb-3">
+                                <div id="fbIconBox" class="w-10 h-10 rounded-full flex items-center justify-center text-xl shrink-0"><i id="fbIcon"></i></div>
+                                <h3 id="fbTitle" class="text-lg font-bold"></h3>
+                            </div>
+                            <p id="fbExplain" class="text-[14px] text-slate-600 leading-relaxed bg-white p-4 rounded-xl border border-slate-200 shadow-sm"></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Nút Điều hướng Quiz -->
+                    <div class="flex justify-between items-center mt-5 mb-4">
+                        <button onclick="navQuiz(-1)" id="btnQPrev" class="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold shadow-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50 flex items-center gap-2"><i class="fas fa-chevron-left"></i> Câu trước</button>
+                        <button onclick="navQuiz(1)" id="btnQNext" class="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-500 border border-blue-600 rounded-xl text-sm font-bold shadow-floating text-white hover:opacity-90 disabled:opacity-50 flex items-center gap-2">Câu sau <i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+// ==========================================
+// 1. DATA GỐC BẢO TOÀN 100% 
+// ==========================================
+const masterData = [
+    {
+        id: "g1", title: "1. Chức năng PM & Dịch vụ gia tăng",
+        changes: `📋 CHI TIẾT THAY ĐỔI SO VỚI BẢN CŨ (Nhóm 1):\n• Đổi tên nhóm nguyên nhân thất bại\n• GIỮ NGUYÊN (không đổi): 1.1–1.16 (16 mục chức năng lõi) 1.17 Employee — nguyên vẹn từ Nhóm 1 cũ.\n• XÓA (trùng lặp): 'Chức năng của FBPos', 'Chức năng của MyKiot' (3 mục ở Nhóm 1 cũ, mục 1.17-1.19 cũ) — đã có sẵn ở Nhóm 3 cũ nên xóa bỏ, không giữ 2 nơi và KiotPro\n• GỘP MỚI (từ Nhóm 3 cũ, nay tô đỏ 1.19-1.25): Shipping -> Kship, MyKiot, Sàn TMĐT, Timesheet, Facebook Pos, Dịch vụ tài chính — Nhóm 3 cũ tự ghi 'Tương tự phần 2' nên gộp thẳng vào luồng xử lý chung này.\n• THÊM MỚI (tô đỏ, mục 1.26): 'Chức năng/dịch vụ khác chưa có trong danh sách' — thay thế Nhóm 2 cũ ('Chức năng chưa đáp ứng', vốn chỉ có hướng dẫn '(Điền tay chức năng thiếu vào Chi tiết)').`,
+        list: ["1.1. Màn hình bán hàng","1.2. Nhập hàng","1.3. Đặt hàng","1.4. Báo cáo","1.5. Đối tác","1.6. Sổ quỹ","1.7. Thiết lập","1.8. Đặt bàn","1.9. Màn hình bếp","1.10. Quản lý khách hàng / tích điểm","1.11. Quản lý khuyến mãi / voucher","1.12. In bếp","1.13. Hoá đơn điện tử","1.14. Tích hợp bán Grab / Shopee Food...","1.15. Phòng / bàn","1.16. Nhân viên","1.17. Chức năng của Employee","1.18. Kship","1.19. MyKiot","1.20. Sàn thương mại điện tử","1.21. Timesheet","1.22. Facebook Pos","1.23. Dịch vụ tài chính","1.24. Chức năng/dịch vụ khác chưa có trong danh sách (điền tay chức năng chưa có vào chi tiết)"],
+        flows: [
+            { cond: "Đã có chức năng nhưng chưa phù hợp", steps: [], note: "Mô tả đầy đủ: Tính năng/dịch vụ nào đang gặp vấn đề (lỗi hoặc chưa đáp ứng) + Lỗi cụ thể như nào / Vì sao không hài lòng, không đáp ứng được việc kinh doanh của cửa hàng + Đã có ticket (TK) hỗ trợ chưa + Đã tạo TK cho khách hàng chưa + Tiến độ xử lý như nào + Phản hồi về việc xử lý từ DVKH/PTSP báo như nào." },
+            { cond: "Chưa có chức năng", steps: ["Theo dõi tiếp - chưa có kết quả", "Phản hồi/thông báo kết quả xử lý cho khách", "Không xử lý được", "Không liên hệ được KH - Hẹn thời gian liên hệ lại", "Chọn ngày liên hệ lại"], note: "" }
+        ]
+    },
+    {
+        id: "g2", title: "2. Phần cứng",
+        changes: `🆕 MỞ RỘNG DANH MỤC (toàn bộ cần tạo mới trên CRM):\n• Trước đây chỉ có 4 nhóm chung chung: Máy in hóa đơn / Máy in tem / Máy quét mã vạch / Phần cứng KH.\n• Nay thay bằng ĐẦY ĐỦ 25 model thiết bị thực tế (đánh số 2.1–2.25), thêm phần phần cứng chưa có`,
+        list: ["2.1. Máy quét đa tia Kpos XL-2302","2.2. Màn hình hiển thị QR KV99","2.3. Kpos XL-6500A (Sunlux)","2.4. Máy quét mã vạch KV910","2.5. Máy POS D68 Single","2.6. Máy POS D68 Dual","2.7. Máy POS D10 NFC","2.8. Máy POS D10 Pro","2.9. Máy SoftPOS KV88","2.10. Máy in hóa đơn KV804","2.11. Máy in hóa đơn TP80NL","2.12. Máy in hóa đơn KV838","2.13. Máy in hóa đơn cầm tay KV500","2.14. Máy in hóa đơn để bàn KV505","2.15. Máy in mã vạch 2 tem XP-365B","2.16. Máy in tem sàn 410B","2.17. Máy in mã vạch D35","2.18. Khay đựng tiền CK-405","2.19. Máy chấm công KPOS N308","2.20. Giấy in nhiệt K80x45","2.21. Giấy in nhiệt K80x80","2.22. Decal 2 tem (35x22x30m)","2.23. Decal 1 tem (50x30x30m)","2.24. Decal 1 tem (40x25x30m)","2.25. Loa không dây KV66","2.26. Phần cứng chưa có trong danh sách (điền tay phần cứng thiếu vào chi tiết)"],
+        flows: [
+            { cond: "Chưa có phần cứng", steps: ["Đề xuất khuyến mãi/hỗ trợ trình SM", "Sales điền picklist đề xuất khuyến mãi (Giá, Phần cứng, Thời gian sử dụng, Voucher giao vận, Tính năng)", "Mô tả khuyến mãi đề xuất cụ thể (Ví dụ: Giá: Giảm 200K cho KH)"], note: "Mô tả đầy đủ: Phần cứng bị hỏng/hư hay khách chưa có phần cứng cần phần cứng hỗ trợ việc kinh doanh của cửa hàng + Đã xin chương trình tặng máy cho khách được duyệt chưa + Đã gửi khách và khách chốt chưa hay như nào." },
+            { cond: "Đã có phần cứng nhưng lỗi", steps: ["Theo dõi tiếp - chưa có kết quả", "Phản hồi/thông báo kết quả xử lý cho khách", "Không xử lý được", "Không liên hệ được KH - Hẹn thời gian liên hệ lại", "Chọn ngày liên hệ lại"], note: "" }
+        ]
+    },
+    {
+        id: "g3", title: "3. CSKH không tốt",
+        changes: "Gộp mục 3 Sales CSKH không tốt và 4 DVKH chăm sóc KH không tốt thành CSKH không tốt",
+        nested: [
+            { sub: "3.1. Sale chăm sóc không tốt", items: [
+                { name: "3.1.1. Sales ký mới không hướng dẫn KH dùng / không hỗ trợ được vấn đề của KH", note: "Mô tả đầy đủ: Sale Ký mới nào chưa hướng dẫn và hỗ trợ cho khách phần nào, khách vướn phần nào + Tiếp nhận vấn đề có hỗ trợ được cho khách không hay đã tạo ticket cho khách để DVKH hỗ trợ cho khách chưa." },
+                { name: "3.1.2. KH muốn được hỗ trợ trực tiếp nhưng sales không đến được", note: "" },
+                { name: "3.1. 3. Sales tái ký chăm sóc khách hàng không tốt", note: "Mô tả đầy đủ: Trường này là bản thân người đang chăm kháh tái ký chưa làm tốt chứ ko phải tái ký cũ - Đang không làm tốt cái gì cho khách hàng." }
+            ]},
+            { sub: "3.2. DVKH chăm sóc không tốt", items: [
+                { name: "3.2.1. Không liên hệ được tổng đài", note: "Mô tả đầy đủ: Khách liên hệ vào lúc nào thời gian nào theo số tổng đài hay kênh nào - sau khi không liên hệ được tổng đài thì khách hàng có liên hệ lại sale để hỗ trợ không" },
+                { name: "3.2.2. Vấn đề không được tổng đài xử lý triệt để", note: "Mô tả đầy đủ: Khách gặp vấn đề gì - đã yểu cầu hỗ trợ mấy lần + check có bao nhiêu ticket hỗ trợ liên quan + đã có phương án nào khác hỗ trợ khách chưa+ hiện có ảnh hưởng lớn đếnw cửa hàng không." },
+                { name: "3.2.3. Không được chủ động chăm sóc trong quá trình dùng", note: "Mô tả đầy đủ: là không chăm sóc như nào trong quá trình sử dụng, lỗi tính năng liên hệ khôn g hỗ trợ hay như nào" }
+            ]}
+        ]
+    },
+    {
+        id: "g4", title: "4. Tình hình kinh doanh",
+        verif: [
+            { sub: "4.1. KH bỏ hẳn không kinh doanh nữa", note: "Mô tả đầy đủ: Khách ngừng kinh doanh đã check các kênh BI tín hiệu như nào, fanpage, shoppe còn đăng bài không, Đã check thử ký mới chưa, trực tiếp cửa hàng có còn mở cửa không.",
+              branches: [
+                  { type: "Xác minh Online (multi-select)", ways: "Xác minh qua google, facebook, shopee, website, tiktok, zalo, instargram, Cổng tra cứu mã số thuế", logic: [
+                      { stt: "Đúng thông tin khách chia sẻ", steps: ["Không xử lý được"] },
+                      { stt: "Sai thông tin khách chia sẻ", steps: ["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại", "Điền khi không xác thực được nguyên nhân mới"] }
+                  ]},
+                  { type: "Xác minh Offline", ways: "Đi trực tiếp cửa hàng / Khu vực không có sales tái ký, nhờ ký mới check", logic: [
+                      { stt: "Đúng thông tin khách chia sẻ", steps: ["Không xử lý được"] },
+                      { stt: "Sai thông tin khách chia sẻ", steps: ["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"] }
+                  ]}
+              ]
+            },
+            { sub: "4.2. KH chỉ tạm ngừng kinh doanh", note: "Mô tả đầy đủ: Khách tạm ngưng đến bao giờ cụ thể 2 tháng 3 tháng hay 6 tháng, Tạm ngưng để sửa cửa hàng hay tạm ngưng để làm gì", branches: [
+                { type: "Xác minh Online & Offline", ways: "(Như 4.1)", logic: [{ stt: "Đúng thông tin khách chia sẻ", steps: ["Chọn ngày liên hệ lại"]}, {stt: "Sai thông tin khách chia sẻ", steps: ["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}] }
+            ]},
+            { sub: "4.3. KH sang nhượng cửa hàng cho người khác", note: "Mô tả đầy đủ: Khách chuyển nhượng lâu chưa, có chuyển nhượng phần mềm không, người mới là ai xin sđt người mới.", branches: [
+                { type: "Xác minh Online & Offline", ways: "(Như 4.1)", logic: [{ stt: "Đúng thông tin khách chia sẻ", steps: ["Không xử lý được"]}, {stt: "Sai thông tin khách chia sẻ", steps: ["Liên hệ KH mới", "Chọn ngày liên hệ lại"]}] }
+            ]},
+            { sub: "4.4. Kinh doanh kém, thấy PM không cần thiết", note: "Mô tả đầy đủ: Khách kinh doanh kém như nào tín hiệu BI doanh thu có sụt giảm không, tín hiệu sử dụng ra hoá đơn các kiểu có bị giảm không hay như nào.\nNote sai thông tin: BI cung cấp báo cáo, yêu cầu sales check xác minh thông tin -> nếu sai thông tin -> Sales tạo act mới", branches: [
+                { type: "Xác minh Online & Offline", ways: "(Như 4.1)", logic: [{ stt: "Đúng thông tin khách chia sẻ", steps: ["Không xử lý được"]}, {stt: "Sai thông tin khách chia sẻ", steps: ["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}], extra: ["Đề xuất khuyến mãi/hỗ trợ trình SM", "Sales điền picklist đề xuất...", "Mô tả KM"] }
+            ]}
+        ]
+    },
+    {
+        id: "g5", title: "5. KH dùng gian hàng khác của KV",
+        verif: [
+            { sub: "5.1. KH ký mới GH khác", note: "Mô tả đầy đủ: Khách hàng ký mới GH nào + Có cùng địa chỉ không + có thuộc vào các quy trình khách hàng ký gian hàng khác 90 ngày hay thuộc trường hợp ký mới trùng khách hay khách hàng có nhiều gian hàng tái Ký gộp link gộp chi nhánh. + Nếu thược các trường hợp được xoá op đã báo xoá op điền đoc xoá op chưa, đã được xử lý xoá op chứ", branches: [
+                { type: "Xác minh Online / Offline", ways: "Check Google, FB... / Cửa hàng", logic: [{stt:"Đúng thông tin khách chia sẻ", steps:["Phối hợp xử lý gian hàng (gộp/xoá OPP)", "Chọn gian hàng trùng", "Chuyển QA để QA lọc và check xóa opt"]}, {stt:"Sai thông tin khách chia sẻ", steps:["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}] }
+            ]},
+            { sub: "5.2. KH mua gian hàng thanh lý", note: "Mô tả đầy đủ: Mua ở đâu - mua qua ai-ai giới thiệu hay mua trên web nào.", branches: [
+                { type: "Xác minh Online / Offline", logic: [{stt:"Đúng thông tin khách chia sẻ", steps:["Không xử lý được", "Chọn gian hàng thanh lý mà KH mua"]}, {stt:"Sai thông tin khách chia sẻ", steps:["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}] }
+            ]}
+        ]
+    },
+    {
+        id: "g6", title: "6. Không liên hệ được KH",
+        verif: [
+            { sub: "6.1. Sai số", note: "Tái ký gửi các case không liên hệ được cho OM -> OM chuyển Retail lấy thông tin SĐT trên hóa đơn -> Tái ký chuyển thông tin cho KMS để check trùng SĐT giữa hóa đơn và CRM -> Nếu không trùng -> Tái ký liên hệ kH", branches: [
+                { type: "Xác minh", logic: [{stt:"Đúng thông tin KH", steps:["Không xử lý được"]}, {stt:"Sai thông tin KH", steps:["Liên hệ KH theo thông tin mới", "Chọn ngày liên hệ lại"]}] }
+            ]},
+            { sub: "6.2 Thuê bao / 6.3 Không nghe / 6.6 Tắt máy ngang", note: "", branches: [
+                { type: "Xác minh", logic: [{stt:"Đúng thông tin KH", steps:["Không xử lý được"]}, {stt:"Sai thông tin KH", steps:["Liên hệ KH theo thông tin mới", "Chọn ngày liên hệ lại"]}] }
+            ]},
+            { sub: "6.4. SĐT không liên quan đến cửa hàng", note: "", branches: [
+                { type: "Xác minh", logic: [{stt:"Đúng thông tin KH", steps:["Không xử lý được"]}, {stt:"Sai thông tin KH", steps:["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}] }
+            ]},
+            { sub: "6.5. KH báo bận, hẹn liên hệ lại sau", note: "", branches: [
+                { type: "Hành động", logic: [{stt:"Thực hiện", steps:["Hẹn lịch liên hệ lại", "Chọn ngày liên hệ lại"]}] }
+            ]}
+        ]
+    },
+    { id: "g7", title: "7. Nguyên nhân về giá", flows: [{cond:"7.1. Nguyên nhân về giá", steps:["Đề xuất khuyến mãi/hỗ trợ trình SM", "Sales điền picklist...", "Mô tả khuyến mãi đề xuất cụ thể"], note:"Mô tả đầy đủ: Khách chê giá như nào+ Đã báo gói nào + Đã báo KM như nào+ thái độ của khách với chương như nào + có chốt được không + Nếu chứ chốt đc đã báo Sm chưa + đề xuất SM KM gì rồi + được duyệt chưa"}] },
+    { id: "g8", title: "8. Mua để đối phó, mua làm quà tặng", flows: [{cond:"8.1. Mua để đối phó, mua làm quà tặng", steps:[], note:"Mô tả đầy đủ: Đối phó cái gì thuế hay gì + Tặng là tặng cho ai + Có kahr năng gia hạn lại không + có đề xuất KM gì không"}] },
+    { id: "g9", title: "9. Không có người dùng / thói quen", verif: [{sub:"9.1. Lớn tuổi ngại dùng / 9.2 Quản lý thủ công / sổ sách", note:"Mô tả đầy đủ: Người lớn tuổi bao tuổi + không có người dùng là không có nhân viên hay như nào + có đi trực tiếp xác nhận chưa", branches:[{type:"Xác minh offline", ways:"Đi trực tiếp cửa hàng / Nhờ ký mới check", logic:[{stt:"Đúng thông tin KH", steps:["Hướng dẫn/đào tạo sử dụng phần mềm cho KH", "Không xử lý được"]}, {stt:"Sai thông tin KH", steps:["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}]}]}] },
+    { id: "g10", title: "10. Đang theo dõi / xử lý", flows: [
+        {cond:"10.1. Đã báo giá, KH chưa phản hồi", steps:["Đề xuất khuyến mãi/hỗ trợ trình SM..."], note:"Mô tả đầy đủ: Đã báo những giá gì + báo qua đâu + Khách có phản ứng gì không + Phân vân thì phân vân cái gì"},
+        {cond:"10.2. Đã đồng ý gia hạn, chờ thanh toán", steps:["Hẹn lịch liên hệ lại", "Chọn ngày liên hệ lại"], note:"Mô tả đầy đủ: Đồng ý gói nào, gửi Qr chưa + khi nào khách thanh toán"},
+        {cond:"10.3. Đang setup / chuyển đổi dữ liệu", steps:["Đề xuất khuyến mãi/hỗ trợ trình SM...", "Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"], note:""}
+    ] },
+    { id: "g11", title: "11. Lo ngại liên quan đến Thuế", verif: [{sub:"11.1 Sợ bị kiểm tra / 11.2 Bị cơ quan thuế chỉ định PM khác", note:"", branches:[{type:"Xác minh Offline", ways:"Đi trực tiếp cửa hàng", logic:[{stt:"Đúng thông tin khách chia sẻ", steps:["Không xử lý được"]}, {stt:"Sai thông tin KH", steps:["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}]}]}] },
+    { id: "g12", title: "12. KH dùng phần mềm khác", list: ["12.1. Sapo","12.2. Viettel","12.3. VNPay","12.4. VNPT","12.5. POS365","12.6. Pancake","12.7. Ocha","12.8. Nhanh","12.9. Misa","12.10. iPOS","12.11. Haravan","12.12. CukCuk","12.13. ABCPay","12.14. Getfly","12.15. Mekong","12.16. Nextsoft","12.17. Ngân Long","12.18. Nobita","12.19. MySpa","12.20. SalonHero","12.21. Fabi","12.22. Phần mềm tự viết","12.23. Khác (KH không chia sẻ)","12.24. Phần mềm chuyên dụng cho ngành","12.25. PosApp","12.26. Phần mềm của sàn TMĐT","12.27. Fast","12.28. EasyBook","12.29. Ánh Sáng","12.30. Tân Phú Minh","12.31. Moss Pharma","12.32. Sổ Bán Hàng","12.33. Web Nhà Thuốc","12.34. Viethas","12.35. Suno","12.36. Niềm Tin","12.37. Muaday","12.38. IDSPA","12.39. GPOS","12.40. SaleWork","12.41. FPT-TiktakPOS","12.42. Tuha","12.43. SkyHotel","12.44. mSeller","12.45. Lý Phú Vinh","12.46. Tân Nguyên","12.47. Easy Invoice","12.48. Dantri Shop","12.49. Moola","12.50. Zinwork","12.51. Winta","12.52. TPOS","12.53. Miscom","12.54. TP Soft","12.55. EasySalon","12.56. HTPOS","12.57. PM Bưu điện","12.58. Phần mềm Offline"], verif: [{sub:"Luồng kiểm tra & Xử lý (Dành cho mọi PM đối thủ)", note:"Mô tả đầy đủ: Dùng phần mềm nào + Đã ký HĐ chưa hay đang tham khảo+ Đã ký là ký trước khi tái Ký tiếp cận hay sau khi Tái Ký tiếp cận (thời gian dùng từ bao lâu)", branches:[{type:"Xác minh thông tin online & offline", ways:"Google, FB, cổng thuế, trực tiếp cửa hàng...", logic:[{stt:"Đúng thông tin KH", steps:["Chọn: Đã mua HOẶC Đang cân nhắc"]}, {stt:"Sai thông tin KH", steps:["Tiếp tục thuyết phục KH", "Chọn ngày liên hệ lại"]}], extra:["Đề xuất khuyến mãi/hỗ trợ trình SM", "Sales điền picklist đề xuất...", "Mô tả khuyến mãi đề xuất cụ thể"]}]}] }
+];
+
+// ==========================================
+// 2. DATA QUIZ MCQ 
+// ==========================================
+const quizData = [
+    { q: 'Trong mục "Chức năng PM", nhóm chức năng nào sau đây ĐƯỢC GỘP MỚI từ Nhóm 3 (cũ) sang Nhóm 1?', opts: ['A. Màn hình bán hàng, Nhập hàng, Đặt hàng', 'B. Kship, MyKiot, Sàn TMĐT, Timesheet, Facebook Pos, Dịch vụ tài chính', 'C. Chức năng của FBPos, Chức năng của MyKiot'], ans: 1, exp: 'Chính xác! Cập nhật mới ghi rõ: GỘP MỚI (từ Nhóm 3 cũ): Shipping -> Kship, MyKiot, Sàn TMĐT... vào thẳng luồng xử lý chung.' },
+    { q: 'Danh mục phần cứng trên CRM hiện tại được mở rộng thành bao nhiêu model thiết bị thực tế?', opts: ['A. 4 nhóm thiết bị chung chung', 'B. 15 model thiết bị', 'C. ĐẦY ĐỦ 25 model thiết bị thực tế'], ans: 2, exp: 'Chính xác! Bản mới đã mở rộng thành ĐẦY ĐỦ 25 model (Ví dụ Kpos XL-2302, KV99...) để có thể picklist chi tiết.' },
+    { q: 'Khi KH phàn nàn "Không liên hệ được tổng đài", Sale cần note những thông tin gì bắt buộc?', opts: ['A. Khách liên hệ vào thời gian nào, theo kênh nào và có liên hệ lại sale không', 'B. Chỉ cần note số điện thoại của khách', 'C. Note lỗi phần mềm mà khách đang gặp phải'], ans: 0, exp: 'Chính xác! Luồng 3.2.1 yêu cầu Note CRM rõ: "Khách liên hệ vào lúc nào thời gian nào... sau đó có liên hệ lại sale không".' },
+    { q: 'Để xác minh KH "Bỏ hẳn không kinh doanh" qua kênh Online, Sale cần check thông tin ở những đâu?', opts: ['A. Chỉ cần check Google và Facebook là đủ', 'B. Bắt buộc check Google, Facebook, Shopee, Website, Tiktok, Zalo, Instargram, Cổng MST', 'C. Không cần check Online, chỉ cần đi trực tiếp cửa hàng'], ans: 1, exp: 'Chính xác! Quy định bắt buộc phải check online đa kênh (multi-select) theo danh sách 8 kênh liệt kê.' },
+    { q: 'Nếu KH ký mới gian hàng khác (Xác minh Đúng thông tin), luồng xử lý Bước 1 là gì?', opts: ['A. Tiếp tục thuyết phục KH', 'B. Không xử lý được, đóng ticket', 'C. Phối hợp xử lý gian hàng (gộp/xoá OPP)'], ans: 2, exp: 'Chính xác! Luồng 5.1 (Đúng thông tin) Bước 1 là: Phối hợp xử lý gian hàng (gộp/xoá OPP) -> Chọn gian hàng trùng -> QA lọc check.' },
+    { q: 'Đối với nguyên nhân "Sai số", sau khi OM chuyển Retail lấy SĐT trên hóa đơn, Tái ký cần làm gì tiếp theo?', opts: ['A. Tự động liên hệ khách theo số mới ngay lập tức', 'B. Chuyển thông tin cho KMS để check trùng SĐT giữa hóa đơn và CRM', 'C. Yêu cầu khách gửi lại số đúng qua email'], ans: 1, exp: 'Chính xác! Luồng check chéo ghi rõ: Tái ký chuyển KMS check trùng -> Nếu KHÔNG TRÙNG thì Tái ký mới liên hệ KH.' },
+    { q: 'Khi đề xuất KM/hỗ trợ trình SM về Nguyên nhân Giá, Sales cần điền picklist gồm những yếu tố nào?', opts: ['A. Giá, Phần cứng, Thời gian sử dụng, Voucher giao vận, Tính năng', 'B. Chỉ cần điền Giá và Thời gian sử dụng', 'C. Giá, Phần cứng và Voucher giao vận'], ans: 0, exp: 'Chính xác! Luồng 7.1 yêu cầu điền Picklist gồm 5 yếu tố này để trình duyệt.' },
+    { q: 'Đối với nguyên nhân "Người lớn tuổi ngại dùng" (Xác minh đúng thông tin), hướng xử lý đúng là?', opts: ['A. Đánh dấu "Không xử lý được" ngay lập tức', 'B. Chuyển cho bộ phận DVKH xử lý', 'C. Hướng dẫn/đào tạo sử dụng phần mềm cho KH'], ans: 2, exp: 'Chính xác! Luồng 9.1 Bước 1 là "Hướng dẫn/đào tạo", sau đó nếu vẫn không được mới chọn "Không xử lý được".' },
+    { q: 'KH thuộc nhóm "Đã báo giá, chưa phản hồi", thông tin Note Activity bắt buộc trên CRM là gì?', opts: ['A. Chỉ cần note số tiền đã báo giá', 'B. Đã báo những giá gì + báo qua đâu + Khách phản ứng gì + Phân vân gì', 'C. Note thời gian hẹn gọi lại'], ans: 1, exp: 'Chính xác! Kịch bản Note 10.1 bắt buộc đủ 4 ý: Báo giá gì, Báo qua kênh nào, Khách phản ứng ra sao và Phân vân cái gì.' },
+    { q: 'KH "Sợ dùng PM bị thuế kiểm tra", yêu cầu XÁC MINH bắt buộc là gì?', opts: ['A. Xác minh Offline (Đi trực tiếp cửa hàng / Nhờ sales khu vực)', 'B. Xác minh Online (Check Cổng MST)', 'C. Xác minh qua điện thoại (Gọi điện hỏi trực tiếp)'], ans: 0, exp: 'Chính xác! Đối với vấn đề nhạy cảm liên quan Thuế (11.1 & 11.2), yêu cầu duy nhất là phải XÁC MINH OFFLINE.' },
+    { q: 'Kịch bản Note cho KH dùng phần mềm đối thủ BẮT BUỘC phải có thông tin nào?', opts: ['A. Tính năng của phần mềm đối thủ có gì hơn', 'B. Đã ký HĐ chưa, ký TRƯỚC hay SAU khi Tái Ký tiếp cận (thời gian dùng)', 'C. Giá của phần mềm đối thủ là bao nhiêu'], ans: 1, exp: 'Chính xác! Kịch bản Note Nhóm 12 quy định: Đã ký chưa? Ký trước hay sau khi Tái Ký tiếp cận (thời gian dùng từ bao lâu).' },
+    { q: 'Có bao nhiêu phần mềm đối thủ được liệt kê chi tiết trong danh sách Picklist CRM?', opts: ['A. 10 phần mềm phổ biến', 'B. 30 phần mềm', 'C. 58 phần mềm'], ans: 2, exp: 'Chính xác! Danh mục 12 liệt kê đầy đủ tới 58 phần mềm (Sapo, Viettel, POS365 đến PM Bưu điện...) để picklist.' }
+];
+
+// ==========================================
+// 3. LOGIC APP & UX TƯƠNG TÁC
+// ==========================================
+let currentLesson = 0, completedLessons = new Set(), currentQuiz = 0, quizAnswers = {};
+const el = id => document.getElementById(id);
+
+// --- TOGGLE LEFT PANEL AUTO/MANUAL ---
+let isLeftPanelOpen = true;
+function toggleSidePanel() {
+    const panel = el('leftPanel');
+    const content = el('leftPanelContent');
+    const btn = el('togglePanelBtn');
+    if(isLeftPanelOpen) {
+        panel.style.width = '0px'; panel.style.minWidth = '0px';
+        content.style.opacity = '0';
+        btn.innerHTML = '<i class="fas fa-chevron-right text-[10px]"></i>';
+    } else {
+        panel.style.width = '35%'; panel.style.minWidth = '320px';
+        setTimeout(() => content.style.opacity = '1', 200);
+        btn.innerHTML = '<i class="fas fa-chevron-left text-[10px]"></i>';
+    }
+    isLeftPanelOpen = !isLeftPanelOpen;
+}
+
+// --- SIDEBAR DRAG RESIZER ---
+const sidebar = el('mainSidebar');
+const resizer = el('sidebarResizer');
+let isResizing = false;
+
+resizer.addEventListener('mousedown', () => { 
+    isResizing = true; 
+    document.body.classList.add('resizing');
+    document.body.style.cursor = 'col-resize'; 
+});
+document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+    let newWidth = e.clientX;
+    if(newWidth < 260) newWidth = 260; // Min width
+    if(newWidth > 500) newWidth = 500; // Max width
+    sidebar.style.width = newWidth + 'px';
+});
+document.addEventListener('mouseup', () => { 
+    isResizing = false; 
+    document.body.classList.remove('resizing');
+    document.body.style.cursor = 'default'; 
+});
+
+// --- MOBILE MENU TOGGLE ---
+function toggleMobileMenu() {
+    const sb = el('mainSidebar');
+    const overlay = el('mobileOverlay');
+    if(sb.classList.contains('open')) {
+        sb.classList.remove('open');
+        overlay.classList.add('hidden');
+    } else {
+        sb.classList.add('open');
+        overlay.classList.remove('hidden');
+    }
+}
+
+// --- RENDER UTILS ---
+const renderVerticalTimeline = steps => {
+    if(!steps || !steps.length) return `<div class="text-[13px] text-slate-400 italic font-medium"><i class="fas fa-flag-checkered mr-1"></i> Luồng kết thúc tại đây</div>`;
+    return `
+        <div class="timeline-line relative space-y-4 pt-2 mb-2">
+            ${steps.map((s,i) => `
+                <div class="relative flex items-start gap-4 group">
+                    <div class="z-10 bg-white border-2 border-blue-500 text-blue-600 w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black shrink-0 shadow-sm mt-0.5 group-hover:scale-110 transition-transform">B${i+1}</div>
+                    <div class="bg-white border border-slate-200 px-4 py-3 rounded-xl shadow-sm text-[13px] font-medium text-slate-700 flex-1 hover:border-blue-300 transition-colors">${s}</div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+};
+
+const renderNote = note => note ? `<div class="mt-5 p-4 bg-amber-50/80 border border-amber-200 rounded-xl text-[13px] text-amber-900 leading-relaxed shadow-sm"><div class="font-bold text-amber-700 flex items-center gap-1.5 mb-1.5"><i class="fas fa-edit"></i> Kịch bản Note CRM:</div>${note}</div>` : '';
+
+// --- INIT APP ---
+function initApp() { renderSidebar(); loadLesson(0); }
+
+function renderSidebar() {
+    let html = '';
+    masterData.forEach((d, idx) => {
+        let isDone = completedLessons.has(idx);
+        html += `
+            <li class="cursor-pointer group border-b border-slate-800/30" onclick="loadLesson(${idx})">
+                <div class="px-5 py-3.5 border-l-[3px] transition-all flex items-center justify-between
+                    ${idx === currentLesson ? 'bg-slate-800/80 border-blue-500 text-white font-semibold' : 'border-transparent text-slate-400 hover:bg-slate-800 hover:text-white'}">
+                    <span class="truncate text-[13px] pr-2">${d.title}</span>
+                    ${isDone ? `<i class="fas fa-check-circle text-emerald-500 text-[11px]"></i>` : `<i class="fas fa-circle text-slate-700 text-[6px]"></i>`}
+                </div>
+            </li>
+        `;
+    });
+    el('lessonMenu').innerHTML = html;
+    let pct = Math.round((completedLessons.size / masterData.length) * 100);
+    el('progressText').innerText = `${pct}%`;
+    el('progressBar').style.width = `${pct}%`;
+    el('completedCountText').innerText = `Hoàn thành: ${completedLessons.size} / 12 chủ đề`;
+    renderDots();
+}
+
+function renderDots() {
+    let html = masterData.map((_, i) => `<div class="w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentLesson ? 'bg-blue-600 scale-[1.8]' : 'bg-slate-300'}"></div>`).join('');
+    el('lessonDots').innerHTML = html;
+}
+
+function navLesson(dir) {
+    let next = currentLesson + dir;
+    if(next >= 0 && next < masterData.length) loadLesson(next);
+}
+
+function loadLesson(idx) {
+    if(!el('view-quiz').classList.contains('hidden')) switchMode('learn');
+    currentLesson = idx;
+    const data = masterData[idx];
+    
+    // Header & Nav
+    el('learnTitle').innerText = data.title;
+    el('btnLPrev').disabled = (idx === 0);
+    el('btnLNext').disabled = (idx === masterData.length - 1);
+    el('lessonCounterMobile').innerText = `${idx+1}/12`;
+    renderSidebar(); // Update UI list & dots
+    
+    // Đóng Mobile menu nếu đang mở
+    if(window.innerWidth <= 768) toggleMobileMenu();
+
+    // AUTO-COLLAPSE LOGIC (Khung bên phải tự động giãn ra nếu ko có Box Vàng/Xanh)
+    const hasLeftData = data.changes || data.list;
+    const panel = el('leftPanel');
+    const toggleBtn = el('togglePanelBtn');
+    
+    if(!hasLeftData) {
+        panel.style.display = 'none';
+        toggleBtn.style.display = 'none';
+    } else {
+        panel.style.display = 'flex';
+        toggleBtn.style.display = 'flex';
+        if(isLeftPanelOpen && window.innerWidth > 768) {
+            panel.style.width = '35%'; panel.style.minWidth = '320px';
+        }
+        
+        // Render Box
+        const yBox = el('yellowBox');
+        if(data.changes) { yBox.classList.remove('hidden'); el('yellowText').innerText = data.changes; } 
+        else yBox.classList.add('hidden');
+
+        const gBox = el('greenBox');
+        if(data.list) { gBox.classList.remove('hidden'); el('greenList').innerHTML = data.list.map(item => `<li>${item}</li>`).join(''); } 
+        else gBox.classList.add('hidden');
+    }
+
+    // Right Panel Content (Flows)
+    let html = ``;
+
+    if(data.flows) {
+        data.flows.forEach(f => {
+            html += `
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-soft overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2 bg-gradient-to-r from-slate-50 to-white">
+                        <i class="fas fa-dot-circle text-blue-500"></i><div class="font-bold text-slate-800 text-[14px]">Tình huống: ${f.cond}</div>
+                    </div>
+                    <div class="p-6">${renderVerticalTimeline(f.steps)}${renderNote(f.note)}</div>
+                </div>
+            `;
+        });
+    }
+
+    if(data.nested) {
+        data.nested.forEach(n => {
+            html += `
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-soft overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-50 to-white px-6 py-4 font-bold text-slate-800 border-b border-slate-200 flex items-center gap-2"><i class="fas fa-sitemap text-slate-400"></i>${n.sub}</div>
+                    <div class="p-6 space-y-4 bg-slate-50/30">
+                        ${n.items.map(item => `
+                            <div class="border border-slate-200 rounded-xl p-5 bg-white shadow-sm hover:border-blue-300 transition-colors">
+                                <div class="font-bold text-blue-700 text-[14px] mb-2">${item.name}</div>
+                                ${renderNote(item.note)}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    if(data.verif) {
+        data.verif.forEach(v => {
+            html += `
+                <div class="bg-white border border-slate-200 rounded-2xl shadow-soft overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-50 to-white px-6 py-4 font-bold text-blue-800 border-b border-blue-100 flex items-center gap-2">
+                        <i class="fas fa-search-location"></i> ${v.sub}
+                    </div>
+                    <div class="p-6">
+                        ${v.note ? `<div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl text-[13px] text-blue-900 shadow-sm font-medium"><i class="fas fa-info-circle mr-1 text-blue-500"></i> ${v.note}</div>` : ''}
+                        
+                        <div class="space-y-6">
+                            ${v.branches.map(br => `
+                                <div class="border-2 border-slate-100 rounded-2xl p-6 relative bg-slate-50/50">
+                                    <div class="absolute -top-3 left-6 bg-slate-700 text-white text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded shadow-sm">BƯỚC 1: ${br.type}</div>
+                                    ${br.ways ? `<div class="text-[13px] text-slate-600 mb-5 mt-2 font-medium bg-white p-3 rounded-lg border border-slate-200 inline-block shadow-sm"><i class="fas fa-wifi text-slate-400 mr-2"></i> ${br.ways}</div>` : ''}
+                                    
+                                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-2">
+                                        ${br.logic.map(lg => {
+                                            let isRight = lg.stt.includes('Đúng'); let isWrong = lg.stt.includes('Sai');
+                                            let badgeClass = isRight ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : isWrong ? 'bg-rose-100 text-rose-700 border-rose-200' : 'bg-slate-100 text-slate-700 border-slate-200';
+                                            let icon = isRight ? 'fa-check-circle' : isWrong ? 'fa-times-circle' : 'fa-info-circle';
+                                            return `
+                                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+                                                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold mb-4 border ${badgeClass} uppercase tracking-wide">
+                                                    <i class="fas ${icon}"></i> Trạng thái: ${lg.stt}
+                                                </div>
+                                                ${renderVerticalTimeline(lg.steps)}
+                                            </div>
+                                        `}).join('')}
+                                    </div>
+                                    ${br.extra ? `<div class="mt-6 pt-5 border-t border-slate-200"><div class="text-[12px] font-bold text-slate-500 mb-3 uppercase tracking-wide"><i class="fas fa-level-down-alt mr-1"></i> Luồng xử lý bổ sung</div>${renderVerticalTimeline(br.extra)}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    el('flowContent').innerHTML = html;
+    el('rightPanel').scrollTop = 0;
+    
+    // Cập nhật Trạng thái nút Đã hiểu bài
+    let btn = el('btnMarkDone');
+    if(completedLessons.has(idx)) {
+        btn.innerHTML = `<i class="fas fa-check-circle"></i> <span class="hidden sm:inline">Đã hoàn thành</span>`;
+        btn.classList.add('bg-slate-100', 'text-slate-500', 'border-slate-200');
+        btn.classList.remove('bg-emerald-100', 'text-emerald-700', 'border-emerald-200', 'hover:bg-emerald-200');
+        btn.disabled = true;
+    } else {
+        btn.innerHTML = `<i class="fas fa-check"></i> <span class="hidden sm:inline">Đã hiểu bài</span>`;
+        btn.classList.remove('bg-slate-100', 'text-slate-500', 'border-slate-200');
+        btn.classList.add('bg-emerald-100', 'text-emerald-700', 'border-emerald-200', 'hover:bg-emerald-200');
+        btn.disabled = false;
+        btn.onclick = () => { completedLessons.add(idx); loadLesson(idx); };
+    }
+}
+
+function switchMode(mode) {
+    if(mode === 'quiz') {
+        el('view-learn').classList.add('hidden');
+        el('view-quiz').classList.remove('hidden');
+        if(window.innerWidth <= 768) toggleMobileMenu();
+        loadQuiz(currentQuiz);
+    } else {
+        el('view-quiz').classList.add('hidden');
+        el('view-learn').classList.remove('hidden');
+    }
+}
+
+// --- QUIZ MCQ LOGIC ---
+function loadQuiz(idx) {
+    currentQuiz = idx;
+    
+    el('qBadge').innerText = `CÂU HỎI ${idx + 1}`;
+    el('qText').innerText = quizData[idx].q;
+    el('qCounter').innerText = `${idx + 1} / ${quizData.length}`;
+    el('btnQPrev').disabled = (idx === 0);
+    el('btnQNext').disabled = (idx === quizData.length - 1);
+
+    // Reset Options
+    for(let i=0; i<3; i++) {
+        let btn = el(`btnOpt${i}`);
+        btn.className = "mcq-btn w-full p-4 md:p-5 border-2 border-slate-200 bg-white flex items-center gap-4";
+        btn.disabled = false;
+        el(`txtOpt${i}`).innerText = quizData[idx].opts[i].substring(3);
+        el(`txtOpt${i}`).previousElementSibling.innerText = quizData[idx].opts[i].substring(0,1);
+    }
+
+    if(quizAnswers[idx] !== undefined) showFeedback(quizAnswers[idx]);
+    else el('feedbackBox').classList.add('hidden');
+}
+
+function answerMCQ(selectedIdx) {
+    quizAnswers[currentQuiz] = selectedIdx;
+    showFeedback(selectedIdx);
+}
+
+function showFeedback(selectedIdx) {
+    const isCorrect = (selectedIdx === quizData[currentQuiz].ans);
+    const correctIdx = quizData[currentQuiz].ans;
+
+    for(let i=0; i<3; i++) {
+        let btn = el(`btnOpt${i}`);
+        btn.disabled = true;
+        if(i === correctIdx) {
+            btn.classList.add('mcq-correct');
+            btn.classList.remove('border-slate-200', 'bg-white');
+        } else if (i === selectedIdx && !isCorrect) {
+            btn.classList.add('mcq-wrong');
+            btn.classList.remove('border-slate-200', 'bg-white');
+        } else {
+            btn.classList.add('opacity-40');
+        }
+    }
+
+    el('feedbackBox').classList.remove('hidden');
+    el('feedbackBox').classList.add('flex');
+    
+    if(isCorrect) {
+        el('fbIconBox').className = "w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl md:text-2xl shrink-0 bg-emerald-100 text-emerald-600 shadow-sm";
+        el('fbIcon').className = "fas fa-check";
+        el('fbTitle').innerText = "Chính xác!";
+        el('fbTitle').className = "text-lg md:text-xl font-bold text-emerald-600";
+    } else {
+        el('fbIconBox').className = "w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl md:text-2xl shrink-0 bg-rose-100 text-rose-600 shadow-sm";
+        el('fbIcon').className = "fas fa-times";
+        el('fbTitle').innerText = "Chưa chính xác!";
+        el('fbTitle').className = "text-lg md:text-xl font-bold text-rose-600";
+    }
+    el('fbExplain').innerText = quizData[currentQuiz].exp;
+}
+
+function navQuiz(step) {
+    let next = currentQuiz + step;
+    if(next >= 0 && next < quizData.length) loadQuiz(next);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    initApp();
+    loadQuiz(0);
+});
+</script>
+</body>
+</html>
